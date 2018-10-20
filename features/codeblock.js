@@ -17,7 +17,7 @@ const jobs = {
 		let content = msg.content;
 		const potentialGists = [];
 		blocks.forEach(block => {
-			if (block.split("\n").length > 5 + 2) {
+			if (block.split("\n").length > maxLines + 2) {
 				content = content.replace(block, '');
 				potentialGists.push(block);
 			}

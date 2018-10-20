@@ -73,7 +73,7 @@ channelHandlers.addHandler('479862475047567361', qna); // #general
 
 // common
 channelHandlers.addHandler('*', commands);
-channelHandlers.addHandler('*', codeblock);
+// channelHandlers.addHandler('*', codeblock);
 
 bot.on('messageReactionAdd', (reaction, user) => {
 	channelHandlers.handleReaction(reaction, user);
