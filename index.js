@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 
 const { logger, stdoutLog, channelLog } = require('./features/log');
 
+const codeblock = require('./features/codeblock').default;
 const qna = require('./features/qna').default;
 const jobs = require('./features/jobs').default;
 const commands = require('./features/commands').default;
@@ -72,6 +73,7 @@ channelHandlers.addHandler('479862475047567361', qna); // #general
 
 // common
 channelHandlers.addHandler('*', commands);
+channelHandlers.addHandler('*', codeblock);
 
 bot.on('messageReactionAdd', (reaction, user) => {
 	channelHandlers.handleReaction(reaction, user);
