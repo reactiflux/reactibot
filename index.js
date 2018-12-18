@@ -89,5 +89,9 @@ bot.on('ready', () => {
 	logger.log('INI','Bot connected to Discord server');
 });
 bot.on('error', (err) => {
-	logger.log('ERR', err);
+	try {
+		logger.log('ERR', JSON.stringify(err));
+	} catch(e) {
+		logger.log('ERR', err);
+	}
 });
