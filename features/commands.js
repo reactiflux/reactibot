@@ -157,7 +157,33 @@ Please also provide any code that might help us using the following syntax:
 					}
 				});
 			},
-		},
+    },
+    {
+      words: [
+        `!code`,
+        `!gist`,
+      ],
+      help: `explains how to attach code`,
+      handleMessage: (msg) => {
+        msg.channel.send({
+          embed: {
+            title: 'Attaching Code',
+            type: 'rich',
+            description: `When asking a question, try to include as much relevant code as you can.
+
+You can paste small bits of code directly in chat with syntax highlighting:
+
+\\\`\\\`\\\`js
+// your code goes here
+\\\`\\\`\\\`
+
+Or you can upload larger blocks of code (or files) to a service such as https://gist.github.com.
+`,
+            color: 7506394,
+          }
+        });
+      },
+    },
 		{
 			words: [`!ping`],
 			help: `explains how to ping politely`,
