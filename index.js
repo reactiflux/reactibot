@@ -90,7 +90,7 @@ bot.on('ready', () => {
 });
 bot.on('error', (err) => {
 	try {
-		logger.log('ERR', JSON.stringify(err));
+		logger.log('ERR', err.message);
 	} catch(e) {
 		logger.log('ERR', err);
 	}
