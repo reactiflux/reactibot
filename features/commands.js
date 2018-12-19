@@ -184,6 +184,24 @@ Or you can upload larger blocks of code (or files) to a service such as https://
         });
       },
     },
+    {
+      words: [
+        `!inputs`,
+      ],
+      help: `provides links to uncontrolled vs controlled components`,
+      handleMessage: (msg) => {
+        msg.channel.send({
+          embed: {
+            title: 'Uncontrolled vs Controlled components',
+            type: 'rich',
+            description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
+Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
+            `,
+            color: 7506394,
+          }
+        });
+      },
+    },
 		{
 			words: [`!ping`],
 			help: `explains how to ping politely`,
