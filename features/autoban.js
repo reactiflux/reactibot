@@ -8,12 +8,11 @@ const autoban = {
   }) => {
 		let hasToken = false;
 		autoban.tags.forEach(token => {
-			if(msg.content.toLowerCase().indexOf(`[${token}]`) !== -1) hasToken = true;
+			if(msg.content.toLowerCase().indexOf(token) !== -1) hasToken = true;
 		});
 		if(hasToken) {
-      msg.guild.ban(msg.author.id)
-      .then(user => console.log(`Banned ${user.username || user.id || user} from ${guild}`))
-      .catch(console.error);			
+      msg.delete();
+      msg.guild.ban(msg.author.id);	
 		}
 	}
 }
