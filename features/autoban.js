@@ -1,6 +1,6 @@
 const autoban = {
 	tags: [
-		'sex dating',
+		'sex dating > http://discord.amazingsexdating.com',
 	],
 	handleMessage: ({
     msg,
@@ -11,6 +11,7 @@ const autoban = {
 			if(msg.content.toLowerCase().indexOf(token) !== -1) hasToken = true;
 		});
 		if(hasToken) {
+      msg.author.send(`Hello there! Our automated systems detected your message as a spam message and you have been banned from the server. If this is an error on our side, please feel free to contact on of the moderators.`);
       msg.delete();
       msg.guild.ban(msg.author.id);	
 		}
