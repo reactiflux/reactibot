@@ -210,9 +210,8 @@ Similarly, don’t DM other members without asking first. All of the same proble
 				const { author, channel, mentions } = msg;
 				
 				try {
-					bot.channels.get(newChannel.replace('<#', '').replace('>','')).send(`${author} has opened a portal from ${channel} summoning ${mentions.members.map(i => i).join(' ')}`);
+					msg.guild.channels.get(newChannel.replace('<#', '').replace('>','')).send(`${author} has opened a portal from ${channel} summoning ${mentions.members.map(i => i).join(' ')}`);
 				} catch(e) {
-
 				}
 			}			
 		}		
