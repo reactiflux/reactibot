@@ -103,7 +103,7 @@ In order to fix this, you need to bind your function, either in constructor:
 class YourComponent extends React.Component {
   constructor(props) {
     super(props);
-    this.handleClick = this.handle.click.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick() {
