@@ -2,8 +2,8 @@ const autoban = {
 	tags: [
 		'http://discord.amazingsexdating.com',
 		'http://gambldiscord.bestoffersx.com',
-		'earnings on sports > http://discordbetfaq.whatsappx.com/',
-		'make big money > http://discordbetfaq.whatsappx.com/'
+		'http://discordbetfaq.whatsappx.com/',
+		'http://discord.bestdatingforall.com/'
 	],
 	handleMessage: ({
     msg,
