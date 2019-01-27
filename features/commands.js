@@ -254,7 +254,6 @@ Similarly, don’t DM other members without asking first. All of the same proble
         if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
         cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
         commands.triggers[trigger].handleMessage.call(this, msg);
-        break;
       }
     });
   }
