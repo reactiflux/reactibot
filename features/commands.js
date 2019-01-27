@@ -218,29 +218,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
         const [command, ...args] = msg.content.substring(1).split(/[\s.]/g);
         const { fuse } = await MDN.getStore();
         const [topResult, ...rest] = fuse.search(args.join(" "));
-        const stringDOM = await fetch(
-          `${MDN.baseUrl}${topResult.item.href}`
-        ).then(res => res.text());
-        const { document } = new JSDOM(stringDOM).window;
-        const title = document.querySelector(".document-title").textContent;
-        const description = document.querySelector("#wikiArticle p")
-          .textContent;
-
-        msg.channel.send({
-          embed: {
-            type: "rich",
-            author: {
-              name: "MDN",
-              url: `${MDN.baseUrl}`,
-              icon_url:
-                "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
-            },
-            title,
-            description,
-            color: 0x83d0f2,
-            url: `${MDN.baseUrl}${topResult.item.href}`
-          }
-        });
+	msg.channel.send(`Documentation for ${args.join('.')} - ${MDN.baseUrl}${topResult.item.href}`);
       }
     }
   ],
