@@ -246,18 +246,15 @@ Similarly, don’t DM other members without asking first. All of the same proble
   ],
   handleMessage: ({ msg, user }) => {
     Object.keys(commands.triggers).map(trigger => {
-      let hasWord = false;
-      const words = commands.triggers[trigger].words;
-      words.map(word => {
-        if (msg.content.toLowerCase().indexOf(word) === 0) {
-          hasWord = word;
-        }
-      });
+      const keyword = commands.triggers[trigger].words.find(word => {
+        return msg.content.toLowerCase().indexOf(word) === 0);
+      }
 
-      if (hasWord) {
-        if (cooldown.hasCooldown(msg.author.id, `commands.${hasWord}`)) return;
-        cooldown.addCooldown(msg.author.id, `commands.${hasWord}`);
+      if (keyword) {
+        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
+        cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
         commands.triggers[trigger].handleMessage.call(this, msg);
+        break;
       }
     });
   }

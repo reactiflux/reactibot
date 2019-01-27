@@ -95,15 +95,11 @@ ${msg.content}
 
   handleMessage: ({ msg, user }) => {
     Object.keys(qna.commands).map(trigger => {
-      let hasWord = false;
-      const words = qna.commands[trigger].words;
-      words.map(word => {
-        if (msg.content.toLowerCase().includes(word)) {
-          hasWord = word;
-        }
+      const keyword = words.find(word => {
+        return msg.content.toLowerCase().includes(word);
       });
 
-      if (hasWord) {
+      if (keyword) {
         msg.guild.fetchMember(user.id).then(user => {
           if (qna.allowedRoles.find(role => user.roles.find("name", role))) {
             qna.commands[trigger].handleMessage.call(this, msg);
