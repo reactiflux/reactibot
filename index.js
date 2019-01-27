@@ -16,32 +16,32 @@ bot.login(process.env.DISCORD_HASH);
 
 const channelHandlers = {
 	channels: {},
-	
+
 	addHandler: (channelId, channelHandler) => {
 		const handlers = channelHandlers.channels[channelId] || [];
 		handlers.push(channelHandler);
 		channelHandlers.channels[channelId] = handlers;
 	},
-	
+
 	handle: (msg, user) => {
 		const channel = msg.channel.id;
 		if(channelHandlers.channels[channel]) {
 			channelHandlers.channels[channel].forEach(handler => handler.handleMessage && handler.handleMessage.call(this, {
-				msg, 
+				msg,
 				user
 			}));
 		}
-		
+
 		if(channelHandlers.channels['*']) {
 			channelHandlers.channels['*'].forEach(handler => {
 				handler.handleMessage && handler.handleMessage.call(this, {
-					msg, 
+					msg,
 					user
 				})
 			});
 		}
 	},
-	
+
 	handleReaction: (reaction, user) => {
 		const channel = reaction.message.channel.id;
 		if(channelHandlers.channels[channel]) {
@@ -50,7 +50,7 @@ const channelHandlers = {
 				user
 			}));
 		}
-		
+
 		if(channelHandlers.channels['*']) {
 			channelHandlers.channels['*'].forEach(handler => handler.handleReaction && handler.handleReaction.call(this, {
 				reaction,
@@ -82,7 +82,7 @@ bot.on('messageReactionAdd', (reaction, user) => {
 });
 
 bot.on("message", (msg) => {
-	if(msg.author.id === bot.user.id) return;	
+	if(msg.author.id === bot.user.id) return;
 	channelHandlers.handle(msg, msg.author);
 });
 
