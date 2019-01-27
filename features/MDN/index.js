@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
-const Fuse = require('fuse.js');
-const { JSDOM } = require('jsdom');
+const fetch = require("node-fetch");
+const Fuse = require("fuse.js");
+const { JSDOM } = require("jsdom");
 
 const fuseOptions = {
   shouldSort: true,
@@ -11,7 +11,7 @@ const fuseOptions = {
   distance: 1000,
   maxPatternLength: 32,
   minMatchCharLength: 1,
-  keys: ['title'],
+  keys: ["title"]
 };
 
 const MDN = (() => {
@@ -20,17 +20,17 @@ const MDN = (() => {
   const buildStore = async () => {
     const obj = {};
     const stringDOM = await fetch(
-      'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Index'
+      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Index"
     ).then(res => res.text());
 
     const { document } = new JSDOM(stringDOM).window;
     const queryResults = [
-      ...document.querySelectorAll('#wikiArticle table tr td[rowspan="2"] > a'),
+      ...document.querySelectorAll('#wikiArticle table tr td[rowspan="2"] > a')
     ];
 
     obj.cache = queryResults.map(r => ({
       title: r.textContent,
-      href: r.href,
+      href: r.href
     }));
     obj.fuse = new Fuse(obj.cache, fuseOptions);
     return obj;
@@ -41,10 +41,10 @@ const MDN = (() => {
       if (!store) store = await buildStore();
       return store;
     },
-    baseUrl: `https://developer.mozilla.org`,
+    baseUrl: `https://developer.mozilla.org`
   };
 })();
 
 module.exports = {
-  MDN,
+  MDN
 };

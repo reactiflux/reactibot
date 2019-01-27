@@ -1,20 +1,20 @@
 const cooldown = {
   cooldowns: {},
 
-  addCooldown: (id, type = 'user', time = 30) => {
+  addCooldown: (id, type = "user", time = 30) => {
     const key = `${id}.${type}`;
     cooldown.cooldowns[key] = true;
     setTimeout(() => {
       cooldown.removeCooldown(id, type);
     }, time * 1000);
   },
-  
+
   removeCooldown: (id, type) => {
     const key = `${id}.${type}`;
     cooldown.cooldowns[key] = false;
   },
-  
-  hasCooldown: (id, type = 'user') => {
+
+  hasCooldown: (id, type = "user") => {
     const key = `${id}.${type}`;
     return cooldown.cooldowns[key] === true;
   }
@@ -22,4 +22,4 @@ const cooldown = {
 
 module.exports = {
   default: cooldown
-}
+};
