@@ -95,7 +95,7 @@ ${msg.content}
 
   handleMessage: ({ msg, user }) => {
     Object.keys(qna.commands).map(trigger => {
-      const keyword = words.find(word => {
+      const keyword = qna.commands[trigger].find(word => {
         return msg.content.toLowerCase().includes(word);
       });
 
