@@ -247,7 +247,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
   handleMessage: ({ msg, user }) => {
     Object.keys(commands.triggers).map(trigger => {
       const keyword = commands.triggers[trigger].words.find(word => {
-        return msg.content.toLowerCase().indexOf(word) === 0);
+        return msg.content.toLowerCase().indexOf(word) === 0;
       }
 
       if (keyword) {
