@@ -10,6 +10,7 @@ const qna = require("./features/qna").default;
 const jobs = require("./features/jobs").default;
 const autoban = require("./features/autoban").default;
 const commands = require("./features/commands").default;
+const witInvite = require("./features/wit-invite").default;
 
 const bot = new discord.Client();
 bot.login(process.env.DISCORD_HASH);
@@ -78,6 +79,7 @@ logger.add(channelLog(bot, "479862475047567361"));
 
 // reactiflux
 channelHandlers.addHandler("103882387330457600", jobs);
+channelHandlers.addHandler("541673256596537366", witInvite); // #women-in-tech
 channelHandlers.addHandler("106168778013822976", qna); // reactiflux-admin
 channelHandlers.addHandler("193117606629081089", qna); // #q&a
 
