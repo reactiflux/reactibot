@@ -15,6 +15,7 @@
     "fuse.js": "^3.3.0",
     "gists": "^2.0.0",
     "jsdom": "^13.2.0",
-    "node-fetch": "^2.2.0"
+    "node-fetch": "^2.2.0",
+    "query-string": "^6.2.0"
   }
 }
