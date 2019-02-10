@@ -11,6 +11,7 @@ const jobs = require("./features/jobs").default;
 const autoban = require("./features/autoban").default;
 const commands = require("./features/commands").default;
 const witInvite = require("./features/wit-invite").default;
+const stats = require("./features/stats").default;
 
 const bot = new discord.Client();
 bot.login(process.env.DISCORD_HASH);
@@ -76,6 +77,9 @@ const channelHandlers = {
 
 logger.add(stdoutLog);
 logger.add(channelLog(bot, "479862475047567361"));
+
+// Amplitude metrics
+stats(bot);
 
 // reactiflux
 channelHandlers.addHandler("103882387330457600", jobs);
