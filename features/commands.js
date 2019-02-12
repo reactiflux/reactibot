@@ -26,67 +26,6 @@ const commands = {
       }
     },
     {
-      words: [`!rrlinks`],
-      help: `shares a repository of helpful links regarding React and Redux`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title: "Helpful links",
-            type: "rich",
-            description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
-            color: 7506394
-          }
-        });
-      }
-    },
-    // {
-    //   words: [`!xy`],
-    //   help: `explains the XY problem`,
-    //   handleMessage: msg => {
-    //     msg.channel.send({
-    //       embed: {
-    //         title: "Helpful links",
-    //         type: "rich",
-    //         description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
-    //         color: 7506394
-    //       }
-    //     });
-    //   }
-    // },
-    {
-      words: [`!ymnnr`],
-      help: `links to the You Might Not Need Redux article`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title: "You Might Not Need Redux",
-            type: "rich",
-            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
-
-https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
-            color: 7506394
-          }
-        });
-      }
-    },
-    {
-      words: [`!derived`],
-      help: `links to the React docs regarding the getDerivedStateFromProps function (ab)use`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title:
-              "You might not need getDerivedStateFrom props or state at all!",
-            type: "rich",
-            description: `React 16.4 included a bugfix for getDerivedStateFromProps which caused some existing bugs in React components to reproduce more consistently. If this release exposed a case where your application was using an anti-pattern and didn’t work properly after the fix...
-
-https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
-            color: 7506394
-          }
-        });
-      }
-    },
-    {
       words: [`!bind`],
       help: `explains how and why to bind in React applications`,
       handleMessage: msg => {
@@ -155,45 +94,6 @@ Please also provide any code that might help us using the following syntax:
         });
       }
     },
-    {
-      words: [`!code`, `!gist`],
-      help: `explains how to attach code`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title: "Attaching Code",
-            type: "rich",
-            description: `When asking a question, try to include as much relevant code as you can.
-
-You can paste small bits of code directly in chat with syntax highlighting:
-
-\\\`\\\`\\\`js
-// your code goes here
-\\\`\\\`\\\`
-
-Or you can upload larger blocks of code (or files) to a service such as https://gist.github.com.
-`,
-            color: 7506394
-          }
-        });
-      }
-    },
-//     {
-//       words: [`!ping`],
-//       help: `explains how to ping politely`,
-//       handleMessage: msg => {
-//         msg.channel.send({
-//           embed: {
-//             title: "Don’t ping or DM other devs you aren’t actively talking to",
-//             type: "rich",
-//             description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
-
-// Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
-//             color: 7506394
-//           }
-//         });
-//       }
-//     },
     {
       words: [`!move`],
       help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
