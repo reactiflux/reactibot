@@ -5,7 +5,8 @@ const { MDN } = require("./MDN");
 const fs = require("fs");
 
 const commands = {
-  triggers: [
+  triggers: [],
+  staticTriggers: [
     {
       words: [`!commands`],
       help: `lists all available commands`,
@@ -147,10 +148,10 @@ Please also provide any code that might help us using the following syntax:
   ],
   handleMessage: ({ msg, user }) => {
     const content = JSON.parse(fs.readFileSync('./commands.json'));
-    commands.triggers = content.map(command => {
+    commands.triggers = commands.staticTriggers.concat(content.map(command => {
       command.handleMessage = msg => msg.channel.send(command.message);
       return command;
-    });
+    }));
     Object.keys(commands.triggers).map(trigger => {
       const keyword = commands.triggers[trigger].words.find(word => {
         return msg.content.toLowerCase().indexOf(word) === 0;
