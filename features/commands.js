@@ -146,6 +146,11 @@ Please also provide any code that might help us using the following syntax:
     }
   ],
   handleMessage: ({ msg, user }) => {
+    const content = JSON.parse(fs.readFileSync('./commands.json'));
+    commands.triggers = content.map(command => {
+      command.handleMessage = msg => msg.channel.send(command.message);
+      return command;
+    });
     Object.keys(commands.triggers).map(trigger => {
       const keyword = commands.triggers[trigger].words.find(word => {
         return msg.content.toLowerCase().indexOf(word) === 0;
@@ -159,15 +164,6 @@ Please also provide any code that might help us using the following syntax:
     });
   }
 };
-
-var content = JSON.parse(fs.readFileSync('./commands.json'));
-
-if(content) content.forEach(command => {
-  command.handleMessage = msg => {
-    msg.channel.send(command.message)
-  }
-  commands.triggers.push(command);
-})
 
 module.exports = {
   default: commands

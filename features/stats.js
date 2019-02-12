@@ -12,7 +12,6 @@ const emitEvent = (eventName, { data, userId = 0 } = {}) => {
       event_properties: data
     })
   };
-
   fetch(`https://api.amplitude.com/httpapi?${queryString.stringify(fields)}`);
 };
 
