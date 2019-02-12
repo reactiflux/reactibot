@@ -2,6 +2,7 @@ const cooldown = require("./cooldown").default;
 const fetch = require("node-fetch");
 const { JSDOM } = require("jsdom");
 const { MDN } = require("./MDN");
+const fs = require("fs");
 
 const commands = {
   triggers: [
@@ -38,20 +39,20 @@ const commands = {
         });
       }
     },
-    {
-      words: [`!xy`],
-      help: `explains the XY problem`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title: "Helpful links",
-            type: "rich",
-            description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
-            color: 7506394
-          }
-        });
-      }
-    },
+    // {
+    //   words: [`!xy`],
+    //   help: `explains the XY problem`,
+    //   handleMessage: msg => {
+    //     msg.channel.send({
+    //       embed: {
+    //         title: "Helpful links",
+    //         type: "rich",
+    //         description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
+    //         color: 7506394
+    //       }
+    //     });
+    //   }
+    // },
     {
       words: [`!ymnnr`],
       help: `links to the You Might Not Need Redux article`,
@@ -177,22 +178,22 @@ Or you can upload larger blocks of code (or files) to a service such as https://
         });
       }
     },
-    {
-      words: [`!ping`],
-      help: `explains how to ping politely`,
-      handleMessage: msg => {
-        msg.channel.send({
-          embed: {
-            title: "Don’t ping or DM other devs you aren’t actively talking to",
-            type: "rich",
-            description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
+//     {
+//       words: [`!ping`],
+//       help: `explains how to ping politely`,
+//       handleMessage: msg => {
+//         msg.channel.send({
+//           embed: {
+//             title: "Don’t ping or DM other devs you aren’t actively talking to",
+//             type: "rich",
+//             description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
 
-Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
-            color: 7506394
-          }
-        });
-      }
-    },
+// Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
+//             color: 7506394
+//           }
+//         });
+//       }
+//     },
     {
       words: [`!move`],
       help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
@@ -258,6 +259,15 @@ Similarly, don’t DM other members without asking first. All of the same proble
     });
   }
 };
+
+var content = JSON.parse(fs.readFileSync('./commands.json'));
+
+if(content) content.map(command => {
+  command.handleMessage = msg => {
+    msg.channel.send(command.message)
+  }
+  commands.triggers.push(command);
+})
 
 module.exports = {
   default: commands
