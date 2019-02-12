@@ -162,7 +162,7 @@ Please also provide any code that might help us using the following syntax:
 
 var content = JSON.parse(fs.readFileSync('./commands.json'));
 
-if(content) content.map(command => {
+if(content) content.forEach(command => {
   command.handleMessage = msg => {
     msg.channel.send(command.message)
   }
