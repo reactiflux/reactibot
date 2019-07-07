@@ -1,13 +1,36 @@
 const autoban = {
   naughty: [
-    "dating", "naked", "pictures", "photos", "gambling", "betting", "whatsapp", "telegram"
+    "betting",
+    "dating",
+    "gambling",
+    "naked",
+    "photos",
+    "pictures",
+    "telegram",
+    "whatsapp",
   ],
-  nice: ["react", "javascript", "hiring", "for hire"],
+  nice: [
+    "codepen",
+    "codesandbox",
+    "for hire",
+    "github",
+    "help",
+    "hiring",
+    "javascript",
+    "mozilla",
+    "pastebin",
+    "question",
+    "react",
+    "stackblitz",
+    "stackoverflow",
+    "typescript",
+  ],
   handleMessage: ({ msg }) => {
     const messageContent = msg.content.toLowerCase();
     const matchWord = word => messageContent.includes(word);
 
-    const isNewUser = (Date.now() - msg.author.createdTimestamp) < (48 * 3600 * 1000);
+    const isNewUser =
+      Date.now() - msg.author.createdTimestamp < 48 * 3600 * 1000;
     const containsLink = /https?:\/\//.test(messageContent);
     const containsNaughtyWord = autoban.naughty.some(matchWord);
     const containsNiceWord = autoban.nice.some(matchWord);
