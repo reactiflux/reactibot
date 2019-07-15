@@ -194,6 +194,24 @@ Similarly, don’t DM other members without asking first. All of the same proble
       }
     },
     {
+      words: [
+        `!inputs`,
+      ],
+      help: `provides links to uncontrolled vs controlled components`,
+      handleMessage: (msg) => {
+        msg.channel.send({
+          embed: {
+            title: 'Uncontrolled vs Controlled components',
+            type: 'rich',
+            description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
+Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
+            `,
+            color: 7506394,
+          }
+        });
+      },
+    },
+    {
       words: [`!move`],
       help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
       handleMessage: msg => {
