@@ -82,6 +82,9 @@ logger.add(channelLog(bot, "479862475047567361"));
 // Amplitude metrics
 stats(bot);
 
+// start deduper cleaner
+deduper.registerCleaner();
+
 // reactiflux
 channelHandlers.addHandler("103882387330457600", jobs);
 channelHandlers.addHandler("541673256596537366", witInvite); // #women-in-tech

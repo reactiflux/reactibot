@@ -6,6 +6,7 @@ const deduper = {
   ],
 
   dupeExpireTime: 2 * 60 * 1000, // 2 minutes to reject the duplicate as cross-post (ms)
+  cleanerInterval: 10 * 60 * 1000, // Frees up the memory from 10 to 10 minutes (ms)
 
   lastMessageOfMember: {},
 
@@ -40,6 +41,18 @@ Thank you :)
         deduper.lastMessageOfMember[userId] = msg;
       }
     }
+  },
+
+  registerCleaner: () => {
+    setInterval(() => {
+      Object.keys(deduper.lastMessageOfMember).forEach(userId => {
+        const msg = deduper.lastMessageOfMember[userId];
+
+        if (Date.now() - msg.createdTimestamp > deduper.dupeExpireTime) {
+          delete deduper.lastMessageOfMember[userId];
+        }
+      });
+    }, deduper.cleanerInterval);
   }
 };
 
