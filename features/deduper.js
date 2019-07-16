@@ -5,7 +5,7 @@ const deduper = {
     "600037610005463050"
   ],
 
-  // dupeExpireTime
+  dupeExpireTime: 2 * 60 * 1000, // 2 minutes to reject the duplicate as cross-post (ms)
 
   lastMessageOfMember: {},
 
@@ -15,7 +15,7 @@ const deduper = {
     msg.author
         .send(`Hello there! It looks like you just posted a message to the #${msg.channel.name} channel on our server.
 			
-We don't allow cross posting, so I had to delete your message because it is idential as your last one posted on #${lastMsg.channel.name}. You can avoid this warning deleting the first message.
+We don't allow cross-posting, so I had to delete your message because it is identical as your last one posted on #${lastMsg.channel.name}. You can avoid this warning deleting the first message or waiting 2 minutes.
 
 Thank you :)
 
@@ -26,11 +26,14 @@ Thank you :)
     if (deduper.monitoredChannels.includes(msg.channel.id)) {
       const userId = user.id;
       const lastMessage = deduper.lastMessageOfMember[userId];
+
       if (
         lastMessage &&
         !lastMessage.deleted &&
         lastMessage.channel.id !== msg.channel.id &&
-        lastMessage.content === msg.content
+        lastMessage.content === msg.content &&
+        msg.createdTimestamp - lastMessage.createdTimestamp <
+          deduper.dupeExpireTime
       ) {
         deduper.deleteMsgAndWarnUser(msg, lastMessage);
       } else {
