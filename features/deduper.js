@@ -1,8 +1,8 @@
 const deduper = {
   monitoredChannels: [
-    "600025060379721760",
-    "600037597955489797",
-    "600037610005463050"
+    "102860784329052160", // #general
+    "103696749012467712", // #need-help-0
+    "565213527673929729" // #need-help-1
   ],
 
   dupeExpireTime: 2 * 60 * 1000, // 2 minutes to reject the duplicate as cross-post (ms)
