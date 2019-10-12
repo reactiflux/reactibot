@@ -8,7 +8,20 @@ const deduper = {
   dupeExpireTime: 2 * 60 * 1000, // 2 minutes to reject the duplicate as cross-post (ms)
   cleanerInterval: 10 * 60 * 1000, // Frees up the memory from 10 to 10 minutes (ms)
 
-  lastMessageOfMember: {},
+  /**
+   * Structure example:
+   * {
+   *   "userIdOne": {
+   *     "channelIdOne": message1,
+   *     "channelIdTwo": message2,
+   *   },
+   *   "userIdTwo": {
+   *     "channelIdOne": message3,
+   *     "channelIdTwo": message4,
+   *   },
+   * }
+   */
+  lastMessagesOfMember: {},
 
   deleteMsgAndWarnUser: (msg, lastMsg) => {
     lastMsg.delete();
@@ -24,9 +37,12 @@ Thank you :)
   },
 
   handleMessage: ({ msg, user }) => {
-    if (deduper.monitoredChannels.includes(msg.channel.id)) {
-      const userId = user.id;
-      const lastMessage = deduper.lastMessageOfMember[userId];
+    const userId = user.id;
+    const lastMessagesPerChannel = deduper.lastMessagesOfMember[userId] || {};
+    let shouldSaveMessageToList = true;
+
+    Object.keys(lastMessagesPerChannel).forEach(channelId => {
+      const lastMessage = lastMessagesPerChannel[channelId];
 
       if (
         lastMessage &&
@@ -37,20 +53,30 @@ Thank you :)
           deduper.dupeExpireTime
       ) {
         deduper.deleteMsgAndWarnUser(msg, lastMessage);
-      } else {
-        deduper.lastMessageOfMember[userId] = msg;
+        shouldSaveMessageToList = false;
       }
+    });
+
+    if (shouldSaveMessageToList) {
+      deduper.lastMessagesOfMember[userId] =
+        deduper.lastMessagesOfMember[userId] || {};
+
+      deduper.lastMessagesOfMember[userId][msg.channel.id] = msg;
     }
   },
 
   registerCleaner: () => {
     setInterval(() => {
-      Object.keys(deduper.lastMessageOfMember).forEach(userId => {
-        const msg = deduper.lastMessageOfMember[userId];
+      Object.keys(deduper.lastMessagesOfMember).forEach(userId => {
+        const lastMessagesPerChannel = deduper.lastMessagesOfMember[userId];
 
-        if (Date.now() - msg.createdTimestamp > deduper.dupeExpireTime) {
-          delete deduper.lastMessageOfMember[userId];
-        }
+        Object.keys(lastMessagesPerChannel).forEach(channelId => {
+          const msg = lastMessagesPerChannel[channelId];
+
+          if (Date.now() - msg.createdTimestamp > deduper.dupeExpireTime) {
+            delete lastMessagesPerChannel[channelId];
+          }
+        });
       });
     }, deduper.cleanerInterval);
   }
