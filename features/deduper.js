@@ -44,13 +44,18 @@ Thank you :)
     Object.keys(lastMessagesPerChannel).forEach(channelId => {
       const lastMessage = lastMessagesPerChannel[channelId];
 
+      // we take the difference between the time when this message was sent with the time when the last message was sent,
+      // if there is an interval bigger than `deduper.dupeExpireTime`, then it is not considered as a duplicate
+      const isWithinTheTimeLimit =
+        msg.createdTimestamp - lastMessage.createdTimestamp <
+        deduper.dupeExpireTime;
+
       if (
         lastMessage &&
         !lastMessage.deleted &&
         lastMessage.channel.id !== msg.channel.id &&
         lastMessage.content === msg.content &&
-        msg.createdTimestamp - lastMessage.createdTimestamp <
-          deduper.dupeExpireTime
+        isWithinTheTimeLimit
       ) {
         deduper.deleteMsgAndWarnUser(msg, lastMessage);
         shouldSaveMessageToList = false;
@@ -73,6 +78,8 @@ Thank you :)
         Object.keys(lastMessagesPerChannel).forEach(channelId => {
           const msg = lastMessagesPerChannel[channelId];
 
+          // if the message is older than the expire time it will never be considered a duplicate, so
+          // we can remove it from the array to free space
           if (Date.now() - msg.createdTimestamp > deduper.dupeExpireTime) {
             delete lastMessagesPerChannel[channelId];
           }
