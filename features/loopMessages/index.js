@@ -2,8 +2,8 @@
  * ------------------------------
  * Loop Messages
  * ------------------------------
- * The bot will be sending a determined set of messages to some channels to repeat
- * important information, but without spamming these channels
+ * The bot will keep a message as the last one in a channel, with an interval between each post,
+ * to keep important information more visible to users
  *
  * How it works:
  * At startup and repeatedly by a given interval, for each loop message, the bot will:
