@@ -12,6 +12,7 @@ const autoban = require("./features/autoban").default;
 const commands = require("./features/commands").default;
 const witInvite = require("./features/wit-invite").default;
 const stats = require("./features/stats").default;
+const loopMessages = require("./features/loopMessages");
 
 const bot = new discord.Client();
 bot.login(process.env.DISCORD_HASH);
@@ -80,6 +81,9 @@ logger.add(channelLog(bot, "479862475047567361"));
 
 // Amplitude metrics
 stats(bot);
+
+// Loop Messages
+loopMessages.register(bot, logger);
 
 // reactiflux
 channelHandlers.addHandler("103882387330457600", jobs);
