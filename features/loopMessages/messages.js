@@ -1,6 +1,7 @@
 module.exports = [
   {
     channelId: "600037610005463050", // #another
+    interval: 40 * 60 * 1000, // 40 minutes (ms)
     content: `
 
 :arrows_clockwise: __PLEASE READ BEFORE POSTING__ :pushpin:

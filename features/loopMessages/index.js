@@ -16,8 +16,8 @@
 
 const loopMessages = require("./messages.js");
 
-// time between each check to send a new loop message
-const INTERVAL_TIME = 40 * 60 * 1000; // 40 minutes (ms)
+// if the interval is not specified in the msg object, then we will use this one
+const DEFAULT_INTERVAL_TIME = 60 * 60 * 1000; // 1 hour (ms)
 
 function getContent(loopMessage) {
   return loopMessage.trim();
@@ -36,7 +36,9 @@ function isLoopMessage(messageToCheck, loopMessage, bot) {
 
 async function sendLoopMessage(client, loopMessage) {
   const channel = client.channels.get(loopMessage.channelId);
-  const channelMessages = await channel.fetchMessages({ limit: 50 });
+  const channelMessages = await channel.fetchMessages({
+    limit: 50 // we don't need to worry about deleting old messages
+  });
 
   // if the last message in the channel is from the bot, we don't need to send it again
   if (isLoopMessage(channelMessages.first(), loopMessage, client)) {
@@ -57,17 +59,15 @@ async function sendLoopMessage(client, loopMessage) {
 module.exports = {
   register: (client, logger) => {
     client.on("ready", () => {
-      const sendLoopMessages = () => {
-        loopMessages.forEach(message => {
+      loopMessages.forEach(message => {
+        sendLoopMessage(client, message); // initial run on startup
+
+        const interval = message.interval || DEFAULT_INTERVAL_TIME;
+
+        setInterval(() => {
           sendLoopMessage(client, message);
-        });
-      };
-
-      setInterval(() => {
-        sendLoopMessages();
-      }, INTERVAL_TIME);
-
-      sendLoopMessages();
+        }, interval);
+      });
 
       logger.log("INI", "Registered Loop Messages");
     });
