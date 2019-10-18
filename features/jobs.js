@@ -3,6 +3,8 @@ const cooldown = require("./cooldown").default;
 const jobs = {
   tags: ["forhire", "for hire", "hiring", "remote", "local"],
   handleMessage: ({ msg, user }) => {
+    if (msg.author.bot) return;
+
     let hasTags = false;
     jobs.tags.forEach(tag => {
       if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
