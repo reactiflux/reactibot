@@ -17,7 +17,7 @@
 const loopMessages = require("./messages.js");
 
 // time between each check to send a new loop message
-const INTERVAL_TIME = 5 * 60 * 1000; // 5 minutes (ms)
+const INTERVAL_TIME = 40 * 60 * 1000; // 40 minutes (ms)
 
 function getContent(loopMessage) {
   return loopMessage.trim();
