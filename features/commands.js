@@ -234,6 +234,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
       handleMessage: async msg => {
         const [command, ...args] = msg.content.substring(1).split(/[\s.]/g);
+        const fetchMsg = await msg.channel.send(`Fetching "${args.join(" ")}"...`);
+
         const { fuse } = await MDN.getStore();
         const [topResult, ...rest] = fuse.search(args.join(" "));
         const stringDOM = await fetch(
@@ -244,7 +246,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         const description = document.querySelector("#wikiArticle > p")
           .textContent;
 
-        msg.channel.send({
+        await msg.channel.send({
           embed: {
             type: "rich",
             author: {
@@ -259,6 +261,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             url: `${MDN.baseUrl}${topResult.item.href}`
           }
         });
+
+        fetchMsg.delete();
       }
     }
   ],
