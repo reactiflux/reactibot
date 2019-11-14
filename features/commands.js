@@ -240,8 +240,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           `${MDN.baseUrl}${topResult.item.href}`
         ).then(res => res.text());
         const { document } = new JSDOM(stringDOM).window;
-        const title = document.querySelector(".document-title").textContent;
-        const description = document.querySelector("#wikiArticle p")
+        const title = document.querySelector(".title").textContent;
+        const description = document.querySelector("#wikiArticle > p")
           .textContent;
 
         msg.channel.send({
