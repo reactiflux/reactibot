@@ -107,6 +107,7 @@ bot.on("message", msg => {
 logger.log("INI", "Bootstrap complete");
 bot.on("ready", () => {
   logger.log("INI", "Bot connected to Discord server");
+  bot.user.setActivity('for !commands', { type: "WATCHING" });
 });
 bot.on("error", err => {
   try {
