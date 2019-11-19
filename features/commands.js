@@ -127,6 +127,22 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
         });
       }
     },
+    {
+      words: [`!lift`],
+      help: `links to the React docs regarding the common need to "lift" state`,
+      handleMessage: msg => {
+        msg.channel.send({
+          embed: {
+            title: "Lifting State Up",
+            type: "rich",
+            description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
+
+https://reactjs.org/docs/lifting-state-up.html`,
+            color: 7506394
+          }
+        })
+      }
+    },
 
     {
       words: [`!ask`],
