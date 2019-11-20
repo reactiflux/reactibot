@@ -11,6 +11,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-      with:
-        ref: master
-    - run: git push --quiet $PRODUCTION_GIT_URL
+    - run: |
+        git checkout master
+        git push --quiet $PRODUCTION_GIT_URL
