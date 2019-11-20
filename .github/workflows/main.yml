@@ -17,7 +17,7 @@ jobs:
         known-hosts: ${{ secrets.KNOWN_HOSTS }}
     - run: git clone https://github.com/reactiflux/reactibot
     - run: cd reactibot
-    - run: git push --quiet $PRODUCTION_GIT_URL
+    - run: git push $PRODUCTION_GIT_URL
       working-directory: ./reactibot
       env:
         PRODUCTION_GIT_URL: ${{ secrets.PRODUCTION_GIT_URL }}
