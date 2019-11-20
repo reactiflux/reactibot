@@ -1,0 +1,12 @@
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - run: git push --quiet $PRODUCTION_GIT_URL
