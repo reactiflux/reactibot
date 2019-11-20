@@ -11,6 +11,6 @@ jobs:
 
     steps:
     - run: |
-        git clone https://runner@github.com/reactiflux/reactibot
+        git clone https://runner@github.com/reactiflux/reactibot.git
         cd reactibot
         git push --quiet $PRODUCTION_GIT_URL
