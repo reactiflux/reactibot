@@ -16,7 +16,6 @@ jobs:
         public-key: ${{ secrets.SSH_KEY_PUBLIC }}
         known-hosts: ${{ secrets.KNOWN_HOSTS }}
     - run: git clone https://github.com/reactiflux/reactibot
-    - run: cd reactibot
     - run: git push $PRODUCTION_GIT_URL
       working-directory: ./reactibot
       env:
