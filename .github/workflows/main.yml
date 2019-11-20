@@ -11,4 +11,4 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - run: git push --quiet $PRODUCTION_GIT_URL $GITHUB_REF
+    - run: git push --quiet $PRODUCTION_GIT_URL master
