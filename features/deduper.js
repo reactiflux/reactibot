@@ -1,4 +1,5 @@
 const deduper = {
+  logChannelId: "591326408396111907", // Channel where the bot will report about dedupes (#mod-log)
   dupeExpireTime: 2 * 60 * 1000, // 2 minutes to reject the duplicate as cross-post (ms)
   cleanerInterval: 10 * 60 * 1000, // Frees up the memory from 10 to 10 minutes (ms)
 
@@ -19,6 +20,7 @@ const deduper = {
 
   deleteMsgAndWarnUser: (msg, lastMsg) => {
     lastMsg.delete();
+
     // prettier-ignore
     msg.author
         .send(`Hello there! It looks like you just posted a message to the #${msg.channel.name} channel on our server.
@@ -28,6 +30,10 @@ We don't allow cross-posting, so I had to delete your previous message on #${las
 Thank you :)
 
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
+
+    msg.client.channels
+      .get(deduper.logChannelId)
+      .send(`Warned <@${msg.author.id}> for crossposting`);
   },
 
   handleMessage: ({ msg, user }) => {
