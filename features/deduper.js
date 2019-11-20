@@ -28,7 +28,7 @@ const deduper = {
     // prettier-ignore
     msg.author
         .send(`Hello there! It looks like you just posted a message to the #${msg.channel.name} channel on our server.
-			
+
 We don't allow cross-posting, so I had to delete your previous message on #${lastMsg.channel.name} because it is identical as your recent message. You can avoid the deletion of messages waiting 2 minutes.
 
 Thank you :)
