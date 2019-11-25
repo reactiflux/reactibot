@@ -86,6 +86,42 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
       }
     },
     {
+      words: [`!stateUpdates`],
+      help: `Explains the issue with state updates being asynchronous`,
+      handleMessage: msg => {
+        msg.channel.send({
+          embed: {
+            title:
+              "State Updates May Be Asynchronous",
+            type: "rich",
+            description: `Often times you might run into an issue like this
+\`\`\`js
+const handleEvent = e => {
+  setState(e.target.value);
+  console.log(state);
+}
+\`\`\`
+where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous, so synchronous logic after a state update should not rely on the state value.
+\`\`\`js
+// log it directly inside render
+console.log(state);
+
+// Or in a useEffect call
+useEffect(() => {
+  console.log(state);
+}, [state]);
+
+const handleEvent = e => {
+  setState(e.target.value);
+};
+\`\`\`
+Check out https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c and https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous for more information.`,
+            color: 7506394
+          }
+        });
+      }
+    },
+    {
       words: [`!bind`],
       help: `explains how and why to bind in React applications`,
       handleMessage: msg => {
