@@ -94,7 +94,7 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
             title:
               "State Updates May Be Asynchronous",
             type: "rich",
-            description: `Often times you might run into an issue like this
+            description: `Often times you run into an issue like this
 \`\`\`js
 const handleEvent = e => {
   setState(e.target.value);
