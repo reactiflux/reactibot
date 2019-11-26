@@ -115,7 +115,11 @@ const handleEvent = e => {
   setState(e.target.value);
 };
 \`\`\`
-Check out https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c and https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous for more information.`,
+Check out these resources for more information:
+https://github.com/facebook/react/issues/11527#issuecomment-360199710
+https://stackoverflow.com/questions/48563650/does-react-keep-the-order-for-state-updates/48610973#48610973
+https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
+https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous for more information.`,
             color: 7506394
           }
         });
