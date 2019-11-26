@@ -102,22 +102,8 @@ const handleEvent = e => {
 }
 \`\`\`
 where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous, so synchronous logic after a state update should not rely on the state value.
-\`\`\`js
-// log it directly inside render
-console.log(state);
 
-// Or in a useEffect call
-useEffect(() => {
-  console.log(state);
-}, [state]);
-
-const handleEvent = e => {
-  setState(e.target.value);
-};
-\`\`\`
 Check out these resources for more information:
-https://github.com/facebook/react/issues/11527#issuecomment-360199710
-https://stackoverflow.com/questions/48563650/does-react-keep-the-order-for-state-updates/48610973#48610973
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
 https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous for more information.`,
             color: 7506394
