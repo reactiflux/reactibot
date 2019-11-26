@@ -101,7 +101,7 @@ const handleEvent = e => {
   console.log(state);
 }
 \`\`\`
-where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous, so synchronous logic after a state update should not rely on the state value.
+where \`state\` is not the most up to date value when you log it. This is caused by **state updates being asynchronous**, so synchronous logic after a state update should not rely on the state value.
 
 Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
