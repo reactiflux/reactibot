@@ -87,7 +87,7 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     },
     {
       words: [`!stateupdates`, `!su`],
-      help: `Explains the issue with state updates being asynchronous`,
+      help: `Explains the implications involved with state updates being asynchronous`,
       handleMessage: msg => {
         msg.channel.send({
           embed: {
