@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout to branch
+        uses: actions/checkout@v1
+        with:
+          ref: ${{ github.ref }}
       - name: Push to server
         uses: appleboy/ssh-action@master
         env:
@@ -21,8 +25,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH
           script: |
-            sudo git clone ${{ secrets.GITHUB_REPO }}
             cd reactibot
-            sudo docker stop reactibot
-            sudo docker build . -t reactiflux/reactibot:latest
-            sudo docker run -d --name reactibot -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
+            sudo git checkout feature/actions
+            sudo git pull
+            sudo docker container stop $(docker container ls -aq)
+            sudo docker container rm $(docker container ls -aq)
+            sudo docker image prune -f
+            sudo docker build -t reactiflux/reactibot:latest .
+            sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
