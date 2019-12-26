@@ -21,7 +21,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH
           script: |
-            sudo git pull ${{ secrets.GITHUB_REPO }}
+            sudo git clone ${{ secrets.GITHUB_REPO }}
+            cd reactibot
             sudo docker stop $(sudo docker ps -a -q)
             sudo docker build . -t reactiflux/reactibot:latest
             sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
