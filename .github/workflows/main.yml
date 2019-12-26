@@ -3,6 +3,8 @@ name: Reactibot deployment
 on:
   push:
     branches:
+      - master
+      - develop
       - feature/actions
 
 jobs:
