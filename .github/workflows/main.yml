@@ -28,8 +28,8 @@ jobs:
             cd reactibot
             sudo git checkout $GITHUB_REF
             sudo git pull
-            sudo docker container stop $(docker container ls -aq)
-            sudo docker container rm $(docker container ls -aq)
+            sudo docker container stop $(sudo docker container ls -aq)
+            sudo docker container rm $(sudo docker container ls -aq)
             sudo docker image prune -f
             sudo docker build -t reactiflux/reactibot:latest .
             sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
