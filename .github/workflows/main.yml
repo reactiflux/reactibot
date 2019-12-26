@@ -23,10 +23,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
-          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH
+          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_REF
           script: |
             cd reactibot
-            sudo git checkout feature/actions
+            sudo git checkout $GITHUB_REF
             sudo git pull
             sudo docker container stop $(docker container ls -aq)
             sudo docker container rm $(docker container ls -aq)
