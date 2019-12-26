@@ -23,6 +23,6 @@ jobs:
           script: |
             sudo git clone ${{ secrets.GITHUB_REPO }}
             cd reactibot
-            sudo docker stop $(sudo docker ps -a -q)
+            sudo docker stop reactibot
             sudo docker build . -t reactiflux/reactibot:latest
-            sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
+            sudo docker run -d --name reactibot -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
