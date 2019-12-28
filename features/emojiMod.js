@@ -63,7 +63,7 @@ const reactionHandlers = {
     }
 
     if (numberOfStaffReactions >= config.deletionThreshold) {
-      logMessage = `\`<@${message.author.id}> has met the deletion threshold in <#${message.channel.id}> for the message:`;
+      logMessage = `<@${message.author.id}> has met the deletion threshold in <#${message.channel.id}> for the message:`;
 
       message.delete();
     }
