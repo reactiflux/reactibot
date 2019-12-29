@@ -25,6 +25,9 @@ const reactionHandlers = {
     if (!isStaff(member)) {
       return;
     }
+    if (isStaff(message.guild.members.get(message.author.id))) {
+      return;
+    }
     const usersWhoReacted = reaction.users.map(user =>
       message.guild.members.get(user.id)
     );
