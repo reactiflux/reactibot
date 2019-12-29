@@ -12,8 +12,9 @@ const autoban = require("./features/autoban").default;
 const commands = require("./features/commands").default;
 const witInvite = require("./features/wit-invite").default;
 const stats = require("./features/stats").default;
+const emojiMod = require("./features/emojiMod").default;
 
-const bot = new discord.Client();
+const bot = new discord.Client({ partials: ["MESSAGE", "CHANNEL"] });
 bot.login(process.env.DISCORD_HASH);
 
 const channelHandlers = {
@@ -94,8 +95,17 @@ channelHandlers.addHandler("479862475047567361", qna); // #general
 channelHandlers.addHandler("*", commands);
 // channelHandlers.addHandler('*', codeblock);
 channelHandlers.addHandler("*", autoban);
+channelHandlers.addHandler("*", emojiMod(bot));
 
-bot.on("messageReactionAdd", (reaction, user) => {
+bot.on("messageReactionAdd", async (reaction, user) => {
+  if (reaction.message.partial) {
+    try {
+      await reaction.message.fetch();
+    } catch (error) {
+      console.log("Something went wrong when fetching the message: ", error);
+    }
+  }
+
   channelHandlers.handleReaction(reaction, user);
 });
 
@@ -105,10 +115,15 @@ bot.on("message", msg => {
 });
 
 logger.log("INI", "Bootstrap complete");
+
 bot.on("ready", () => {
-  logger.log("INI", "Bot connected to Discord server");
-  bot.user.setActivity('for !commands', { type: "WATCHING" });
+  Array.from(bot.guilds.values()).forEach(guild => {
+    logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
+  });
+
+  bot.user.setActivity("for !commands", { type: "WATCHING" });
 });
+
 bot.on("error", err => {
   try {
     logger.log("ERR", err.message);
