@@ -1,3 +1,5 @@
+const cooldown = require("./cooldown").default;
+
 const staffRoles = ["mvp", "moderator", "admin", "admins"];
 
 const isStaff = member =>
@@ -80,7 +82,12 @@ const reactionHandlers = {
       }
     }
   },
-  "👎": (bot, reaction, message) => {
+  "👎": (bot, reaction, message, member) => {
+    if (cooldown.hasCooldown(member.id, "thumbsdown")) {
+      return;
+    }
+    cooldown.addCooldown(member.id, "thumbsdown");
+
     const reactions = thumbsDownEmojis.reduce(
       (acc, emoji) => {
         if (message.reactions.get(emoji)) {
