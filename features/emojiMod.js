@@ -83,10 +83,6 @@ const reactionHandlers = {
     }
   },
   "👎": (bot, reaction, message, member) => {
-    if (isStaff(member)) {
-      return;
-    }
-
     if (cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;
     }
