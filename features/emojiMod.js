@@ -86,7 +86,7 @@ const reactionHandlers = {
     if (cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;
     }
-    cooldown.addCooldown(member.id, "thumbsdown");
+    cooldown.addCooldown(member.id, "thumbsdown", 20 * 60);
 
     const reactions = thumbsDownEmojis.reduce(
       (acc, emoji) => {
