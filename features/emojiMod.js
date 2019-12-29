@@ -122,7 +122,7 @@ const reactionHandlers = {
       .join("");
 
     if (numberOfTotalReactions >= config.thumbsDownThreshold) {
-      logMessage = `@moderator - <@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
+      logMessage = `<@&102870499406647296> - <@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
     }
 
     if (logMessage) {
