@@ -178,7 +178,17 @@ https://reactjs.org/docs/lifting-state-up.html`,
           embed: {
             title: "Asking to ask",
             type: "rich",
-            description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.`,
+            description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
+
+Bad: "hey can anyone help me?"	
+Bad: "anyone good with redux?"
+Good: 
+> I'm trying to fire a redux action from my component, but it's not getting to the reducer.
+> \`\`\`js
+> // snippet of code
+> \`\`\`
+> I'm seeing an error, but I don't know if it's related.
+> \`Uncaught TypeError: undefined is not a function\``,
             color: 7506394
           }
         });
