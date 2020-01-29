@@ -178,19 +178,7 @@ https://reactjs.org/docs/lifting-state-up.html`,
           embed: {
             title: "Asking to ask",
             type: "rich",
-            description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
-
-Example:
-
-Bad: "Hey can anyone help me with some JS?"
-Bad: "Anyone good with JS?"
-Good: "I'm having trouble adding a class to a div using JS. Can I have some help?"
-
-Please also provide any code that might help us using the following syntax:
-
-\\\`\\\`\\\`js
-// your code goes here
-\\\`\\\`\\\``,
+            description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.`,
             color: 7506394
           }
         });
