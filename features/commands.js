@@ -180,17 +180,15 @@ https://reactjs.org/docs/lifting-state-up.html`,
             type: "rich",
             description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
 
-Example:
-
-Bad: "Hey can anyone help me with some JS?"
-Bad: "Anyone good with JS?"
-Good: "I'm having trouble adding a class to a div using JS. Can I have some help?"
-
-Please also provide any code that might help us using the following syntax:
-
-\\\`\\\`\\\`js
-// your code goes here
-\\\`\\\`\\\``,
+Bad: "hey can anyone help me?"	
+Bad: "anyone good with redux?"
+Good: 
+> I'm trying to fire a redux action from my component, but it's not getting to the reducer.
+> \`\`\`js
+> // snippet of code
+> \`\`\`
+> I'm seeing an error, but I don't know if it's related.
+> \`Uncaught TypeError: undefined is not a function\``,
             color: 7506394
           }
         });
