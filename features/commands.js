@@ -306,6 +306,20 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
         fetchMsg.delete();
       }
+    },
+    {
+      words: [`!crosspost`, `!crossposting`],
+      help: `explains why and how to avoid crossposting`,
+      handleMessage: msg => {
+        msg.channel.send({
+          embed: {
+            title: "Crossposting",
+            type: "rich",
+            description: `Do not crosspost messages by copying and pasting them into multiple channels. This makes it harder to help you as discussions may be broken up into multiple channels, and takes more space from other users asking questions. Instead, post your message once to the channel you think is most relevant.`,
+            color: 7506394
+          }
+        });
+      }
     }
   ],
   handleMessage: ({ msg, user }) => {
