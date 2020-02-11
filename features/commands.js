@@ -311,7 +311,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   handleMessage: ({ msg, user }) => {
     Object.keys(commands.triggers).map(trigger => {
       const keyword = commands.triggers[trigger].words.find(word => {
-        return msg.content.toLowerCase().indexOf(word) === 0;
+        return msg.content.toLowerCase().includes(word);
       });
 
       if (keyword) {
