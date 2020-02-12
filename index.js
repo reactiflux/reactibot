@@ -117,7 +117,7 @@ bot.on("message", msg => {
 logger.log("INI", "Bootstrap complete");
 
 bot.on("ready", () => {
-  Array.from(bot.guilds.cache).forEach(guild => {
+  Array.from(bot.guilds.values()).forEach(guild => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
