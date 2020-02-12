@@ -18,6 +18,5 @@
     "jsdom": "^13.2.0",
     "node-fetch": "^2.2.0",
     "query-string": "^6.2.0"
-  },
-  "prettier": {}
+  }
 }
