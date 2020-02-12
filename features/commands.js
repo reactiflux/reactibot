@@ -1,7 +1,7 @@
-const cooldown = require("./cooldown").default;
-const fetch = require("node-fetch");
-const { JSDOM } = require("jsdom");
-const { MDN } = require("./MDN");
+const cooldown = require('./cooldown').default
+const fetch = require('node-fetch')
+const { JSDOM } = require('jsdom')
+const { MDN } = require('./MDN')
 
 const commands = {
   triggers: [
@@ -11,17 +11,17 @@ const commands = {
       handleMessage: msg => {
         const payload = commands.triggers
           .map(trigger => {
-            return `${trigger.words.join(", ")} - ${trigger.help}`;
+            return `${trigger.words.join(', ')} - ${trigger.help}`
           })
-          .join("\n")
-          .trim();
+          .join('\n')
+          .trim()
 
         msg.channel.send(
           `We have a few commands available: \`\`\`${payload}\`\`\``,
           {
             reply: msg.author
           }
-        );
+        )
       }
     },
     {
@@ -30,12 +30,12 @@ const commands = {
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Helpful links",
-            type: "rich",
+            title: 'Helpful links',
+            type: 'rich',
             description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -44,12 +44,12 @@ const commands = {
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Helpful links",
-            type: "rich",
+            title: 'Helpful links',
+            type: 'rich',
             description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -58,14 +58,14 @@ const commands = {
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "You Might Not Need Redux",
-            type: "rich",
+            title: 'You Might Not Need Redux',
+            type: 'rich',
             description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
 
 https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -75,14 +75,14 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
         msg.channel.send({
           embed: {
             title:
-              "You might not need getDerivedStateFrom props or state at all!",
-            type: "rich",
+              'You might not need getDerivedStateFrom props or state at all!',
+            type: 'rich',
             description: `React 16.4 included a bugfix for getDerivedStateFromProps which caused some existing bugs in React components to reproduce more consistently. If this release exposed a case where your application was using an anti-pattern and didn’t work properly after the fix...
 
 https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -91,9 +91,8 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title:
-              "State Updates May Be Asynchronous",
-            type: "rich",
+            title: 'State Updates May Be Asynchronous',
+            type: 'rich',
             description: `Often times you run into an issue like this
 \`\`\`js
 const handleEvent = e => {
@@ -108,7 +107,7 @@ https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
 https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -117,8 +116,8 @@ https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchron
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Binding functions",
-            type: "rich",
+            title: 'Binding functions',
+            type: 'rich',
             description: `In JavaScript, a class function will not be bound to the instance of the class, this is why you often see messages saying that you can't access something of undefined.
 
 In order to fix this, you need to bind your function, either in constructor:
@@ -150,7 +149,7 @@ class YourComponent extends React.Component {
 Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/ for more informations`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -159,8 +158,8 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Lifting State Up",
-            type: "rich",
+            title: 'Lifting State Up',
+            type: 'rich',
             description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
 
 https://reactjs.org/docs/lifting-state-up.html`,
@@ -176,8 +175,8 @@ https://reactjs.org/docs/lifting-state-up.html`,
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Asking to ask",
-            type: "rich",
+            title: 'Asking to ask',
+            type: 'rich',
             description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
 
 Bad: "hey can anyone help me?"	
@@ -191,7 +190,7 @@ Good:
 > \`Uncaught TypeError: undefined is not a function\``,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -200,8 +199,8 @@ Good:
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Attaching Code",
-            type: "rich",
+            title: 'Attaching Code',
+            type: 'rich',
             description: `When asking a question, try to include as much relevant code as you can.
 
 You can paste small bits of code directly in chat with syntax highlighting:
@@ -216,7 +215,7 @@ We are also big fans of https://codesandbox.io/s/new where you can set up a work
 `,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
@@ -225,22 +224,20 @@ We are also big fans of https://codesandbox.io/s/new where you can set up a work
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: "Don’t ping or DM other devs you aren’t actively talking to",
-            type: "rich",
+            title: 'Don’t ping or DM other devs you aren’t actively talking to',
+            type: 'rich',
             description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
 
 Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
             color: 7506394
           }
-        });
+        })
       }
     },
     {
-      words: [
-        `!inputs`,
-      ],
+      words: [`!inputs`],
       help: `provides links to uncontrolled vs controlled components`,
-      handleMessage: (msg) => {
+      handleMessage: msg => {
         msg.channel.send({
           embed: {
             title: 'Uncontrolled vs Controlled components',
@@ -248,26 +245,26 @@ Similarly, don’t DM other members without asking first. All of the same proble
             description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
 Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
             `,
-            color: 7506394,
+            color: 7506394
           }
-        });
-      },
+        })
+      }
     },
     {
       words: [`!move`],
       help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
       handleMessage: msg => {
-        const [_, newChannel] = msg.content.split(" ");
-        const { author, channel, mentions } = msg;
+        const [_, newChannel] = msg.content.split(' ')
+        const { author, channel, mentions } = msg
 
         try {
           msg.guild.channels
-            .get(newChannel.replace("<#", "").replace(">", ""))
+            .get(newChannel.replace('<#', '').replace('>', ''))
             .send(
               `${author} has opened a portal from ${channel} summoning ${mentions.members
                 .map(i => i)
-                .join(" ")}`
-            );
+                .join(' ')}`
+            )
         } catch (e) {}
       }
     },
@@ -275,73 +272,73 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       words: [`!mdn`],
       help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
       handleMessage: async msg => {
-        const [command, ...args] = msg.content.substring(1).split(/[\s.]/g);
-        const fetchMsg = await msg.channel.send(`Fetching "${args.join(" ")}"...`);
+        const [command, ...args] = msg.content.substring(1).split(/[\s.]/g)
+        const fetchMsg = await msg.channel.send(
+          `Fetching "${args.join(' ')}"...`
+        )
 
-        const { fuse } = await MDN.getStore();
-        const [topResult, ...rest] = fuse.search(args.join(" "));
+        const { fuse } = await MDN.getStore()
+        const [topResult, ...rest] = fuse.search(args.join(' '))
         const stringDOM = await fetch(
           `${MDN.baseUrl}${topResult.item.href}`
-        ).then(res => res.text());
-        const { document } = new JSDOM(stringDOM).window;
-        const title = document.querySelector(".title").textContent;
-        const description = document.querySelector("#wikiArticle > p")
-          .textContent;
+        ).then(res => res.text())
+        const { document } = new JSDOM(stringDOM).window
+        const title = document.querySelector('.title').textContent
+        const description = document.querySelector('#wikiArticle > p')
+          .textContent
 
         await msg.channel.send({
           embed: {
-            type: "rich",
+            type: 'rich',
             author: {
-              name: "MDN",
+              name: 'MDN',
               url: `${MDN.baseUrl}`,
               icon_url:
-                "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
+                'https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png'
             },
             title,
             description,
             color: 0x83d0f2,
             url: `${MDN.baseUrl}${topResult.item.href}`
           }
-        });
+        })
 
-        fetchMsg.delete();
+        fetchMsg.delete()
       }
-		},
-		{
-      words: [
-        `!appIdeas`,
-      ],
+    },
+    {
+      words: [`!appIdeas`],
       help: `provides a link to the best curated app ideas for beginners to advanced devs`,
-      handleMessage: (msg) => {
+      handleMessage: msg => {
         msg.channel.send({
           embed: {
             title: 'Florinpop17s Curated App Ideas!',
             type: 'rich',
-						description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
+            description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
 						
 						https://github.com/florinpop17/app-ideas
-            `,
-            color: 7506394,
+						`,
+            color: 7506394
           }
-        });
-      },
-    },
+        })
+      }
+    }
   ],
   handleMessage: ({ msg, user }) => {
     Object.keys(commands.triggers).map(trigger => {
       const keyword = commands.triggers[trigger].words.find(word => {
-        return msg.content.toLowerCase().indexOf(word) === 0;
-      });
+        return msg.content.toLowerCase().indexOf(word) === 0
+      })
 
       if (keyword) {
-        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
-        commands.triggers[trigger].handleMessage.call(this, msg);
+        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return
+        cooldown.addCooldown(msg.author.id, `commands.${keyword}`)
+        commands.triggers[trigger].handleMessage.call(this, msg)
       }
-    });
+    })
   }
-};
+}
 
 module.exports = {
   default: commands
-};
+}
