@@ -306,7 +306,26 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
         fetchMsg.delete();
       }
-    }
+		},
+		{
+      words: [
+        `!appIdeas`,
+      ],
+      help: `provides a link to the best curated app ideas for beginners to advanced devs`,
+      handleMessage: (msg) => {
+        msg.channel.send({
+          embed: {
+            title: 'Florinpop17s Curated App Ideas!',
+            type: 'rich',
+						description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
+						
+						https://github.com/florinpop17/app-ideas
+            `,
+            color: 7506394,
+          }
+        });
+      },
+    },
   ],
   handleMessage: ({ msg, user }) => {
     Object.keys(commands.triggers).map(trigger => {
