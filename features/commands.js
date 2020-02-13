@@ -308,7 +308,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       }
     },
     {
-      words: [`!crosspost`, `!crossposting`],
+      words: [`!crosspost`, `!xpost`],
       help: `explains why and how to avoid crossposting`,
       handleMessage: msg => {
         msg.channel.send({
