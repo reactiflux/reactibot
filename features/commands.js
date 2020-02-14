@@ -91,8 +91,7 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
       handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title:
-              "State Updates May Be Asynchronous",
+            title: "State Updates May Be Asynchronous",
             type: "rich",
             description: `Often times you run into an issue like this
 \`\`\`js
@@ -166,7 +165,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
 https://reactjs.org/docs/lifting-state-up.html`,
             color: 7506394
           }
-        })
+        });
       }
     },
 
@@ -236,22 +235,20 @@ Similarly, don’t DM other members without asking first. All of the same proble
       }
     },
     {
-      words: [
-        `!inputs`,
-      ],
+      words: [`!inputs`],
       help: `provides links to uncontrolled vs controlled components`,
-      handleMessage: (msg) => {
+      handleMessage: msg => {
         msg.channel.send({
           embed: {
-            title: 'Uncontrolled vs Controlled components',
-            type: 'rich',
+            title: "Uncontrolled vs Controlled components",
+            type: "rich",
             description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
 Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
             `,
-            color: 7506394,
+            color: 7506394
           }
         });
-      },
+      }
     },
     {
       words: [`!move`],
@@ -276,7 +273,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
       handleMessage: async msg => {
         const [command, ...args] = msg.content.substring(1).split(/[\s.]/g);
-        const fetchMsg = await msg.channel.send(`Fetching "${args.join(" ")}"...`);
+        const fetchMsg = await msg.channel.send(
+          `Fetching "${args.join(" ")}"...`
+        );
 
         const { fuse } = await MDN.getStore();
         const [topResult, ...rest] = fuse.search(args.join(" "));
@@ -308,6 +307,23 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       }
     },
     {
+      words: [`!appideas`],
+      help: `provides a link to the best curated app ideas for beginners to advanced devs`,
+      handleMessage: msg => {
+        msg.channel.send({
+          embed: {
+            title: "Florinpop17s Curated App Ideas!",
+            type: "rich",
+            description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
+						
+						https://github.com/florinpop17/app-ideas
+						`,
+            color: 7506394
+          }
+        });
+      }
+    },
+    {
       words: [`!crosspost`, `!xpost`],
       help: `explains why and how to avoid crossposting`,
       handleMessage: msg => {
@@ -315,8 +331,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           embed: {
             title: "Crossposting",
             type: "rich",
-            description: `Do not crosspost messages by copying and pasting them into multiple channels. This makes it harder to help you as discussions may be broken up into multiple channels, and takes more space from other users asking questions. Instead, post your message once to the channel you think is most relevant.`,
-            color: 7506394
+            description: `Do not crosspost messages by copying and pasting them into multiple channels. This makes it harder to help you as discussions may be broken up into multiple channels, and takes more space from other users asking questions. Instead, post your message once to the channel you think is most relevant.`
           }
         });
       }
