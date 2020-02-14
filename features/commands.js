@@ -307,7 +307,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       }
     },
     {
-      words: [`!appIdeas`],
+      words: [`!appideas`],
       help: `provides a link to the best curated app ideas for beginners to advanced devs`,
       handleMessage: msg => {
         msg.channel.send({
