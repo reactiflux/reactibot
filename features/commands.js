@@ -101,8 +101,8 @@ const handleEvent = e => {
 }
 \`\`\`
 where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
-Check out these resources for more information:
 
+Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
 https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous`,
             color: 7506394
@@ -210,8 +210,8 @@ You can paste small bits of code directly in chat with syntax highlighting:
 \\\`\\\`\\\`
 
 Or you can upload larger blocks of code (or files) to a service such as https://gist.github.com.
-We are also big fans of https://codesandbox.io/s/new where you can set up a working example of your code (or reproduce your bug). You can even link it to an existing GitHub repo so that others can try out your code live and help you solve your problems.
 
+We are also big fans of https://codesandbox.io/s/new where you can set up a working example of your code (or reproduce your bug). You can even link it to an existing GitHub repo so that others can try out your code live and help you solve your problems.
 `,
             color: 7506394
           }
