@@ -39,9 +39,7 @@ const jobs = {
         })
         .then(d => {
           msg.channel.send(
-            `It looks like you posted quite a long code block. I've removed it and created a GIST of it - please check it at ${
-              d.body.html_url
-            }`,
+            `It looks like you posted quite a long code block. I've removed it and created a GIST of it - please check it at ${d.body.html_url}`,
             {
               reply: msg.author
             }
