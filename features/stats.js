@@ -36,7 +36,7 @@ const stats = client => {
         channel: channel.id,
         messageLength: content.length,
         roles: member
-          ? [...member.roles.cache]
+          ? [...member.roles.cache.values()]
               .map(({ name }) => name)
               // Everybody has 'everyone', so it double-counts when viewing
               // metrics charts.
