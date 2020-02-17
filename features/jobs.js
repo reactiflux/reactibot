@@ -3,7 +3,9 @@ const cooldown = require("./cooldown").default;
 const staffRoles = ["mvp", "moderator", "admin", "admins"];
 
 const isStaff = member =>
-  member.roles.some(role => staffRoles.includes(role.name.toLowerCase()));
+  Array.from(member.roles.cache.values()).some(role =>
+    staffRoles.includes(role.name.toLowerCase())
+  );
 
 const jobs = {
   tags: ["forhire", "for hire", "hiring", "remote", "local"],
@@ -14,7 +16,7 @@ const jobs = {
     });
     if (!hasTags && msg.mentions.members.array().length === 0) {
       if (cooldown.hasCooldown(msg.author.id, "user.jobs")) return;
-      if (isStaff(msg.guild.members.get(msg.author.id))) {
+      if (isStaff(msg.member)) {
         return;
       }
 
