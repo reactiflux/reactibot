@@ -10,7 +10,6 @@ const qna = require("./features/qna").default;
 const jobs = require("./features/jobs").default;
 const autoban = require("./features/autoban").default;
 const commands = require("./features/commands").default;
-const witInvite = require("./features/wit-invite").default;
 const stats = require("./features/stats").default;
 const emojiMod = require("./features/emojiMod").default;
 
@@ -84,7 +83,6 @@ stats(bot);
 
 // reactiflux
 channelHandlers.addHandler("103882387330457600", jobs);
-channelHandlers.addHandler("541673256596537366", witInvite); // #women-in-tech
 channelHandlers.addHandler("106168778013822976", qna); // reactiflux-admin
 channelHandlers.addHandler("193117606629081089", qna); // #q&a
 
