@@ -1,17 +1,19 @@
 {
-  "name": "discordbot",
+  "name": "reactibot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Source code of Reactibot, utilized at Reactiflux server",
+  "private": true,
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reactiflux/reactibot.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "discord.js": "https://github.com/discordjs/discord.js.git",
     "dotenv": "^6.1.0",
