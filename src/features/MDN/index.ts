@@ -1,8 +1,10 @@
-const fetch = require("node-fetch");
-const Fuse = require("fuse.js");
-const { JSDOM } = require("jsdom");
+import fetch from "node-fetch";
+import Fuse, { FuseOptions } from "fuse.js";
+import { JSDOM } from "jsdom";
 
-const fuseOptions = {
+export type MdnStoreCacheItem = { title: string; href: string };
+
+const fuseOptions: FuseOptions<MdnStoreCacheItem> = {
   shouldSort: true,
   includeScore: true,
   threshold: 0.8,
@@ -14,37 +16,36 @@ const fuseOptions = {
   keys: ["title"]
 };
 
-const MDN = (() => {
-  let store;
+type Store = {
+  cache?: Array<MdnStoreCacheItem>;
+  fuse?: Fuse<MdnStoreCacheItem, typeof fuseOptions>;
+};
 
-  const buildStore = async () => {
-    const obj = {};
-    const stringDOM = await fetch(
-      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Index"
-    ).then(res => res.text());
+let store: Store = null;
 
-    const { document } = new JSDOM(stringDOM).window;
-    const queryResults = [
-      ...document.querySelectorAll('#wikiArticle table tr td[rowspan="2"] > a')
-    ];
+const buildStore = async () => {
+  const obj: Store = {};
+  const stringDOM = await fetch(
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Index"
+  ).then(res => res.text());
 
-    obj.cache = queryResults.map(r => ({
-      title: r.textContent,
-      href: r.href
-    }));
-    obj.fuse = new Fuse(obj.cache, fuseOptions);
-    return obj;
-  };
+  const { document } = new JSDOM(stringDOM).window;
+  const queryResults = [
+    ...document.querySelectorAll('#wikiArticle table tr td[rowspan="2"] > a')
+  ] as HTMLAnchorElement[];
 
-  return {
-    getStore: async () => {
-      if (!store) store = await buildStore();
-      return store;
-    },
-    baseUrl: `https://developer.mozilla.org`
-  };
-})();
+  obj.cache = queryResults.map(r => ({
+    title: r.textContent,
+    href: r.href
+  }));
+  obj.fuse = new Fuse(obj.cache, fuseOptions);
+  return obj;
+};
 
-module.exports = {
-  MDN
+export const MDN = {
+  getStore: async () => {
+    if (!store) store = await buildStore();
+    return store;
+  },
+  baseUrl: `https://developer.mozilla.org`
 };

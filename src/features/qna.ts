@@ -1,127 +1,135 @@
-const qna = {
-  pending: 1,
-  answered: 2,
-  allowedRoles: ["moderator", "Moderator", "admin", "Admin"],
+import { Message, TextChannel, DMChannel } from "discord.js";
+import { ChannelHandlers } from "../types";
 
-  list: {},
-  counter: 0,
+const ALLOWED_ROLES = ["moderator", "Moderator", "admin", "Admin"];
 
-  prevMessage: [],
+enum QnAMessageType {
+  Question,
+  Answer
+}
 
-  counterAsWord: q => {
-    if (q === 0) return ":zero:";
-    if (q === 1) return ":one:";
-    if (q === 2) return ":two:";
-    if (q === 3) return ":three:";
-    else return "more than three";
+type QnAMessages = {
+  [messageId: string]: QnAMessageType;
+};
+
+const qnaMessages: QnAMessages = {};
+let counter = 0;
+let prevMessagesIds: string[] = [];
+
+const counterAsWord = (q: number) => {
+  if (q === 0) return ":zero:";
+  if (q === 1) return ":one:";
+  if (q === 2) return ":two:";
+  if (q === 3) return ":three:";
+  else return "more than three";
+};
+
+const flush = (channel: TextChannel | DMChannel) => {
+  prevMessagesIds.forEach(oldId =>
+    channel.messages.fetch(oldId).then(msg => msg.delete())
+  );
+  prevMessagesIds = [];
+};
+
+const prompt = (msg: Message) => {
+  if (counter < 3) {
+    msg.channel
+      .send(
+        `:robot: Please ask your question now. Our guest has ${counterAsWord(
+          counter
+        )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`
+      )
+      .then(msg => {
+        flush(msg.channel);
+        prevMessagesIds.push(msg.id);
+      });
+  } else {
+    msg.channel
+      .send(
+        `:robot: Please stop your questions for now. Our guest has ${counterAsWord(
+          counter
+        )} questions queued.`
+      )
+      .then(msg => {
+        flush(msg.channel);
+        prevMessagesIds.push(msg.id);
+      });
+  }
+};
+
+type Commands = {
+  [trigger: string]: (msg: Message) => void;
+};
+
+const reactionCommands: Commands = {
+  "🇶": msg => {
+    qnaMessages[msg.id] = QnAMessageType.Question;
+    counter++;
+    prompt(msg);
   },
-
-  flush: msg => {
-    qna.prevMessage.forEach(oldId =>
-      msg.channel.fetchMessage(oldId).then(msg => msg.delete())
-    );
-    qna.prevMessage = [];
+  "🇦": msg => {
+    qnaMessages[msg.id] = QnAMessageType.Answer;
+    if (counter === 0) return;
+    counter--;
+    prompt(msg);
   },
-
-  prompt: msg => {
-    if (qna.counter < 3) {
-      msg.channel
-        .send(
-          `:robot: Please ask your question now. Our guest has ${qna.counterAsWord(
-            qna.counter
-          )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`
-        )
-        .then(msg => {
-          qna.flush(msg);
-          qna.prevMessage.push(msg.id);
-        });
-    } else {
-      msg.channel
-        .send(
-          `:robot: Please stop your questions for now. Our guest has ${qna.counterAsWord(
-            qna.counter
-          )} questions queued.`
-        )
-        .then(msg => {
-          qna.flush(msg);
-          qna.prevMessage.push(msg.id);
-        });
-    }
-  },
-
-  triggers: {
-    "🇶": (msg, user) => {
-      qna.list[msg.id] = qna.pending;
-      qna.counter++;
-      qna.prompt(msg);
-    },
-    "🇦": (msg, user) => {
-      qna.list[msg.id] = qna.answered;
-      if (qna.counter === 0) return;
-      qna.counter--;
-      qna.prompt(msg);
-    },
-    "❌": (msg, user) => {
-      msg.author
-        .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
-			
+  "❌": msg => {
+    msg.author
+      .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
+    
 Most likely the message was removed, because we try to limit the current unanswered messages count to about 3, our guest(s) might need more time to answer all the questions.
-			
+    
 Please feel free to ask your question again when a slot becomes open. I've copied the question bellow for you:
-			
+    
 \`\`\`
 ${msg.content}
 \`\`\`
-			
+    
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
-      msg.delete();
-    }
+    msg.delete();
+  }
+};
+
+const messageCommands: Commands = {
+  "!qa:reset": () => {
+    counter = 0;
   },
+  "!qa:count": msg => {
+    prompt(msg);
+  }
+};
 
-  commands: [
-    {
-      words: [`!qa:reset`],
-      handleMessage: msg => {
-        qna.counter = 0;
-      }
-    },
-    {
-      words: [`!qa:count`],
-      handleMessage: msg => {
-        qna.prompt(msg);
-      }
-    }
-  ],
+const qna: ChannelHandlers = {
+  handleMessage: ({ msg }) => {
+    const command = messageCommands[msg.content.toLowerCase()];
+    if (!command) return;
 
-  handleMessage: ({ msg, user }) => {
-    Object.keys(qna.commands).map(trigger => {
-      const keyword = qna.commands[trigger].words.find(word => {
-        return msg.content.toLowerCase().includes(word);
-      });
-
-      if (keyword) {
-        msg.guild.fetchMember(user.id).then(user => {
-          if (qna.allowedRoles.find(role => user.roles.find("name", role))) {
-            qna.commands[trigger].handleMessage.call(this, msg);
-          }
-        });
-      }
+    const author = msg.guild.member(msg.author);
+    const allowed = ALLOWED_ROLES.some(allowedRole => {
+      return author.roles.cache.has(allowedRole);
     });
+
+    if (allowed) {
+      command(msg);
+    }
   },
 
   handleReaction: ({ reaction, user }) => {
-    if (qna.list[reaction.message.id]) return;
-    const emoji = reaction.emoji.toString();
-    if (qna.triggers[emoji]) {
-      reaction.message.guild.fetchMember(user.id).then(user => {
-        if (qna.allowedRoles.find(role => user.roles.find("name", role))) {
-          qna.triggers[emoji].call(this, reaction.message, user);
-        }
-      });
+    // We already handled this message, skip it
+    if (qnaMessages[reaction.message.id]) return;
+
+    const command = reactionCommands[reaction.emoji.toString()];
+    if (!command) return;
+
+    const author = reaction.message.guild.member(user.id);
+    const allowed = ALLOWED_ROLES.some(allowedRole => {
+      return author.roles.cache.has(allowedRole);
+    });
+
+    if (allowed) {
+      command(reaction.message);
     }
   }
 };
 
-module.exports = {
-  default: qna
-};
+export default qna;

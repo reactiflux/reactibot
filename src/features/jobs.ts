@@ -1,21 +1,20 @@
-const cooldown = require("./cooldown").default;
+import { ChannelHandlers } from "../types";
+import { isStaff } from "../utils";
+import cooldown from "./cooldown";
 
-const staffRoles = ["mvp", "moderator", "admin", "admins"];
+const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
-const isStaff = member =>
-  Array.from(member.roles.cache.values()).some(role =>
-    staffRoles.includes(role.name.toLowerCase())
-  );
-
-const jobs = {
-  tags: ["forhire", "for hire", "hiring", "remote", "local"],
-  handleMessage: ({ msg, user }) => {
+const jobs: ChannelHandlers = {
+  handleMessage: ({ msg }) => {
     let hasTags = false;
-    jobs.tags.forEach(tag => {
+
+    tags.forEach(tag => {
       if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
     });
+
     if (!hasTags && msg.mentions.members.array().length === 0) {
       if (cooldown.hasCooldown(msg.author.id, "user.jobs")) return;
+
       if (isStaff(msg.member)) {
         return;
       }
@@ -40,6 +39,4 @@ Thank you :)
   }
 };
 
-module.exports = {
-  default: jobs
-};
+export default jobs;

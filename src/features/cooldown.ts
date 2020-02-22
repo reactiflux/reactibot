@@ -1,25 +1,29 @@
-const cooldown = {
-  cooldowns: {},
+type Cooldowns = {
+  [id: string]: boolean;
+};
 
-  addCooldown: (id, type = "user", time = 30) => {
+const cooldowns: Cooldowns = {};
+
+const cooldown = {
+  addCooldown: (id: string, type = "user", timeInSeconds = 30) => {
     const key = `${id}.${type}`;
-    cooldown.cooldowns[key] = true;
+
+    cooldowns[key] = true;
+
     setTimeout(() => {
       cooldown.removeCooldown(id, type);
-    }, time * 1000);
+    }, timeInSeconds * 1000);
   },
 
-  removeCooldown: (id, type) => {
+  removeCooldown: (id: string, type: string) => {
     const key = `${id}.${type}`;
-    cooldown.cooldowns[key] = false;
+    cooldowns[key] = false;
   },
 
-  hasCooldown: (id, type = "user") => {
+  hasCooldown: (id: string, type = "user") => {
     const key = `${id}.${type}`;
-    return cooldown.cooldowns[key] === true;
+    return cooldowns[key] === true;
   }
 };
 
-module.exports = {
-  default: cooldown
-};
+export default cooldown;
