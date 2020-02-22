@@ -17,11 +17,11 @@ const fuseOptions: FuseOptions<MdnStoreCacheItem> = {
 };
 
 type Store = {
-  cache?: Array<MdnStoreCacheItem>;
+  cache?: MdnStoreCacheItem[];
   fuse?: Fuse<MdnStoreCacheItem, typeof fuseOptions>;
 };
 
-let store: Store = null;
+let store: Store | null = null;
 
 const buildStore = async () => {
   const obj: Store = {};
@@ -37,7 +37,7 @@ const buildStore = async () => {
   obj.cache = queryResults.map(r => ({
     title: r.textContent,
     href: r.href
-  }));
+  })) as MdnStoreCacheItem[];
   obj.fuse = new Fuse(obj.cache, fuseOptions);
   return obj;
 };

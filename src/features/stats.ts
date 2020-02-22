@@ -43,10 +43,13 @@ const stats = (client: Client) => {
 
   client.on("message", msg => {
     const { member, author, channel, content } = msg;
+
+    if (!channel || !author) return;
+
     emitEvent(EVENTS.message, {
       data: {
         channel: channel.id,
-        messageLength: content.length,
+        messageLength: content?.length ?? 0,
         roles: member
           ? [...member.roles.cache.values()]
               .map(({ name }) => name)

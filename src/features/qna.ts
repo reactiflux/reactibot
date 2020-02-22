@@ -104,9 +104,9 @@ const qna: ChannelHandlers = {
     const command = messageCommands[msg.content.toLowerCase()];
     if (!command) return;
 
-    const author = msg.guild.member(msg.author);
+    const author = msg.guild?.member(msg.author);
     const allowed = ALLOWED_ROLES.some(allowedRole => {
-      return author.roles.cache.has(allowedRole);
+      return author?.roles.cache.has(allowedRole);
     });
 
     if (allowed) {
@@ -121,9 +121,9 @@ const qna: ChannelHandlers = {
     const command = reactionCommands[reaction.emoji.toString()];
     if (!command) return;
 
-    const author = reaction.message.guild.member(user.id);
+    const author = reaction.message.guild?.member(user.id);
     const allowed = ALLOWED_ROLES.some(allowedRole => {
-      return author.roles.cache.has(allowedRole);
+      return author?.roles.cache.has(allowedRole);
     });
 
     if (allowed) {

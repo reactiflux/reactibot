@@ -106,7 +106,11 @@ bot.on("messageReactionAdd", async (reaction, user) => {
 });
 
 bot.on("message", msg => {
-  if (msg.author.id === bot.user.id) return;
+  if (msg.partial) {
+    return;
+  }
+
+  if (msg.author.id === bot.user?.id) return;
 
   handleMessage(msg);
 });
@@ -118,7 +122,7 @@ bot.on("ready", () => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
-  bot.user.setActivity("for !commands", { type: "WATCHING" });
+  bot.user?.setActivity("for !commands", { type: "WATCHING" });
 });
 
 bot.on("error", err => {

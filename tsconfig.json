@@ -4,10 +4,12 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "dist",
-    "strict": false,
-    "allowJs": true,
+    "strict": true,
+    "allowJs": false,
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

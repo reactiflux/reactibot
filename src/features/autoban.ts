@@ -16,13 +16,14 @@ const autoban: ChannelHandlers = {
     });
 
     if (hasToken) {
-      msg.author.send(
-        `Hello there! Our automated systems detected your message as a spam message and you have been banned from the server. If this is an error on our side, please feel free to contact one of the moderators.`
-      );
-
-      msg.delete();
-      msg.guild.member(msg.author).ban(); // TODO: test this
-      //msg.guild.members.ban(msg.author); <- alternative
+      msg.author
+        .send(
+          `Hello there! Our automated systems detected your message as a spam message and you have been banned from the server. If this is an error on our side, please feel free to contact one of the moderators.`
+        )
+        .then(() => {
+          msg.delete();
+          msg.guild?.member(msg.author)?.ban();
+        });
     }
   }
 };

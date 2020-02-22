@@ -266,9 +266,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const [, newChannel] = msg.content.split(" ");
 
       try {
-        const targetChannel = msg.guild.channels.cache.get(
+        const targetChannel = msg.guild?.channels.cache.get(
           newChannel.replace("<#", "").replace(">", "")
         ) as TextChannel;
+
+        if (!msg.mentions.members) return;
 
         targetChannel.send(
           `${msg.author} has opened a portal from ${
@@ -290,16 +292,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       );
 
       const { fuse } = await MDN.getStore();
-      const [topResult] = fuse.search(args.join(" ")) as Array<{
+      const [topResult] = fuse?.search(args.join(" ")) as Array<{
         item: MdnStoreCacheItem;
       }>;
       const stringDOM = await fetch(
         `${MDN.baseUrl}${topResult.item.href}`
       ).then(res => res.text());
       const { document } = new JSDOM(stringDOM).window;
-      const title = document.querySelector(".title").textContent;
+      const title = document.querySelector(".title")?.textContent;
       const description = document.querySelector("#wikiArticle > p")
-        .textContent;
+        ?.textContent;
 
       await msg.channel.send({
         embed: {
@@ -342,6 +344,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
 const commands: ChannelHandlers = {
   handleMessage: ({ msg }) => {
+    if (!msg.guild) {
+      return;
+    }
+
     commandsList.forEach(command => {
       const keyword = command.words.find(word => {
         return msg.content.toLowerCase().indexOf(word) === 0;
