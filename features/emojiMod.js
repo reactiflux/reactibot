@@ -3,7 +3,7 @@ const cooldown = require("./cooldown").default;
 const staffRoles = ["mvp", "moderator", "admin", "admins"];
 
 const isStaff = member =>
-  (member.roles || []).some(role =>
+  (member.roles.cache || []).some(role =>
     staffRoles.includes(role.name.toLowerCase())
   );
 
@@ -25,16 +25,16 @@ const reactionHandlers = {
     if (!isStaff(member)) {
       return;
     }
-    if (isStaff(message.guild.members.get(message.author.id))) {
+    if (isStaff(message.guild.members.cache.get(message.author.id))) {
       return;
     }
-    const usersWhoReacted = reaction.users.map(user =>
-      message.guild.members.get(user.id)
+    const usersWhoReacted = reaction.users.cache.map(user =>
+      message.guild.members.cache.get(user.id)
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
-    const modLogChannel = bot.channels.find(
+    const modLogChannel = bot.channels.cache.find(
       channel =>
         channel.name === "mod-log" || channel.id === "257930126145224704"
     );
@@ -93,8 +93,8 @@ const reactionHandlers = {
 
     const reactions = thumbsDownEmojis.reduce(
       (acc, emoji) => {
-        if (message.reactions.get(emoji)) {
-          acc.count += message.reactions.get(emoji).count;
+        if (message.reactions.cache.get(emoji)) {
+          acc.count += message.reactions.cache.get(emoji).count;
 
           // todo: figure out how to do this
           // acc.users.push(Object.values(message.reactions.get(emoji).users));
@@ -110,7 +110,7 @@ const reactionHandlers = {
 
     const numberOfTotalReactions = reactions.count;
 
-    const modLogChannel = bot.channels.find(
+    const modLogChannel = bot.channels.cache.find(
       channel => channel.name === "mod-log"
     );
 
@@ -164,7 +164,7 @@ const emojiMod = bot => ({
         bot,
         reaction,
         message,
-        message.guild.members.get(user.id)
+        message.guild.members.cache.get(user.id)
       );
     }
   }

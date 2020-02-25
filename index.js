@@ -13,7 +13,9 @@ const commands = require("./features/commands").default;
 const stats = require("./features/stats").default;
 const emojiMod = require("./features/emojiMod").default;
 
-const bot = new discord.Client({ partials: ["MESSAGE", "CHANNEL"] });
+const bot = new discord.Client({
+  partials: ["MESSAGE", "CHANNEL", "REACTION"]
+});
 bot.login(process.env.DISCORD_HASH);
 
 const channelHandlers = {
@@ -101,6 +103,14 @@ bot.on("messageReactionAdd", async (reaction, user) => {
       await reaction.message.fetch();
     } catch (error) {
       console.log("Something went wrong when fetching the message: ", error);
+    }
+  }
+
+  if (reaction.partial) {
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.log("Something went wrong when fetching the reaction: ", error);
     }
   }
 
