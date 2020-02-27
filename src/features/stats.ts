@@ -13,14 +13,12 @@ const emitEvent = (
   { data, userId }: { data?: EmitEventData; userId?: string } = {}
 ) => {
   const fields = {
-    /* eslint-disable @typescript-eslint/camelcase */
     api_key: process.env.AMPLITUDE_KEY,
     event: JSON.stringify({
       user_id: userId,
       event_type: eventName,
       event_properties: data
     })
-    /* eslint-enable @typescript-eslint/camelcase */
   };
 
   fetch(`https://api.amplitude.com/httpapi?${queryString.stringify(fields)}`);

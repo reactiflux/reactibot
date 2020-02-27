@@ -309,7 +309,6 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           author: {
             name: "MDN",
             url: `${MDN.baseUrl}`,
-            // eslint-disable-next-line @typescript-eslint/camelcase
             icon_url:
               "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
           },
