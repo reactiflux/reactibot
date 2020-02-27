@@ -34,10 +34,10 @@ const buildStore = async () => {
     ...document.querySelectorAll('#wikiArticle table tr td[rowspan="2"] > a')
   ] as HTMLAnchorElement[];
 
-  obj.cache = queryResults.map(r => ({
-    title: r.textContent,
+  obj.cache = queryResults.map<MdnStoreCacheItem>(r => ({
+    title: r.textContent || "",
     href: r.href
-  })) as MdnStoreCacheItem[];
+  }));
   obj.fuse = new Fuse(obj.cache, fuseOptions);
   return obj;
 };
