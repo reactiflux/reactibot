@@ -17,7 +17,9 @@ import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import { ChannelHandlers } from "./types";
 
-const bot = new discord.Client({ partials: ["MESSAGE", "CHANNEL"] });
+const bot = new discord.Client({
+  partials: ["MESSAGE", "CHANNEL", "REACTION"]
+});
 bot.login(process.env.DISCORD_HASH);
 
 export type ChannelHandlersById = {
@@ -92,6 +94,14 @@ addHandler("*", emojiMod);
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
     return;
+  }
+
+  if (reaction.partial) {
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.log("Something went wrong when fetching the reaction: ", error);
+    }
   }
 
   if (reaction.message.partial) {
