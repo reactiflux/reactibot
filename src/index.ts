@@ -93,7 +93,11 @@ addHandler("*", emojiMod);
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
-    return;
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.log("Something went wrong when fetching the user: ", error);
+    }
   }
 
   if (reaction.partial) {
@@ -115,12 +119,24 @@ bot.on("messageReactionAdd", async (reaction, user) => {
   handleReaction(reaction, user as User);
 });
 
-bot.on("message", msg => {
+bot.on("message", async msg => {
   if (msg.partial) {
-    return;
+    try {
+      await msg.fetch();
+    } catch (e) {
+      console.log("Something went wrong when fetching the message: ", e);
+    }
   }
 
-  if (msg.author.id === bot.user?.id) return;
+  if (msg.author?.partial) {
+    try {
+      await msg.author?.fetch();
+    } catch (e) {
+      console.log("Something went wrong when fetching the message: ", e);
+    }
+  }
+
+  if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
 });
