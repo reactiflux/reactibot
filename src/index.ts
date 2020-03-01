@@ -108,34 +108,10 @@ bot.on("messageReactionAdd", async (reaction, user) => {
     }
   }
 
-  if (reaction.message.partial) {
-    try {
-      await reaction.message.fetch();
-    } catch (e) {
-      console.log("Something went wrong when fetching the message: ", e);
-    }
-  }
-
   handleReaction(reaction, user as User);
 });
 
 bot.on("message", async msg => {
-  if (msg.partial) {
-    try {
-      await msg.fetch();
-    } catch (e) {
-      console.log("Something went wrong when fetching the message: ", e);
-    }
-  }
-
-  if (msg.author?.partial) {
-    try {
-      await msg.author?.fetch();
-    } catch (e) {
-      console.log("Something went wrong when fetching the message: ", e);
-    }
-  }
-
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
