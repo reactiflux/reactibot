@@ -1,11 +1,7 @@
-const cooldown = require("./cooldown").default;
-
-const staffRoles = ["mvp", "moderator", "admin", "admins"];
-
-const isStaff = member =>
-  (member.roles.cache || []).some(role =>
-    staffRoles.includes(role.name.toLowerCase())
-  );
+import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
+import cooldown from "./cooldown";
+import { isStaff } from "../utils";
+import { ChannelHandlers } from "../types";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -16,37 +12,54 @@ const config = {
   deletionThreshold: Infinity
 };
 
-const warningMessages = {};
+type WarningMessages = {
+  [messageId: string]: Message;
+};
+
+const warningMessages: WarningMessages = {};
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
-const reactionHandlers = {
-  "⚠️": (bot, reaction, message, member) => {
-    if (!isStaff(member)) {
+type ReactionHandlers = {
+  [emoji: string]: (
+    reaction: MessageReaction,
+    message: Message,
+    member: GuildMember
+  ) => void;
+};
+
+const reactionHandlers: ReactionHandlers = {
+  "⚠️": (reaction, message, member) => {
+    // Skip if the user that reacted isn't in the staff of the post is from someone
+    // from the staff
+    if (
+      !message.guild ||
+      !message.author ||
+      !isStaff(member) ||
+      isStaff(message.guild.member(message.author.id))
+    ) {
       return;
     }
-    if (isStaff(message.guild.members.cache.get(message.author.id))) {
-      return;
-    }
+
     const usersWhoReacted = reaction.users.cache.map(user =>
-      message.guild.members.cache.get(user.id)
+      message.guild?.member(user.id)
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
-    const modLogChannel = bot.channels.cache.find(
+    const modLogChannel = message.guild?.channels.cache.find(
       channel =>
         channel.name === "mod-log" || channel.id === "257930126145224704"
-    );
+    ) as TextChannel;
 
     const userNames = usersWhoReacted
       .filter(user => !isStaff(user))
-      .map(member => member.user.username)
+      .map(member => member?.user.username)
       .join(", ");
 
     const staffNames = usersWhoReacted
       .filter(isStaff)
-      .map(member => member.user.username)
+      .map(member => member?.user.username)
       .join(", ");
 
     let logMessage = "";
@@ -54,7 +67,7 @@ const reactionHandlers = {
       "\n\n",
       `\`${message.content}\``,
       "\n\n",
-      `Link: https://discordapp.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
+      `Link: https://discordapp.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
       "\n\n",
       userNames && `Reactors: \`${userNames}\``,
       staffNames && userNames && "\n",
@@ -85,16 +98,17 @@ const reactionHandlers = {
       }
     }
   },
-  "👎": (bot, reaction, message, member) => {
-    if (cooldown.hasCooldown(member.id, "thumbsdown")) {
+  "👎": (reaction, message, member) => {
+    if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;
     }
+
     cooldown.addCooldown(member.id, "thumbsdown", 60); // 1 minute
 
     const reactions = thumbsDownEmojis.reduce(
       (acc, emoji) => {
         if (message.reactions.cache.get(emoji)) {
-          acc.count += message.reactions.cache.get(emoji).count;
+          acc.count += message.reactions.cache.get(emoji)?.count || 0;
 
           // todo: figure out how to do this
           // acc.users.push(Object.values(message.reactions.get(emoji).users));
@@ -110,9 +124,10 @@ const reactionHandlers = {
 
     const numberOfTotalReactions = reactions.count;
 
-    const modLogChannel = bot.channels.cache.find(
-      channel => channel.name === "mod-log"
-    );
+    const modLogChannel = message.guild.channels.cache.find(
+      channel =>
+        channel.name === "mod-log" || channel.id === "257930126145224704"
+    ) as TextChannel;
 
     let logMessage = "";
     const logMessageEnding = [
@@ -142,34 +157,31 @@ const reactionHandlers = {
   }
 };
 
-const emojiMod = bot => ({
-  handleReaction: ({ reaction, user }) => {
+const emojiMod: ChannelHandlers = {
+  handleReaction: ({ reaction, user, bot }) => {
     const { message } = reaction;
-    const { member } = message;
-    if (user.id === bot.user.id) {
+
+    if (
+      !message.guild ||
+      user.id === bot.user?.id ||
+      message.author.id === bot.user?.id
+    )
       return;
-    }
-    if (message.author.id === bot.user.id) {
-      return;
-    }
+
     let emoji = reaction.emoji.toString();
 
     if (thumbsDownEmojis.includes(emoji)) {
       emoji = "👎";
     }
 
+    const member = message.guild.member(user.id);
+    if (!member) return;
+
     const reactionHandler = reactionHandlers[emoji];
     if (reactionHandler) {
-      reactionHandler(
-        bot,
-        reaction,
-        message,
-        message.guild.members.cache.get(user.id)
-      );
+      reactionHandler(reaction, message, member);
     }
   }
-});
-
-module.exports = {
-  default: emojiMod
 };
+
+export default emojiMod;
