@@ -211,16 +211,14 @@ Good:
           title: "Attaching Code",
           type: "rich",
           description: `When asking a question, try to include as much relevant code as you can.
-
-You can paste small bits of code directly in chat with syntax highlighting:
+Paste small bits of code directly in chat with syntax highlighting:
 
 \\\`\\\`\\\`js
 // your code goes here
 \\\`\\\`\\\`
 
-Or you can upload larger blocks of code (or files) to a service such as https://gist.github.com.
-
-We are also big fans of https://codesandbox.io/s/new where you can set up a working example of your code (or reproduce your bug). You can even link it to an existing GitHub repo so that others can try out your code live and help you solve your problems.
+Link a Gist to upload entire files: https://gist.github.com
+Link a Code Sandbox to share runnable examples: https://codesandbox.io/s/new
 `,
           color: EMBED_COLOR
         }
