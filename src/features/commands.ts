@@ -342,6 +342,26 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
+  },
+  {
+    words: [`!cors`],
+    help: `provides a link to what CORS is and how to fix it`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Understanding CORS",
+          type: "rich",
+          description: `
+          Cross-Origin Resource Sharing (CORS) is a mechanism that lets remote servers restrict which origin (i.e your website) can access it.
+          
+          Read more at:
+          https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
+          https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
