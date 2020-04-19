@@ -1,4 +1,4 @@
-import { Message, TextChannel, DMChannel } from "discord.js";
+import { Message, TextChannel, DMChannel, NewsChannel } from "discord.js";
 import { ChannelHandlers } from "../types";
 
 const ALLOWED_ROLES = ["moderator", "Moderator", "admin", "Admin"];
@@ -24,7 +24,7 @@ const counterAsWord = (q: number) => {
   else return "more than three";
 };
 
-const flush = (channel: TextChannel | DMChannel) => {
+const flush = (channel: TextChannel | DMChannel | NewsChannel) => {
   prevMessagesIds.forEach(oldId =>
     channel.messages.fetch(oldId).then(msg => msg.delete())
   );
