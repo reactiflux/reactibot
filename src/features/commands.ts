@@ -293,6 +293,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const [topResult] = fuse?.search(args.join(" ")) as Array<{
         item: MdnStoreCacheItem;
       }>;
+
+      if (!topResult) {
+        fetchMsg.edit(`Could not find anything on MDN for '${args.join(" ")}'`);
+        return;
+      }
+
       const stringDOM = await fetch(
         `${MDN.baseUrl}${topResult.item.href}`
       ).then(res => res.text());
