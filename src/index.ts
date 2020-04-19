@@ -72,7 +72,9 @@ const handleReaction = (reaction: MessageReaction, user: User) => {
 };
 
 logger.add(stdoutLog);
-logger.add(channelLog(bot, "479862475047567361"));
+if (process.env.BOT_LOG) {
+  logger.add(channelLog(bot, process.env.BOT_LOG)); // #bot-log
+}
 
 // Amplitude metrics
 setupStats(bot);
@@ -134,3 +136,12 @@ bot.on("error", err => {
     logger.log("ERR", err + "");
   }
 });
+
+const errorHandler = (error: any) => {
+  if (error && error.message) {
+    logger.log("ERROR", error.message);
+  }
+};
+
+process.on("uncaughtException", errorHandler);
+process.on("unhandledRejection", errorHandler);
