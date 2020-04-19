@@ -341,7 +341,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
 const commands: ChannelHandlers = {
   handleMessage: ({ msg }) => {
-    if (!msg.guild) {
+    if (!msg.guild && msg.channel.type !== "dm") {
       return;
     }
 
