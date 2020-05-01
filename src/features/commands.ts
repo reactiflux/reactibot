@@ -362,6 +362,44 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
+  },
+  {
+    words: [`!fetch`, `!async`],
+    help: `explains conditional rendering with fetch`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Fetching and Conditional Rendering",
+          type: "rich",
+          description: `When setting state from an asynchronous operation like fetch, the data from your fetch will not immediately be available in your render function.
+
+For example:
+\`\`\`js
+useEffect(() => {
+  fetch("https://jsonplaceholder.typicode.com/todos/")
+    .then(response => response.json())
+    .then(data => setTodos(data));
+}, []);
+\`\`\`
+
+When iterating over this data, you might get an error like \`Cannot get property map of undefined\`. A simple condition in your render function can prevent this:
+\`\`\`js
+<ul>
+  {todos &&
+    todos.map(todo => (
+      <li key={todo.id} className={todo.completed && "completed"}>
+        {todo.title}
+      </li>
+    ))}
+</ul>
+\`\`\`
+
+A helpful useAPI hook: https://andrewstevens.dev/posts/useApi-react-hook/
+`,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
