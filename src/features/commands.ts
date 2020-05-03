@@ -362,6 +362,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
+  },
+  {
+    words: [`!immutability`, `!imm`],
+    help: `provides resources for helping with immutability`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Immutable updates",
+          type: "rich",
+          description: `Immutable updates involve modifying data by creating new, updated objects instead of modifying the original object directly.
+          You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
+
+          https://daveceddia.com/react-redux-immutability-guide/
+          https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
