@@ -371,8 +371,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embed: {
           title: "Immutability",
           type: "rich",
-          description: `Immutability is the concept of updating data by creating entirely new variables that do not have references to previous data.
-          You can not modify existing data directly and must update the entire object.  
+          description: `Immutability is the concept of updating data by creating new values rather than mutating values at existing references.
+          You cannot modify existing data directly in React or Redux.
 
           https://daveceddia.com/react-redux-immutability-guide/
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
