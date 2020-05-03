@@ -371,8 +371,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embed: {
           title: "Immutability",
           type: "rich",
-          description: `Immutable update patterns is the concept of updating data by creating new values rather than mutating values at existing references.
-          You should not modify existing data directly in React or Redux, or your UI may not update properly.
+          description: `Immutability is the concept of updating data by copying objects and arrays and modifying the copies, instead of modifying the original items.
+          You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
           https://daveceddia.com/react-redux-immutability-guide/
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
