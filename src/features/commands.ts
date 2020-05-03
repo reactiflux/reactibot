@@ -369,9 +369,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     handleMessage: msg => {
       msg.channel.send({
         embed: {
-          title: "Immutability",
+          title: "Immutable updates",
           type: "rich",
-          description: `Immutability is the concept of updating data by copying objects and arrays and modifying the copies, instead of modifying the original items.
+          description: `Immutable updates involve modifying data by creating new, updated objects instead of modifying the original object directly.
           You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
           https://daveceddia.com/react-redux-immutability-guide/
