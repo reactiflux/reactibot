@@ -342,6 +342,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
+  },
+  {
+    words: [`!immutability`],
+    help: `provides resources for helping with immutability`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Immutability",
+          type: "rich",
+          description: `Immutability is the concept of updating data by creating entirely new variables that do not have references to previous data.
+          You can not modify existing data directly and must update the entire object.  
+
+          https://daveceddia.com/react-redux-immutability-guide/
+          https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
