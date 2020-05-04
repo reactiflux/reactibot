@@ -286,7 +286,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const query = args.join(" ");
       const [fetchMsg, res] = await Promise.all([
         msg.channel.send(`Fetching "${query}"...`),
-        fetch(`https://developer.mozilla.org/api/v1/search/en-US?q=${query}`)
+        fetch(
+          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`
+        )
       ]);
 
       const { documents } = await res.json();
@@ -388,7 +390,7 @@ const commands: ChannelHandlers = {
       });
 
       if (keyword) {
-        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
+        // if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
         cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
         command.handleMessage(msg);
       }
