@@ -381,6 +381,26 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
+  },
+  {
+    words: [`!formatting`, `!prettier`],
+    help: `describes Prettier and explains how to use it to format code`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Formatting code with Prettier",
+          type: "rich",
+          description: `Inconsistent indentation and syntax can make it more difficult to understand code, create churn from style debates, and cause logic and syntax errors.
+
+Prettier is a modern and well-supported formatter that completely reformats your code to be more readable and follow best practices.
+
+To format some code without installing anything, use the playground: https://prettier.io/playground/
+To enforce its style in your projects, use the CLI: https://prettier.io/docs/en/install.html
+To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
