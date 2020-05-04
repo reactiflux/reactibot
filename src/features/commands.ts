@@ -297,7 +297,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         return;
       }
 
-      const { title, exerpt: description, slug, locale } = topResult;
+      const { title, excerpt: description, slug, locale } = topResult;
 
       await msg.channel.send({
         embed: {
