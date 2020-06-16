@@ -216,7 +216,7 @@ Paste small bits of code directly in chat with syntax highlighting:
 \\\`\\\`\\\`
 
 Link a Gist to upload entire files: https://gist.github.com
-Link a Code Sandbox to share runnable examples: https://codesandbox.io/s/new
+Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 `,
           color: EMBED_COLOR
         }
