@@ -16,7 +16,7 @@ export const channelLog = (bot: Client, channelID: string): Logger => (
   try {
     const channel = bot.channels.cache.get(channelID) as TextChannel;
     if (channel) {
-    channel.send(`[${type}] ${text}`);
+      channel.send(`[${type}] ${text}`);
     }
   } catch (error) {
     console.error(error);
