@@ -4,15 +4,47 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install
-      run: npm ci
-    - name: Test
-      run: npm test
-    - name: Build
-      run: npm run build --if-present
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build --if-present
+
+  deployment:
+    if: contains(['master', 'develop', 'feature/actions'], 'bug')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout to branch
+        uses: actions/checkout@v1
+        with:
+          ref: ${{ github.ref }}
+      - name: Push to server
+        uses: appleboy/ssh-action@master
+        env:
+          AMPLITUDE_KEY: ${{ secrets.AMPLITUDE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
+          BOT_LOG: ${{ secrets.BOT_LOG }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_HEAD_REF,BOT_LOG
+          script: |
+            cd reactibot
+            sudo git config --global url."https://".insteadOf git://
+            sudo git config --global url."https://github.com/".insteadOf git@github.com
+            sudo git checkout $GITHUB_HEAD_REF
+            sudo git pull
+            sudo docker container stop $(sudo docker container ls -aq)
+            sudo docker container rm $(sudo docker container ls -aq)
+            sudo docker image prune -f
+            sudo docker build -t reactiflux/reactibot:latest .
+            sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH -e BOT_LOG=$BOT_LOG reactiflux/reactibot:latest
