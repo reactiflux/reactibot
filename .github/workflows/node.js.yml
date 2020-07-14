@@ -17,6 +17,7 @@ jobs:
         run: npm run build --if-present
 
   deployment:
+    needs: build
     if: github.ref == 'master' || github.ref == 'develop' || github.ref == 'feature/actions'
     runs-on: ubuntu-latest
 
