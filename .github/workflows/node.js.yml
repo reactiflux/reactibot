@@ -17,7 +17,7 @@ jobs:
         run: npm run build --if-present
 
   deployment:
-    if: contains(['master', 'develop', 'feature/actions'], 'bug')
+    if: branch === 'master' || branch === 'develop' || branch === 'feature/actions'
     runs-on: ubuntu-latest
 
     steps:
