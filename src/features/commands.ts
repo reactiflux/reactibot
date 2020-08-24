@@ -1,7 +1,5 @@
 import fetch from "node-fetch";
-import { JSDOM } from "jsdom";
 import { Message, TextChannel } from "discord.js";
-import { MDN, MdnStoreCacheItem } from "./MDN";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 
@@ -188,9 +186,9 @@ https://reactjs.org/docs/lifting-state-up.html`,
           type: "rich",
           description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
 
-Bad: "hey can anyone help me?"	
+Bad: "hey can anyone help me?"
 Bad: "anyone good with redux?"
-Good: 
+Good:
 > I'm trying to fire a redux action from my component, but it's not getting to the reducer.
 > \`\`\`js
 > // snippet of code
@@ -218,7 +216,7 @@ Paste small bits of code directly in chat with syntax highlighting:
 \\\`\\\`\\\`
 
 Link a Gist to upload entire files: https://gist.github.com
-Link a Code Sandbox to share runnable examples: https://codesandbox.io/s/new
+Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 `,
           color: EMBED_COLOR
         }
@@ -285,35 +283,37 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
     handleMessage: async msg => {
       const [, ...args] = msg.content.split(" ");
-      const fetchMsg = await msg.channel.send(
-        `Fetching "${args.join(" ")}"...`
-      );
+      const query = args.join(" ");
+      const [fetchMsg, res] = await Promise.all([
+        msg.channel.send(`Fetching "${query}"...`),
+        fetch(
+          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`
+        )
+      ]);
 
-      const { fuse } = await MDN.getStore();
-      const [topResult] = fuse?.search(args.join(" ")) as Array<{
-        item: MdnStoreCacheItem;
-      }>;
-      const stringDOM = await fetch(
-        `${MDN.baseUrl}${topResult.item.href}`
-      ).then(res => res.text());
-      const { document } = new JSDOM(stringDOM).window;
-      const title = document.querySelector(".title")?.textContent;
-      const description = document.querySelector("#wikiArticle > p")
-        ?.textContent;
+      const { documents } = await res.json();
+      const [topResult] = documents;
+
+      if (!topResult) {
+        fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
+        return;
+      }
+
+      const { title, excerpt: description, slug, locale } = topResult;
 
       await msg.channel.send({
         embed: {
           type: "rich",
           author: {
             name: "MDN",
-            url: `${MDN.baseUrl}`,
+            url: "https://developer.mozilla.org",
             icon_url:
               "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
           },
           title,
           description,
           color: 0x83d0f2,
-          url: `${MDN.baseUrl}${topResult.item.href}`
+          url: `https://developer.mozilla.org/${locale}/${slug}`
         }
       });
 
@@ -329,9 +329,68 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           title: "Florinpop17s Curated App Ideas!",
           type: "rich",
           description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
-          
+
           https://github.com/florinpop17/app-ideas
           `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!cors`],
+    help: `provides a link to what CORS is and how to fix it`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Understanding CORS",
+          type: "rich",
+          description: `
+          Cross-Origin Resource Sharing (CORS) is a mechanism that lets remote servers restrict which origin (i.e your website) can access it.
+
+          Read more at:
+          https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
+          https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!immutability`, `!imm`],
+    help: `provides resources for helping with immutability`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Immutable updates",
+          type: "rich",
+          description: `Immutable updates involve modifying data by creating new, updated objects instead of modifying the original object directly.
+          You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
+
+          https://daveceddia.com/react-redux-immutability-guide/
+          https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!formatting`, `!prettier`],
+    help: `describes Prettier and explains how to use it to format code`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Formatting code with Prettier",
+          type: "rich",
+          description: `Inconsistent indentation and syntax can make it more difficult to understand code, create churn from style debates, and cause logic and syntax errors.
+
+Prettier is a modern and well-supported formatter that completely reformats your code to be more readable and follow best practices.
+
+To format some code without installing anything, use the playground: https://prettier.io/playground/
+To enforce its style in your projects, use the CLI: https://prettier.io/docs/en/install.html
+To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           color: EMBED_COLOR
         }
       });
@@ -354,7 +413,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
 const commands: ChannelHandlers = {
   handleMessage: ({ msg }) => {
-    if (!msg.guild) {
+    if (!msg.guild && msg.channel.type !== "dm") {
       return;
     }
 

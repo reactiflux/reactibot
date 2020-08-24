@@ -15,9 +15,12 @@ export const channelLog = (bot: Client, channelID: string): Logger => (
 ) => {
   try {
     const channel = bot.channels.cache.get(channelID) as TextChannel;
+    if (channel) {
     channel.send(`[${type}] ${text}`);
-    // eslint-disable-next-line no-empty
-  } catch (e) {}
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const loggers: Logger[] = [];
