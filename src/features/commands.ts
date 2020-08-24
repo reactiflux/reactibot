@@ -210,7 +210,7 @@ Good:
         embed: {
           title: "Attaching Code",
           type: "rich",
-\\\`\\\`\\\`js
+          description: `\\\`\\\`\\\`js
 // short code snippets go here
 \\\`\\\`\\\`
 
