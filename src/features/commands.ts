@@ -208,11 +208,8 @@ Good:
         embed: {
           title: "Attaching Code",
           type: "rich",
-          description: `When asking a question, try to include as much relevant code as you can.
-Paste small bits of code directly in chat with syntax highlighting:
-
-\\\`\\\`\\\`js
-// your code goes here
+          description: `\\\`\\\`\\\`js
+// short code snippets go here
 \\\`\\\`\\\`
 
 Link a Gist to upload entire files: https://gist.github.com
