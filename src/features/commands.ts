@@ -403,7 +403,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach(command => {
       const keyword = command.words.find(word => {
-        return msg.content.toLowerCase().indexOf(word) === 0;
+        return msg.content.toLowerCase().includes(word);
       });
 
       if (keyword) {
