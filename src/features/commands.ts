@@ -401,11 +401,10 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embed: {
           title: "Please use gender neutral language by default",
           type: "rich",
-          description: `Unless someone has made it clear what gender they are, please do not refer to them with gendered language.
+          description: `Unless someone has made their gender known, please use gender neutral language.
 
-Examples:
-
-- Instead of "she/her/hers" or "he/him/his" use "they/them/theirs"
+- Instead of "hey guys," try "hey folks", "hey all", or similar
+- Use "they/them/theirs" if you aren't sure of someone's pronouns
 - "thanks friend" instead of "thanks man"`,
           color: EMBED_COLOR
         }
