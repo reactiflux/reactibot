@@ -392,6 +392,25 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         }
       });
     }
+  },
+  {
+    words: [`!gender`],
+    help: `reminds users to use gender-neutral language`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Please use gender neutral language by default",
+          type: "rich",
+          description: `Unless someone has made it clear what gender they are, please do not refer to them with gendered language.
+
+Examples:
+
+- Instead of "she/her/hers" or "he/him/his" use "they/them/theirs"
+- "thanks friend" instead of "thanks man"`,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
