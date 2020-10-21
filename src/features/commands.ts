@@ -392,6 +392,24 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         }
       });
     }
+  },
+  {
+    words: [`!gender`],
+    help: `reminds users to use gender-neutral language`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Please use gender neutral language by default",
+          type: "rich",
+          description: `Unless someone has made their pronouns known, please use gender neutral language.
+
+- Instead of "hey guys," try "hey folks", "hey all", or similar
+- Use "they/them/theirs" if you aren't sure of someone's pronouns
+- "thanks friend" instead of "thanks man"`,
+          color: EMBED_COLOR
+        }
+      });
+    }
   }
 ];
 
