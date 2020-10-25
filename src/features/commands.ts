@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
+import { isStaff } from "../utils";
 
 const EMBED_COLOR = 7506394;
 
@@ -17,6 +18,7 @@ const commandsList: Command[] = [
     help: `lists all available commands`,
     handleMessage: msg => {
       const payload = commandsList
+        .filter(trigger => trigger.help)
         .map(trigger => {
           return `${trigger.words.join(", ")} - ${trigger.help}`;
         })
@@ -407,6 +409,30 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 - Use "they/them/theirs" if you aren't sure of someone's pronouns
 - "thanks friend" instead of "thanks man"`,
           color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: ["@here", "@everyone"],
+    help: "",
+    handleMessage: msg => {
+      if (!msg || !msg.guild) {
+        return;
+      }
+
+      const member = msg.guild.member(msg.author.id);
+
+      if (!member || isStaff(member)) {
+        return;
+      }
+
+      msg.channel.send({
+        embed: {
+          title: "Tsk tsk.",
+          type: "rich",
+          description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+          color: "#BA0C2F"
         }
       });
     }
