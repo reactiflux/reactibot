@@ -431,7 +431,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embed: {
           title: "Tsk tsk.",
           type: "rich",
-          description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will help you if they can.`,
+          description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
           color: "#BA0C2F"
         }
       });
