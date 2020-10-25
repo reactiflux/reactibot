@@ -210,15 +210,12 @@ Good:
         embed: {
           title: "Attaching Code",
           type: "rich",
-          description: `When asking a question, try to include as much relevant code as you can.
-Paste small bits of code directly in chat with syntax highlighting:
-
-\\\`\\\`\\\`js
-// your code goes here
+          description: `\\\`\\\`\\\`js
+// short code snippets go here
 \\\`\\\`\\\`
 
 Link a Gist to upload entire files: https://gist.github.com
-Link a Code Sandbox to share runnable examples: https://codesandbox.io/s/new
+Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 `,
           color: EMBED_COLOR
         }
@@ -399,6 +396,24 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   },
   {
+    words: [`!gender`],
+    help: `reminds users to use gender-neutral language`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Please use gender neutral language by default",
+          type: "rich",
+          description: `Unless someone has made their pronouns known, please use gender neutral language.
+
+- Instead of "hey guys," try "hey folks", "hey all", or similar
+- Use "they/them/theirs" if you aren't sure of someone's pronouns
+- "thanks friend" instead of "thanks man"`,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: ["@here", "@everyone"],
     help: "",
     handleMessage: msg => {
@@ -432,7 +447,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach(command => {
       const keyword = command.words.find(word => {
-        return msg.content.toLowerCase().indexOf(word) === 0;
+        return msg.content.toLowerCase().includes(word);
       });
 
       if (keyword) {
