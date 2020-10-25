@@ -51,7 +51,7 @@ const commandsList: Command[] = [
     handleMessage: msg => {
       msg.channel.send({
         embed: {
-          title: "Helpful links",
+          title: "The XY Issue",
           type: "rich",
           description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
           color: EMBED_COLOR
