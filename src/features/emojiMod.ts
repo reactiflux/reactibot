@@ -67,7 +67,7 @@ const reactionHandlers: ReactionHandlers = {
       "\n\n",
       `\`${message.content}\``,
       "\n\n",
-      `Link: https://discordapp.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
+      `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
       "\n\n",
       userNames && `Reactors: \`${userNames}\``,
       staffNames && userNames && "\n",
@@ -134,7 +134,7 @@ const reactionHandlers: ReactionHandlers = {
       "\n\n",
       `\`${message.content}\``,
       "\n\n",
-      `Link: https://discordapp.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
+      `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
     ]
       .filter(Boolean)
       .join("");
