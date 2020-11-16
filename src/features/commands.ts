@@ -216,6 +216,7 @@ Good:
 
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
+Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
 `,
           color: EMBED_COLOR
         }
