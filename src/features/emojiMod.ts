@@ -1,6 +1,6 @@
 import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
-import { isStaff } from "../utils";
+import { isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
 
 const config = {
@@ -63,9 +63,10 @@ const reactionHandlers: ReactionHandlers = {
       .join(", ");
 
     let logMessage = "";
+
     const logMessageEnding = [
       "\n\n",
-      `\`${message.content}\``,
+      `\`${truncateMessage(message.content)}\``,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
       "\n\n",
@@ -102,7 +103,7 @@ const reactionHandlers: ReactionHandlers = {
       `You've received a warning from the moderators on your message in ${message.channel}`,
       "\n\n",
       "Your message: \n",
-      `\`${message.content}\``,
+      `\`${truncateMessage(message.content)}\``,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`
     ].join("");
@@ -143,7 +144,7 @@ const reactionHandlers: ReactionHandlers = {
     let logMessage = "";
     const logMessageEnding = [
       "\n\n",
-      `\`${message.content}\``,
+      `\`${truncateMessage(message.content)}\``,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
     ]
