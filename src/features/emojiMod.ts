@@ -30,7 +30,7 @@ type ReactionHandlers = {
 
 const reactionHandlers: ReactionHandlers = {
   "⚠️": (reaction, message, member) => {
-    // Skip if the user that reacted isn't in the staff of the post is from someone
+    // Skip if the user that reacted isn't in the staff or the post is from someone
     // from the staff
     if (
       !message.guild ||
@@ -97,6 +97,17 @@ const reactionHandlers: ReactionHandlers = {
         });
       }
     }
+
+    const privateMessageToSender = [
+      `You've received a warning from the moderators on your message in ${message.channel}`,
+      "\n\n",
+      "Your message: \n",
+      `\`${message.content}\``,
+      "\n\n",
+      `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`
+    ].join("");
+
+    message.author.send(privateMessageToSender);
   },
   "👎": (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
