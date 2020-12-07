@@ -99,14 +99,13 @@ const reactionHandlers: ReactionHandlers = {
       }
     }
 
-    const privateMessageToSender = [
-      `You've received a warning from the moderators on your message in ${message.channel}`,
-      "\n\n",
-      "Your message: \n",
-      `\`${truncateMessage(message.content)}\``,
-      "\n\n",
-      `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`
-    ].join("");
+    const privateMessageToSender = 
+      `You've received a warning from the moderators on your message in ${message.channel}
+
+Your message:
+\`${truncateMessage(message.content)}\`
+
+Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}
 
     message.author.send(privateMessageToSender);
   },
