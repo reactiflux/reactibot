@@ -99,13 +99,16 @@ const reactionHandlers: ReactionHandlers = {
       }
     }
 
-    const privateMessageToSender = 
-      `You've received a warning from the moderators on your message in ${message.channel}
+    const privateMessageToSender = `You've received a warning from the moderators on your message in ${
+      message.channel
+    }
 
 Your message:
 \`${truncateMessage(message.content)}\`
 
-Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}
+Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${
+      message.id
+    }`;
 
     message.author.send(privateMessageToSender);
   },
@@ -143,7 +146,7 @@ Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${
     let logMessage = "";
     const logMessageEnding = [
       "\n\n",
-      `\`${truncateMessage(message.content)}\``,
+      `${truncateMessage(message.content)}`,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
     ]
