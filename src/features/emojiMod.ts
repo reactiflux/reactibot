@@ -1,6 +1,6 @@
 import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
-import { isStaff } from "../utils";
+import { isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
 
 const config = {
@@ -30,7 +30,7 @@ type ReactionHandlers = {
 
 const reactionHandlers: ReactionHandlers = {
   "⚠️": (reaction, message, member) => {
-    // Skip if the user that reacted isn't in the staff of the post is from someone
+    // Skip if the user that reacted isn't in the staff or the post is from someone
     // from the staff
     if (
       !message.guild ||
@@ -63,9 +63,10 @@ const reactionHandlers: ReactionHandlers = {
       .join(", ");
 
     let logMessage = "";
+
     const logMessageEnding = [
       "\n\n",
-      `\`${message.content}\``,
+      `\`${truncateMessage(message.content)}\``,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
       "\n\n",
@@ -97,6 +98,19 @@ const reactionHandlers: ReactionHandlers = {
         });
       }
     }
+
+    const privateMessageToSender = `You've received a warning from the moderators on your message in ${
+      message.channel
+    }
+
+Your message:
+\`${truncateMessage(message.content)}\`
+
+Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${
+      message.id
+    }`;
+
+    message.author.send(privateMessageToSender);
   },
   "👎": (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
@@ -132,7 +146,7 @@ const reactionHandlers: ReactionHandlers = {
     let logMessage = "";
     const logMessageEnding = [
       "\n\n",
-      `\`${message.content}\``,
+      `${truncateMessage(message.content)}`,
       "\n\n",
       `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
     ]
