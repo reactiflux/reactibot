@@ -10,7 +10,7 @@ export const isStaff = (member: GuildMember | null | undefined) => {
   );
 };
 
-//Discords limit for messagelength
+// Discord's limit for message length
 const maxMessageLength = 2000;
 
 export const truncateMessage = (
