@@ -96,7 +96,7 @@ addHandler("*", emojiMod);
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
     try {
-      await reaction.fetch();
+      await user.fetch();
     } catch (error) {
       console.log("Something went wrong when fetching the user: ", error);
     }
