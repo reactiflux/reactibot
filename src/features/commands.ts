@@ -377,6 +377,51 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     }
   },
   {
+    words: [`!redux`],
+    help: `Info and when and why to use Redux`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "When should you use Redux?",
+          type: "rich",
+          description: `Redux is still the most widely used state management tool for React, but it's important to always ask "what problems am I trying to solve?", and choose tools that solve those problems.  Redux, Context, React Query, and Apollo all solve different problems, with some overlap.
+
+          See these articles for advice on what Redux does and when it makes sense to use it:
+
+          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
+          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!render`],
+    help: `Explanation of how React rendering behavior works`,
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "How does React rendering behavior work?",
+          type: "rich",
+          description: `There are several common misunderstandings about how React renders components. It's important to know that:
+
+          - React re-renders components recursively by default
+          - State updates must be immutable
+          - Updates are usually batched together
+          - Context updates always cause components to re-render
+
+          See this post for a detailed explanation of how React rendering actually works:
+
+          https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: [`!formatting`, `!prettier`],
     help: `describes Prettier and explains how to use it to format code`,
     handleMessage: msg => {
