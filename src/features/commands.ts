@@ -6,36 +6,45 @@ import { isStaff } from "../utils";
 
 const EMBED_COLOR = 7506394;
 
+type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
+
 type Command = {
   words: string[];
   help: string;
+  category: Categories;
   handleMessage: (msg: Message) => void;
 };
+
+const sortedCategories: Categories[] = [
+  "Reactiflux",
+  "Communication",
+  "Web",
+  "React/Redux"
+];
 
 const commandsList: Command[] = [
   {
     words: [`!commands`],
     help: `lists all available commands`,
+    category: "Reactiflux",
     handleMessage: msg => {
-      const payload = commandsList
-        .filter(trigger => trigger.help)
-        .map(trigger => {
-          return `${trigger.words.join(", ")} - ${trigger.help}`;
-        })
-        .join("\n")
-        .trim();
+      const commandsMessage = createCommandsMessage();
 
-      msg.channel.send(
-        `We have a few commands available: \`\`\`${payload}\`\`\``,
-        {
-          reply: msg.author
-        }
-      );
+      msg.channel.send({
+        embed: {
+          title: "Available Help Commands",
+          type: "rich",
+          description: commandsMessage,
+          color: EMBED_COLOR
+        },
+        reply: msg.author
+      });
     }
   },
   {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -50,6 +59,7 @@ const commandsList: Command[] = [
   {
     words: [`!xy`],
     help: `explains the XY problem`,
+    category: "Communication",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -64,6 +74,7 @@ const commandsList: Command[] = [
   {
     words: [`!ymnnr`],
     help: `links to the You Might Not Need Redux article`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -80,6 +91,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
   {
     words: [`!derived`],
     help: `links to the React docs regarding the getDerivedStateFromProps function (ab)use`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -95,8 +107,9 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     }
   },
   {
-    words: [`!stateupdates`, `!su`],
+    words: [`!su`, `!stateupdates`],
     help: `Explains the implications involved with state updates being asynchronous`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -122,6 +135,7 @@ https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchron
   {
     words: [`!bind`],
     help: `explains how and why to bind in React applications`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -164,6 +178,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
   {
     words: [`!lift`],
     help: `links to the React docs regarding the common need to "lift" state`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -181,6 +196,7 @@ https://reactjs.org/docs/lifting-state-up.html`,
   {
     words: [`!ask`],
     help: `explains how to ask questions`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -205,6 +221,7 @@ Good:
   {
     words: [`!code`, `!gist`],
     help: `explains how to attach code`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -226,6 +243,7 @@ Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
   {
     words: [`!ping`],
     help: `explains how to ping politely`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -242,6 +260,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
   {
     words: [`!inputs`],
     help: `provides links to uncontrolled vs controlled components`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -258,6 +277,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!move`],
     help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
+    category: "Reactiflux",
     handleMessage: msg => {
       const [, newChannel] = msg.content.split(" ");
 
@@ -281,6 +301,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!mdn`],
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
+    category: "Web",
     handleMessage: async msg => {
       const [, ...args] = msg.content.split(" ");
       const query = args.join(" ");
@@ -323,6 +344,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
+    category: "Web",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -340,6 +362,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!cors`],
     help: `provides a link to what CORS is and how to fix it`,
+    category: "Web",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -358,8 +381,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     }
   },
   {
-    words: [`!immutability`, `!imm`],
+    words: [`!imm`, `!immutability`],
     help: `provides resources for helping with immutability`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -379,6 +403,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!redux`],
     help: `Info and when and why to use Redux`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -400,6 +425,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!render`],
     help: `Explanation of how React rendering behavior works`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -424,6 +450,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!formatting`, `!prettier`],
     help: `describes Prettier and explains how to use it to format code`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -444,6 +471,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
   {
     words: [`!gender`],
     help: `reminds users to use gender-neutral language`,
+    category: "Communication",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -462,6 +490,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
   {
     words: ["@here", "@everyone"],
     help: "",
+    category: "Communication",
     handleMessage: msg => {
       if (!msg || !msg.guild) {
         return;
@@ -484,6 +513,44 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   }
 ];
+
+const createCommandsMessage = () => {
+  const groupedMessages: { [key in Categories]: Command[] } = {
+    Reactiflux: [],
+    Communication: [],
+    Web: [],
+    "React/Redux": []
+  };
+
+  // Omit any commands that are internal, like the `@here` warning
+  const visibleCommands = commandsList.filter(command => !!command.help);
+
+  visibleCommands.forEach(command => {
+    groupedMessages[command.category].push(command);
+  });
+
+  const categoryDescriptions = sortedCategories.map(category => {
+    const commands = groupedMessages[category];
+    // Mutating in map(), but whatever
+    commands.sort((a, b) => {
+      // Assume there's at least one trigger word per command
+      return a.words[0].localeCompare(b.words[0]);
+    });
+
+    const boldTitle = `**${category}**`;
+    const commandDescriptions = commands
+      .map(command => {
+        const formattedWords = command.words.map(word => `**\`${word}\`**`);
+        return `${formattedWords.join(", ")}: ${command.help}`;
+      })
+      .join("\n");
+
+    const categoryDescription = `${boldTitle}\n${commandDescriptions}`;
+    return categoryDescription;
+  });
+
+  return categoryDescriptions.join("\n\n").trim();
+};
 
 const commands: ChannelHandlers = {
   handleMessage: ({ msg }) => {
