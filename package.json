@@ -8,7 +8,7 @@
     "dev": "ts-node-dev --type-check src/index.ts",
     "build": "tsc",
     "test": "prettier --check 'src/**/*.{js,ts}'",
-    "prettier": "prettier --write 'src/**/*.{js,ts}'"
+    "prettier": "prettier --write \"src/**/*.{js,ts}\""
   },
   "repository": {
     "type": "git",
