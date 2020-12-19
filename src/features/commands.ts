@@ -276,7 +276,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   },
   {
     words: [`!move`],
-    help: `allows you to move the conversation to another channel (usage: \`!move #toChannel @person1 @person2 @person3\`)`,
+    help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
     category: "Reactiflux",
     handleMessage: msg => {
       const [, newChannel] = msg.content.split(" ");
@@ -482,6 +482,55 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 - Instead of "hey guys," try "hey folks", "hey all", or similar
 - Use "they/them/theirs" if you aren't sure of someone's pronouns
 - "thanks friend" instead of "thanks man"`,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!reactts`],
+    help: `Resources and tips for using React + TypeScript together`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Resources for React + TypeScript",
+          type: "rich",
+          description: `The best resource for how to use TypeScript and React together is the React TypeScript CheatSheet. It has advice on how to type function components, hooks, event handlers, and much more:
+
+          https://react-typescript-cheatsheet.netlify.app/
+
+          Also, we advise against use the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
+          \`function MyComp(props: MyCompProps) {}\`:
+          See this issue for details on why to avoid \`React.FC\`:
+
+          https://github.com/facebook/create-react-app/pull/8177
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!hooks`],
+    help: `Resources for learning React Hooks`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Learning React Hooks",
+          type: "rich",
+          description: `React Hooks allow function components to have state, trigger side effects after rendering, and much more.
+
+          The official React docs are the best resource for learning hooks:
+          https://reactjs.org/docs/hooks-intro.html
+
+          However, the React docs still teach classes by default. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
+          https://reactwithhooks.netlify.app/
+
+          This article explains why hooks are important and what problems they solve:
+          https://ui.dev/why-react-hooks/
+          `,
           color: EMBED_COLOR
         }
       });
