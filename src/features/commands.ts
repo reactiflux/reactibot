@@ -65,7 +65,7 @@ const commandsList: Command[] = [
         embed: {
           title: "The XY Issue",
           type: "rich",
-          description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
+          description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
           color: EMBED_COLOR
         }
       });
@@ -90,7 +90,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
   },
   {
     words: [`!derived`],
-    help: `links to the React docs regarding the getDerivedStateFromProps function (ab)use`,
+    help: `Links to the React docs advice to avoid copying props to state`,
     category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
@@ -98,7 +98,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
           title:
             "You might not need getDerivedStateFrom props or state at all!",
           type: "rich",
-          description: `React 16.4 included a bugfix for getDerivedStateFromProps which caused some existing bugs in React components to reproduce more consistently. If this release exposed a case where your application was using an anti-pattern and didn’t work properly after the fix...
+          description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
 https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
           color: EMBED_COLOR
@@ -276,7 +276,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   },
   {
     words: [`!move`],
-    help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
+    help: `allows you to move the conversation to another channel (usage: \`!move #toChannel @person1 @person2 @person3\`)`,
     category: "Reactiflux",
     handleMessage: msg => {
       const [, newChannel] = msg.content.split(" ");
