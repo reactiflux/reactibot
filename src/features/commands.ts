@@ -375,11 +375,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         }
       });
     }
-  },  
+  },
   {
     words: [`!redux`],
     help: `Info and when and why to use Redux`,
-    handleMessage: (msg) => {
+    handleMessage: msg => {
       msg.channel.send({
         embed: {
           title: "When should you use Redux?",
@@ -392,15 +392,15 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
           https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
           `,
-          color: EMBED_COLOR,
-        },
+          color: EMBED_COLOR
+        }
       });
-    },
+    }
   },
   {
     words: [`!render`],
     help: `Explanation of how React rendering behavior works`,
-    handleMessage: (msg) => {
+    handleMessage: msg => {
       msg.channel.send({
         embed: {
           title: "How does React rendering behavior work?",
@@ -416,10 +416,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
           `,
-          color: EMBED_COLOR,
-        },
+          color: EMBED_COLOR
+        }
       });
-    },
+    }
   },
   {
     words: [`!formatting`, `!prettier`],
