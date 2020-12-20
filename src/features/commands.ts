@@ -500,7 +500,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 
           https://react-typescript-cheatsheet.netlify.app/
 
-          Also, we advise against use the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
+          Also, we advise against using the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
           \`function MyComp(props: MyCompProps) {}\`:
           See this issue for details on why to avoid \`React.FC\`:
 
