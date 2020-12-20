@@ -520,12 +520,12 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embed: {
           title: "Learning React Hooks",
           type: "rich",
-          description: `React Hooks allow function components to have state, trigger side effects after rendering, and much more.
+          description: `React Hooks allow function components to have state, trigger side effects after rendering, and much more.  Class components still work, but function components and hooks are now the standard approach used by the React community for any new code, and there are some new React features that only work with hooks.
 
           The official React docs are the best resource for learning hooks:
           https://reactjs.org/docs/hooks-intro.html
 
-          However, the React docs still teach classes by default. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
+          However, the React docs still teach classes in the tutorials. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
           https://reactwithhooks.netlify.app/
 
           This article explains why hooks are important and what problems they solve:
