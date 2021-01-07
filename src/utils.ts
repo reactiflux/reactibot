@@ -1,4 +1,4 @@
-import { GuildMember } from "discord.js";
+import { Guild, GuildMember, TextChannel } from "discord.js";
 
 const staffRoles = ["mvp", "moderator", "admin", "admins"];
 
@@ -20,4 +20,10 @@ export const truncateMessage = (
   if (message.length > maxLength) return `${message.slice(0, maxLength)}...`;
 
   return message;
+};
+
+export const getModLogChannel = (guild: Guild) => {
+  return guild.channels.cache.find(
+    channel => channel.name === "mod-log" || channel.id === "257930126145224704"
+  ) as TextChannel;
 };

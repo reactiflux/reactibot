@@ -1,6 +1,6 @@
-import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
+import { MessageReaction, Message, GuildMember } from "discord.js";
 import cooldown from "./cooldown";
-import { isStaff, truncateMessage } from "../utils";
+import { getModLogChannel, isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
 
 const config = {
@@ -47,10 +47,7 @@ const reactionHandlers: ReactionHandlers = {
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
-    const modLogChannel = message.guild?.channels.cache.find(
-      channel =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
-    ) as TextChannel;
+    const modLogChannel = getModLogChannel(message.guild);
 
     const userNames = usersWhoReacted
       .filter(user => !isStaff(user))
@@ -138,10 +135,7 @@ Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${
 
     const numberOfTotalReactions = reactions.count;
 
-    const modLogChannel = message.guild.channels.cache.find(
-      channel =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
-    ) as TextChannel;
+    const modLogChannel = getModLogChannel(message.guild);
 
     let logMessage = "";
     const logMessageEnding = [
