@@ -16,7 +16,7 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import { ChannelHandlers } from "./types";
-import { handleBan } from "./features/userModerationLogs";
+import { handleBan, handleMemberRemove } from "./features/userModerationLogs";
 
 const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"]
@@ -139,6 +139,7 @@ bot.on("error", err => {
 });
 
 bot.on("guildBanAdd", handleBan);
+bot.on("guildMemberRemove", handleMemberRemove);
 
 const errorHandler = (error: any) => {
   if (error && error.message) {

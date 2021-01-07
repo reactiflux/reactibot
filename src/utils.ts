@@ -27,3 +27,14 @@ export const getModLogChannel = (guild: Guild) => {
     channel => channel.name === "mod-log" || channel.id === "257930126145224704"
   ) as TextChannel;
 };
+
+export const formatDate = (date: Date) =>
+  date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
