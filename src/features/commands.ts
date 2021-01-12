@@ -126,7 +126,8 @@ where \`state\` is not the most up to date value when you log it. This is caused
 
 Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
-https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous`,
+https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
+https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
           color: EMBED_COLOR
         }
       });
