@@ -96,7 +96,7 @@ addHandler("*", emojiMod);
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
     try {
-      await reaction.fetch();
+      await user.fetch();
     } catch (error) {
       console.log("Something went wrong when fetching the user: ", error);
     }
@@ -126,7 +126,7 @@ bot.on("ready", () => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
-  bot.user?.setActivity("for !commands", { type: "WATCHING" });
+  bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
 });
 
 bot.on("error", err => {
