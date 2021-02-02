@@ -2,6 +2,8 @@ import { MessageOptions } from 'child_process'
 import * as discord from 'discord.js'
 import cron from 'node-cron'
 
+export const MESSAGE_SCHEDULE: MessageConfig[] = []
+
 export type MessageConfig = {
     cronExpression: string;
     guilds: {id: discord.Snowflake, channelIds: discord.Snowflake[]}[];
