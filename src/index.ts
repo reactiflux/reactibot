@@ -16,7 +16,10 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import { ChannelHandlers } from "./types";
-import { MESSAGE_SCHEDULE, scheduleMessages } from "./features/scheduled-messages";
+import {
+  MESSAGE_SCHEDULE,
+  scheduleMessages
+} from "./features/scheduled-messages";
 
 const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"]
@@ -129,7 +132,7 @@ bot.on("ready", () => {
 
   bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
 
-  scheduleMessages(bot, MESSAGE_SCHEDULE)
+  scheduleMessages(bot, MESSAGE_SCHEDULE);
 });
 
 bot.on("error", err => {
