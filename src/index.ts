@@ -16,6 +16,10 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import { ChannelHandlers } from "./types";
+import {
+  MESSAGE_SCHEDULE,
+  scheduleMessages
+} from "./features/scheduled-messages";
 
 const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"]
@@ -96,7 +100,7 @@ addHandler("*", emojiMod);
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
     try {
-      await reaction.fetch();
+      await user.fetch();
     } catch (error) {
       console.log("Something went wrong when fetching the user: ", error);
     }
@@ -126,7 +130,9 @@ bot.on("ready", () => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
-  bot.user?.setActivity("for !commands", { type: "WATCHING" });
+  bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
+
+  scheduleMessages(bot, MESSAGE_SCHEDULE);
 });
 
 bot.on("error", err => {

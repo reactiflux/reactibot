@@ -6,36 +6,45 @@ import { isStaff } from "../utils";
 
 const EMBED_COLOR = 7506394;
 
+type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
+
 type Command = {
   words: string[];
   help: string;
+  category: Categories;
   handleMessage: (msg: Message) => void;
 };
+
+const sortedCategories: Categories[] = [
+  "Reactiflux",
+  "Communication",
+  "Web",
+  "React/Redux"
+];
 
 const commandsList: Command[] = [
   {
     words: [`!commands`],
     help: `lists all available commands`,
+    category: "Reactiflux",
     handleMessage: msg => {
-      const payload = commandsList
-        .filter(trigger => trigger.help)
-        .map(trigger => {
-          return `${trigger.words.join(", ")} - ${trigger.help}`;
-        })
-        .join("\n")
-        .trim();
+      const commandsMessage = createCommandsMessage();
 
-      msg.channel.send(
-        `We have a few commands available: \`\`\`${payload}\`\`\``,
-        {
-          reply: msg.author
-        }
-      );
+      msg.channel.send({
+        embed: {
+          title: "Available Help Commands",
+          type: "rich",
+          description: commandsMessage,
+          color: EMBED_COLOR
+        },
+        reply: msg.author
+      });
     }
   },
   {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -50,12 +59,13 @@ const commandsList: Command[] = [
   {
     words: [`!xy`],
     help: `explains the XY problem`,
+    category: "Communication",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
           title: "The XY Issue",
           type: "rich",
-          description: `You may be experiencing an XY problem: http://xyproblem.info/ - basically, try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
+          description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
           color: EMBED_COLOR
         }
       });
@@ -64,6 +74,7 @@ const commandsList: Command[] = [
   {
     words: [`!ymnnr`],
     help: `links to the You Might Not Need Redux article`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -79,14 +90,15 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
   },
   {
     words: [`!derived`],
-    help: `links to the React docs regarding the getDerivedStateFromProps function (ab)use`,
+    help: `Links to the React docs advice to avoid copying props to state`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
           title:
             "You might not need getDerivedStateFrom props or state at all!",
           type: "rich",
-          description: `React 16.4 included a bugfix for getDerivedStateFromProps which caused some existing bugs in React components to reproduce more consistently. If this release exposed a case where your application was using an anti-pattern and didn’t work properly after the fix...
+          description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
 https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
           color: EMBED_COLOR
@@ -95,8 +107,9 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     }
   },
   {
-    words: [`!stateupdates`, `!su`],
+    words: [`!su`, `!stateupdates`],
     help: `Explains the implications involved with state updates being asynchronous`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -113,7 +126,8 @@ where \`state\` is not the most up to date value when you log it. This is caused
 
 Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
-https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous`,
+https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
+https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
           color: EMBED_COLOR
         }
       });
@@ -122,6 +136,7 @@ https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchron
   {
     words: [`!bind`],
     help: `explains how and why to bind in React applications`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -164,6 +179,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
   {
     words: [`!lift`],
     help: `links to the React docs regarding the common need to "lift" state`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -181,6 +197,7 @@ https://reactjs.org/docs/lifting-state-up.html`,
   {
     words: [`!ask`],
     help: `explains how to ask questions`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -205,6 +222,7 @@ Good:
   {
     words: [`!code`, `!gist`],
     help: `explains how to attach code`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -216,6 +234,7 @@ Good:
 
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
+Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
 Link a Snack to share React Native examples: https://snack.expo.io 
 `,
           color: EMBED_COLOR
@@ -226,6 +245,7 @@ Link a Snack to share React Native examples: https://snack.expo.io
   {
     words: [`!ping`],
     help: `explains how to ping politely`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -242,6 +262,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
   {
     words: [`!inputs`],
     help: `provides links to uncontrolled vs controlled components`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -257,7 +278,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   },
   {
     words: [`!move`],
-    help: `allows you to move the conversation to another channel, usage: !move #toChannel @person1 @person2 @person3 ...`,
+    help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
+    category: "Reactiflux",
     handleMessage: msg => {
       const [, newChannel] = msg.content.split(" ");
 
@@ -281,6 +303,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!mdn`],
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
+    category: "Web",
     handleMessage: async msg => {
       const [, ...args] = msg.content.split(" ");
       const query = args.join(" ");
@@ -323,6 +346,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
+    category: "Web",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -340,6 +364,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
   {
     words: [`!cors`],
     help: `provides a link to what CORS is and how to fix it`,
+    category: "Web",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -358,8 +383,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     }
   },
   {
-    words: [`!immutability`, `!imm`],
+    words: [`!imm`, `!immutability`],
     help: `provides resources for helping with immutability`,
+    category: "React/Redux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -377,8 +403,56 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     }
   },
   {
+    words: [`!redux`],
+    help: `Info and when and why to use Redux`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "When should you use Redux?",
+          type: "rich",
+          description: `Redux is still the most widely used state management tool for React, but it's important to always ask "what problems am I trying to solve?", and choose tools that solve those problems.  Redux, Context, React Query, and Apollo all solve different problems, with some overlap.
+
+          See these articles for advice on what Redux does and when it makes sense to use it:
+
+          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
+          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!render`],
+    help: `Explanation of how React rendering behavior works`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "How does React rendering behavior work?",
+          type: "rich",
+          description: `There are several common misunderstandings about how React renders components. It's important to know that:
+
+          - React re-renders components recursively by default
+          - State updates must be immutable
+          - Updates are usually batched together
+          - Context updates always cause components to re-render
+
+          See this post for a detailed explanation of how React rendering actually works:
+
+          https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: [`!formatting`, `!prettier`],
     help: `describes Prettier and explains how to use it to format code`,
+    category: "Reactiflux",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -399,6 +473,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
   {
     words: [`!gender`],
     help: `reminds users to use gender-neutral language`,
+    category: "Communication",
     handleMessage: msg => {
       msg.channel.send({
         embed: {
@@ -415,8 +490,58 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   },
   {
+    words: [`!reactts`],
+    help: `Resources and tips for using React + TypeScript together`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Resources for React + TypeScript",
+          type: "rich",
+          description: `The best resource for how to use TypeScript and React together is the React TypeScript CheatSheet. It has advice on how to type function components, hooks, event handlers, and much more:
+
+          https://react-typescript-cheatsheet.netlify.app/
+
+          Also, we advise against using the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
+          \`function MyComp(props: MyCompProps) {}\`:
+          See this issue for details on why to avoid \`React.FC\`:
+
+          https://github.com/facebook/create-react-app/pull/8177
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!hooks`],
+    help: `Resources for learning React Hooks`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "Learning React Hooks",
+          type: "rich",
+          description: `React Hooks allow function components to have state, trigger side effects after rendering, and much more.  Class components still work, but function components and hooks are now the standard approach used by the React community for any new code, and there are some new React features that only work with hooks.
+
+          The official React docs are the best resource for learning hooks:
+          https://reactjs.org/docs/hooks-intro.html
+
+          However, the React docs still teach classes in the tutorials. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
+          https://reactwithhooks.netlify.app/
+
+          This article explains why hooks are important and what problems they solve:
+          https://ui.dev/why-react-hooks/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: ["@here", "@everyone"],
     help: "",
+    category: "Communication",
     handleMessage: msg => {
       if (!msg || !msg.guild) {
         return;
@@ -439,6 +564,44 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   }
 ];
+
+const createCommandsMessage = () => {
+  const groupedMessages: { [key in Categories]: Command[] } = {
+    Reactiflux: [],
+    Communication: [],
+    Web: [],
+    "React/Redux": []
+  };
+
+  // Omit any commands that are internal, like the `@here` warning
+  const visibleCommands = commandsList.filter(command => !!command.help);
+
+  visibleCommands.forEach(command => {
+    groupedMessages[command.category].push(command);
+  });
+
+  const categoryDescriptions = sortedCategories.map(category => {
+    const commands = groupedMessages[category];
+    // Mutating in map(), but whatever
+    commands.sort((a, b) => {
+      // Assume there's at least one trigger word per command
+      return a.words[0].localeCompare(b.words[0]);
+    });
+
+    const boldTitle = `**${category}**`;
+    const commandDescriptions = commands
+      .map(command => {
+        const formattedWords = command.words.map(word => `**\`${word}\`**`);
+        return `${formattedWords.join(", ")}: ${command.help}`;
+      })
+      .join("\n");
+
+    const categoryDescription = `${boldTitle}\n${commandDescriptions}`;
+    return categoryDescription;
+  });
+
+  return categoryDescriptions.join("\n\n").trim();
+};
 
 const commands: ChannelHandlers = {
   handleMessage: ({ msg }) => {
