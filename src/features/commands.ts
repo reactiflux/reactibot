@@ -322,7 +322,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         return;
       }
 
-      const { title, excerpt: description, slug, locale } = topResult;
+      const {
+        title,
+        excerpt: description,
+        mdn_url: mdnUrl,
+        locale
+      } = topResult;
 
       await msg.channel.send({
         embed: {
@@ -336,7 +341,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           title,
           description,
           color: 0x83d0f2,
-          url: `https://developer.mozilla.org/${locale}/${slug}`
+          url: `https://developer.mozilla.org${mdnUrl}`
         }
       });
 
