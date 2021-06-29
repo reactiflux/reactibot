@@ -2,7 +2,11 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { isStaff } from "../utils";
+import {
+  isStaff,
+  isBotDisabledInChannel,
+  notifyUserBotResponseWasPrevented
+} from "../utils";
 
 const EMBED_COLOR = 7506394;
 
@@ -622,6 +626,17 @@ const commands: ChannelHandlers = {
 
       if (keyword) {
         if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
+
+        const { name: channelName } = msg.channel as TextChannel;
+
+        const hasPreventedBotResponse = isBotDisabledInChannel(channelName);
+
+        if (hasPreventedBotResponse) {
+          notifyUserBotResponseWasPrevented(msg, channelName);
+
+          return;
+        }
+
         cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
         command.handleMessage(msg);
       }
