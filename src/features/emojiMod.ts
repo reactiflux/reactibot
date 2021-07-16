@@ -171,16 +171,7 @@ const emojiMod: ChannelHandlers = {
   handleReaction: ({ reaction, user, bot }) => {
     const { message } = reaction;
 
-    if (
-      !message.guild
-      // ||
-      // user.id === bot.user?.id ||
-      // message.author.id === bot.user?.id
-    ) {
-      console.log("this");
-      return;
-    }
-
+    if (!message.guild) return;
     let emoji = reaction.emoji.toString();
     const member = message.guild.member(user.id);
     if (!member) return;
@@ -192,14 +183,12 @@ const emojiMod: ChannelHandlers = {
         reactionHandler(reaction, message, member, bot);
       }
     }
-    console.log(emoji);
 
     if (thumbsDownEmojis.includes(emoji)) {
       emoji = "👎";
     }
 
     const reactionHandler = reactionHandlers[emoji];
-    console.log(reactionHandler);
     if (reactionHandler) {
       reactionHandler(reaction, message, member, null);
     }
