@@ -1,25 +1,26 @@
-require("dotenv").config();
-
 import discord, {
   Message,
-  PartialMessage,
   MessageReaction,
+  PartialMessage,
+  PartialUser,
   User
 } from "discord.js";
-
-import { logger, stdoutLog, channelLog } from "./features/log";
-// import codeblock from './features/codeblock';
-import qna from "./features/qna";
-import jobs from "./features/jobs";
+import { config } from "dotenv";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
-import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
-import { ChannelHandlers } from "./types";
+import jobs from "./features/jobs";
+import { channelLog, logger, stdoutLog } from "./features/log";
+// import codeblock from './features/codeblock';
+import qna from "./features/qna";
 import {
   MESSAGE_SCHEDULE,
   scheduleMessages
 } from "./features/scheduled-messages";
+import setupStats from "./features/stats";
+import { ChannelHandlers } from "./types";
+
+config();
 
 const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"]
@@ -98,9 +99,18 @@ addHandler("*", autoban);
 addHandler("*", emojiMod);
 
 bot.on("messageReactionAdd", async (reaction, user) => {
+  let users: User | PartialUser = user;
+  if (reaction.me) {
+    const x = user.fetch();
+    const use = reaction.message.author;
+    console.log((await x).username);
+    users = use;
+    // console.log(use);
+  }
+
   if (user.partial) {
     try {
-      await user.fetch();
+      users = await user.fetch();
     } catch (error) {
       console.log("Something went wrong when fetching the user: ", error);
     }
@@ -114,7 +124,7 @@ bot.on("messageReactionAdd", async (reaction, user) => {
     }
   }
 
-  handleReaction(reaction, user as User);
+  handleReaction(reaction, users as User);
 });
 
 bot.on("message", async msg => {

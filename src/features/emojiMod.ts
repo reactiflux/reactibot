@@ -1,7 +1,13 @@
-import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
-import cooldown from "./cooldown";
-import { isStaff, truncateMessage } from "../utils";
+import {
+  Client,
+  GuildMember,
+  Message,
+  MessageReaction,
+  TextChannel
+} from "discord.js";
 import { ChannelHandlers } from "../types";
+import { isBot, isStaff, truncateMessage } from "../utils";
+import cooldown from "./cooldown";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -24,19 +30,22 @@ type ReactionHandlers = {
   [emoji: string]: (
     reaction: MessageReaction,
     message: Message,
-    member: GuildMember
+    member: GuildMember,
+    bot: Client | null | undefined
   ) => void;
 };
 
 const reactionHandlers: ReactionHandlers = {
-  "⚠️": (reaction, message, member) => {
+  "⚠️": (reaction, message, member, bot) => {
     // Skip if the user that reacted isn't in the staff or the post is from someone
-    // from the staff
+    // from the staff but not when it's done by the bot itself
+
     if (
-      !message.guild ||
-      !message.author ||
-      !isStaff(member) ||
-      isStaff(message.guild.member(message.author.id))
+      isBot(member, bot) &&
+      (!message.guild ||
+        !message.author ||
+        !isStaff(member) ||
+        isStaff(message.guild.member(message.author.id)))
     ) {
       return;
     }
@@ -49,7 +58,7 @@ const reactionHandlers: ReactionHandlers = {
 
     const modLogChannel = message.guild?.channels.cache.find(
       channel =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
+        channel.name === "mod-log" || channel.id === "865641297599004713"
     ) as TextChannel;
 
     const userNames = usersWhoReacted
@@ -163,24 +172,36 @@ const emojiMod: ChannelHandlers = {
     const { message } = reaction;
 
     if (
-      !message.guild ||
-      user.id === bot.user?.id ||
-      message.author.id === bot.user?.id
-    )
+      !message.guild
+      // ||
+      // user.id === bot.user?.id ||
+      // message.author.id === bot.user?.id
+    ) {
+      console.log("this");
       return;
+    }
 
     let emoji = reaction.emoji.toString();
+    const member = message.guild.member(user.id);
+    if (!member) return;
+
+    if (emoji === "⚠") {
+      const reactionHandler = reactionHandlers["⚠️"];
+
+      if (reactionHandler) {
+        reactionHandler(reaction, message, member, bot);
+      }
+    }
+    console.log(emoji);
 
     if (thumbsDownEmojis.includes(emoji)) {
       emoji = "👎";
     }
 
-    const member = message.guild.member(user.id);
-    if (!member) return;
-
     const reactionHandler = reactionHandlers[emoji];
+    console.log(reactionHandler);
     if (reactionHandler) {
-      reactionHandler(reaction, message, member);
+      reactionHandler(reaction, message, member, null);
     }
   }
 };

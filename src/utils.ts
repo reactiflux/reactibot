@@ -1,9 +1,30 @@
-import { GuildMember } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 
-const staffRoles = ["mvp", "moderator", "admin", "admins"];
+const staffRoles = ["mvp", "moderator", "admin", "admins", "reactiflux"];
+
+export const isBot = (
+  member: GuildMember | null | undefined,
+  bot: Client | null | undefined
+) => {
+  if (!member) {
+    return false;
+  }
+
+  return member.roles.cache.some(role => {
+    if (
+      staffRoles.includes(role.name.toLowerCase()) &&
+      member.user.id === bot?.user?.id
+    ) {
+      return true;
+    }
+    return false;
+  });
+};
 
 export const isStaff = (member: GuildMember | null | undefined) => {
-  if (!member) return false;
+  if (!member) {
+    return false;
+  }
 
   return member.roles.cache.some(role =>
     staffRoles.includes(role.name.toLowerCase())

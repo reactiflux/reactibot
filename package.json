@@ -18,13 +18,14 @@
   "dependencies": {
     "@types/node-cron": "^2.0.3",
     "discord.js": "^12.5.1",
-    "dotenv": "^6.1.0",
+    "dotenv": "^10.0.0",
     "gists": "^2.0.0",
     "node-cron": "^2.0.3",
     "node-fetch": "^2.2.0",
     "query-string": "^6.2.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/jsdom": "^16.1.0",
     "@types/node": "^13.7.4",
     "@types/node-fetch": "^2.5.4",
