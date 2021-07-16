@@ -10,15 +10,11 @@ export const isBot = (
     return false;
   }
 
-  return member.roles.cache.some(role => {
-    if (
+  return member.roles.cache.some(
+    role =>
       staffRoles.includes(role.name.toLowerCase()) &&
       member.user.id === bot?.user?.id
-    ) {
-      return true;
-    }
-    return false;
-  });
+  );
 };
 
 export const isStaff = (member: GuildMember | null | undefined) => {
