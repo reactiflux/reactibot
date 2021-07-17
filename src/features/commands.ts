@@ -559,6 +559,8 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         return;
       }
 
+      msg.react("⚠️");
+
       msg.channel.send({
         embed: {
           title: "Tsk tsk.",
