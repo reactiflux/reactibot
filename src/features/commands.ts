@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../utils";
 import cooldown from "./cooldown";
+import { reactionHandlers } from "./emojiMod";
 
 const EMBED_COLOR = 7506394;
 
@@ -541,10 +542,10 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   },
   {
-    words: ["@here", "@everyone"],
+    words: ["@here", "everyone"],
     help: "",
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: async msg => {
       if (!msg || !msg.guild) {
         return;
       }
@@ -553,6 +554,12 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 
       if (!member || isStaff(member)) {
         return;
+      }
+      const reaction = await msg.react("⚠️");
+      const reactionHandler = reactionHandlers["⚠️"];
+      if (reactionHandler) {
+        console.log("It's reaching command.ts", true);
+        reactionHandler(reaction, msg, member, true);
       }
 
       msg.channel.send({
@@ -563,23 +570,6 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           color: "#BA0C2F"
         }
       });
-    }
-  },
-  {
-    words: ["steamcommunity"],
-    help: "",
-    category: "Reactiflux",
-    handleMessage: msg => {
-      if (!msg || !msg.guild) {
-        return;
-      }
-
-      msg.react("⚠");
-      const member = msg.guild.member(msg.author.id);
-
-      if (!member || isStaff(member)) {
-        return;
-      }
     }
   }
 ];

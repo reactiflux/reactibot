@@ -1,6 +1,6 @@
 import { Client, GuildMember } from "discord.js";
 
-const staffRoles = ["mvp", "moderator", "admin", "admins", "reactiflux"];
+export const staffRoles = ["mvp", "moderator", "admin", "admins", "reactiflux"];
 
 export const isBot = (
   member: GuildMember | null | undefined,
@@ -9,12 +9,14 @@ export const isBot = (
   if (!member) {
     return false;
   }
-
-  return member.roles.cache.some(
-    role =>
+  const status = member.roles.cache.some(role => {
+    return (
       staffRoles.includes(role.name.toLowerCase()) &&
       member.user.id === bot?.user?.id
-  );
+    );
+  });
+
+  return status;
 };
 
 export const isStaff = (member: GuildMember | null | undefined) => {
@@ -22,9 +24,10 @@ export const isStaff = (member: GuildMember | null | undefined) => {
     return false;
   }
 
-  return member.roles.cache.some(role =>
-    staffRoles.includes(role.name.toLowerCase())
-  );
+  return member.roles.cache.some(role => {
+    console.log("rolename", role.name);
+    return staffRoles.includes(role.name.toLowerCase());
+  });
 };
 
 // Discord's limit for message length

@@ -101,11 +101,8 @@ addHandler("*", emojiMod);
 bot.on("messageReactionAdd", async (reaction, user) => {
   let users: User | PartialUser = user;
   if (reaction.me) {
-    const x = user.fetch();
-    const use = reaction.message.author;
-    console.log((await x).username);
-    users = use;
-    // console.log(use);
+    const reactionUser = reaction.message.author;
+    users = reactionUser;
   }
 
   if (user.partial) {

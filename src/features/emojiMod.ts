@@ -1,12 +1,6 @@
-import {
-  Client,
-  GuildMember,
-  Message,
-  MessageReaction,
-  TextChannel
-} from "discord.js";
+import { GuildMember, Message, MessageReaction, TextChannel } from "discord.js";
 import { ChannelHandlers } from "../types";
-import { isBot, isStaff, truncateMessage } from "../utils";
+import { isStaff, truncateMessage } from "../utils";
 import cooldown from "./cooldown";
 
 const config = {
@@ -31,24 +25,24 @@ type ReactionHandlers = {
     reaction: MessageReaction,
     message: Message,
     member: GuildMember,
-    bot: Client | null | undefined
+    isBot: boolean
   ) => void;
 };
 
-const reactionHandlers: ReactionHandlers = {
-  "⚠️": (reaction, message, member, bot) => {
+export const reactionHandlers: ReactionHandlers = {
+  "⚠️": (reaction, message, member, botBoolean) => {
     // Skip if the user that reacted isn't in the staff or the post is from someone
-    // from the staff but not when it's done by the bot itself
+    // from the staff but not when it's done by the bot itself;
 
     if (
-      isBot(member, bot) &&
-      (!message.guild ||
-        !message.author ||
-        !isStaff(member) ||
-        isStaff(message.guild.member(message.author.id)))
+      !message.guild ||
+      !message.author ||
+      !isStaff(member) ||
+      (botBoolean ? true : isStaff(message.guild.member(message.author.id)))
     ) {
       return;
     }
+    console.log("bot reached after the verification");
 
     const usersWhoReacted = reaction.users.cache.map(user =>
       message.guild?.member(user.id)
@@ -175,14 +169,15 @@ const emojiMod: ChannelHandlers = {
     let emoji = reaction.emoji.toString();
     const member = message.guild.member(user.id);
     if (!member) return;
+    const isReactionByBot = reaction.users.cache.some(user => user.bot);
+    console.log("----------------------");
+    console.log("is bot", isReactionByBot);
 
-    if (emoji === "⚠") {
-      const reactionHandler = reactionHandlers["⚠️"];
-
-      if (reactionHandler) {
-        reactionHandler(reaction, message, member, bot);
-      }
+    if (emoji === "⚠️" && isReactionByBot) {
+      console.log("found warning⚠️ ");
+      return;
     }
+    console.log("don't come here");
 
     if (thumbsDownEmojis.includes(emoji)) {
       emoji = "👎";
@@ -190,7 +185,7 @@ const emojiMod: ChannelHandlers = {
 
     const reactionHandler = reactionHandlers[emoji];
     if (reactionHandler) {
-      reactionHandler(reaction, message, member, null);
+      reactionHandler(reaction, message, member, false);
     }
   }
 };
