@@ -4,7 +4,7 @@ import discord, {
   Message,
   PartialMessage,
   MessageReaction,
-  User
+  User,
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
@@ -18,11 +18,11 @@ import emojiMod from "./features/emojiMod";
 import { ChannelHandlers } from "./types";
 import {
   MESSAGE_SCHEDULE,
-  scheduleMessages
+  scheduleMessages,
 } from "./features/scheduled-messages";
 
 const bot = new discord.Client({
-  partials: ["MESSAGE", "CHANNEL", "REACTION"]
+  partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
 bot.login(process.env.DISCORD_HASH);
 
@@ -35,7 +35,7 @@ const channelHandlersById: ChannelHandlersById = {};
 const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
   channelHandlersById[channelId] = [
     ...(channelHandlersById[channelId] || []),
-    channelHandlers
+    channelHandlers,
   ];
 };
 

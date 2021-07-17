@@ -5,7 +5,7 @@ const ALLOWED_ROLES = ["moderator", "Moderator", "admin", "Admin"];
 
 enum QnAMessageType {
   Question,
-  Answer
+  Answer,
 }
 
 type QnAMessages = {
@@ -26,7 +26,7 @@ const counterAsWord = (q: number) => {
 
 const flush = (channel: TextChannel | DMChannel | NewsChannel) => {
   prevMessagesIds.forEach(oldId =>
-    channel.messages.fetch(oldId).then(msg => msg.delete())
+    channel.messages.fetch(oldId).then(msg => msg.delete()),
   );
   prevMessagesIds = [];
 };
@@ -36,8 +36,8 @@ const prompt = (msg: Message) => {
     msg.channel
       .send(
         `:robot: Please ask your question now. Our guest has ${counterAsWord(
-          counter
-        )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`
+          counter,
+        )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`,
       )
       .then(msg => {
         flush(msg.channel);
@@ -47,8 +47,8 @@ const prompt = (msg: Message) => {
     msg.channel
       .send(
         `:robot: Please stop your questions for now. Our guest has ${counterAsWord(
-          counter
-        )} questions queued.`
+          counter,
+        )} questions queued.`,
       )
       .then(msg => {
         flush(msg.channel);
@@ -87,7 +87,7 @@ ${msg.content}
     
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
     msg.delete();
-  }
+  },
 };
 
 const messageCommands: Commands = {
@@ -96,7 +96,7 @@ const messageCommands: Commands = {
   },
   "!qa:count": msg => {
     prompt(msg);
-  }
+  },
 };
 
 const qna: ChannelHandlers = {
@@ -129,7 +129,7 @@ const qna: ChannelHandlers = {
     if (allowed) {
       command(reaction.message);
     }
-  }
+  },
 };
 
 export default qna;

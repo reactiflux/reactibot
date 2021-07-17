@@ -19,7 +19,7 @@ const sortedCategories: Categories[] = [
   "Reactiflux",
   "Communication",
   "Web",
-  "React/Redux"
+  "React/Redux",
 ];
 
 const commandsList: Command[] = [
@@ -35,11 +35,11 @@ const commandsList: Command[] = [
           title: "Available Help Commands",
           type: "rich",
           description: commandsMessage,
-          color: EMBED_COLOR
+          color: EMBED_COLOR,
         },
-        reply: msg.author
+        reply: msg.author,
       });
-    }
+    },
   },
   {
     words: [`!rrlinks`],
@@ -51,10 +51,10 @@ const commandsList: Command[] = [
           title: "Helpful links",
           type: "rich",
           description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!xy`],
@@ -66,10 +66,10 @@ const commandsList: Command[] = [
           title: "The XY Issue",
           type: "rich",
           description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!ymnnr`],
@@ -83,10 +83,10 @@ const commandsList: Command[] = [
           description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
 
 https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!derived`],
@@ -101,10 +101,10 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
           description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
 https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!su`, `!stateupdates`],
@@ -128,10 +128,10 @@ Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
 https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
 https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!bind`],
@@ -171,10 +171,10 @@ handleClick = () => {
 \`\`\`
 
 Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/ for more informations`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!lift`],
@@ -188,10 +188,10 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
           description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
 
 https://reactjs.org/docs/lifting-state-up.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
 
   {
@@ -214,10 +214,10 @@ Good:
 > \`\`\`
 > I'm seeing an error, but I don't know if it's related.
 > \`Uncaught TypeError: undefined is not a function\``,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!code`, `!gist`],
@@ -238,10 +238,10 @@ Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/
 Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
 Link a Snack to share React Native examples: https://snack.expo.io 
 `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!ping`],
@@ -255,10 +255,10 @@ Link a Snack to share React Native examples: https://snack.expo.io
           description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
 
 Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!inputs`],
@@ -272,10 +272,10 @@ Similarly, don’t DM other members without asking first. All of the same proble
           description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
 Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!move`],
@@ -286,7 +286,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
       try {
         const targetChannel = msg.guild?.channels.cache.get(
-          newChannel.replace("<#", "").replace(">", "")
+          newChannel.replace("<#", "").replace(">", ""),
         ) as TextChannel;
 
         if (!msg.mentions.members) return;
@@ -294,12 +294,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         targetChannel.send(
           `${msg.author} has opened a portal from ${
             msg.channel
-          } summoning ${msg.mentions.members.map(i => i).join(" ")}`
+          } summoning ${msg.mentions.members.map(i => i).join(" ")}`,
         );
       } catch (e) {
         console.log("Something went wrong when summoning a portal: ", e);
       }
-    }
+    },
   },
   {
     words: [`!mdn`],
@@ -311,8 +311,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const [fetchMsg, res] = await Promise.all([
         msg.channel.send(`Fetching "${query}"...`),
         fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`
-        )
+          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
+        ),
       ]);
 
       const { documents } = await res.json();
@@ -327,7 +327,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         title,
         excerpt: description,
         mdn_url: mdnUrl,
-        locale
+        locale,
       } = topResult;
 
       await msg.channel.send({
@@ -337,17 +337,17 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             name: "MDN",
             url: "https://developer.mozilla.org",
             icon_url:
-              "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
+              "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
           },
           title,
           description,
           color: 0x83d0f2,
-          url: `https://developer.mozilla.org${mdnUrl}`
-        }
+          url: `https://developer.mozilla.org${mdnUrl}`,
+        },
       });
 
       fetchMsg.delete();
-    }
+    },
   },
   {
     words: [`!appideas`],
@@ -362,10 +362,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://github.com/florinpop17/app-ideas
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!cors`],
@@ -383,10 +383,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
           https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!imm`, `!immutability`],
@@ -403,10 +403,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://daveceddia.com/react-redux-immutability-guide/
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!redux`],
@@ -425,10 +425,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
           https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!render`],
@@ -450,10 +450,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!formatting`, `!prettier`],
@@ -471,10 +471,10 @@ Prettier is a modern and well-supported formatter that completely reformats your
 To format some code without installing anything, use the playground: https://prettier.io/playground/
 To enforce its style in your projects, use the CLI: https://prettier.io/docs/en/install.html
 To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!gender`],
@@ -490,10 +490,10 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 - Instead of "hey guys," try "hey folks", "hey all", or similar
 - Use "they/them/theirs" if you aren't sure of someone's pronouns
 - "thanks friend" instead of "thanks man"`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!reactts`],
@@ -514,10 +514,10 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 
           https://github.com/facebook/create-react-app/pull/8177
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!hooks`],
@@ -539,10 +539,10 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           This article explains why hooks are important and what problems they solve:
           https://ui.dev/why-react-hooks/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: ["@here", "@everyone"],
@@ -564,11 +564,11 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           title: "Tsk tsk.",
           type: "rich",
           description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-          color: "#BA0C2F"
-        }
+          color: "#BA0C2F",
+        },
       });
-    }
-  }
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
@@ -576,7 +576,7 @@ const createCommandsMessage = () => {
     Reactiflux: [],
     Communication: [],
     Web: [],
-    "React/Redux": []
+    "React/Redux": [],
   };
 
   // Omit any commands that are internal, like the `@here` warning
@@ -626,7 +626,7 @@ const commands: ChannelHandlers = {
         command.handleMessage(msg);
       }
     });
-  }
+  },
 };
 
 export default commands;

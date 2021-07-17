@@ -23,7 +23,7 @@ const cooldown = {
   hasCooldown: (id: string, type = "user") => {
     const key = `${id}.${type}`;
     return cooldowns[key] === true;
-  }
+  },
 };
 
 export default cooldown;

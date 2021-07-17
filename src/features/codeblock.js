@@ -1,6 +1,6 @@
 const Gists = require("gists");
 const gists = new Gists({
-  token: process.env.GITHUB_TOKEN
+  token: process.env.GITHUB_TOKEN,
 });
 
 const maxLines = 15;
@@ -32,17 +32,17 @@ const jobs = {
                 content: item
                   .split("\n")
                   .slice(1, -1)
-                  .join("\n")
-              }
+                  .join("\n"),
+              },
             });
-          }, {})
+          }, {}),
         })
         .then(d => {
           msg.channel.send(
             `It looks like you posted quite a long code block. I've removed it and created a GIST of it - please check it at ${d.body.html_url}`,
             {
-              reply: msg.author
-            }
+              reply: msg.author,
+            },
           );
           msg.delete();
         })
@@ -50,9 +50,9 @@ const jobs = {
           console.log(e);
         });
     }
-  }
+  },
 };
 
 module.exports = {
-  default: jobs
+  default: jobs,
 };

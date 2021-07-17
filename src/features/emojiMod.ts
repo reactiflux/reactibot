@@ -9,7 +9,7 @@ const config = {
   // This is how many ️️warning reactions a post must get until mods are alerted
   thumbsDownThreshold: 2,
   // This is how many ️️warning reactions a post must get the message is deleted
-  deletionThreshold: Infinity
+  deletionThreshold: Infinity,
 };
 
 type WarningMessages = {
@@ -24,7 +24,7 @@ type ReactionHandlers = {
   [emoji: string]: (
     reaction: MessageReaction,
     message: Message,
-    member: GuildMember
+    member: GuildMember,
   ) => void;
 };
 
@@ -42,14 +42,14 @@ const reactionHandlers: ReactionHandlers = {
     }
 
     const usersWhoReacted = reaction.users.cache.map(user =>
-      message.guild?.member(user.id)
+      message.guild?.member(user.id),
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
       channel =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
+        channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
     const userNames = usersWhoReacted
@@ -72,7 +72,7 @@ const reactionHandlers: ReactionHandlers = {
       "\n\n",
       userNames && `Reactors: \`${userNames}\``,
       staffNames && userNames && "\n",
-      staffNames && `Staff: \`${staffNames}\``
+      staffNames && `Staff: \`${staffNames}\``,
     ]
       .filter(Boolean)
       .join("");
@@ -119,15 +119,15 @@ const reactionHandlers: ReactionHandlers = {
       },
       {
         count: 0,
-        users: []
-      }
+        users: [],
+      },
     );
 
     const numberOfTotalReactions = reactions.count;
 
     const modLogChannel = message.guild.channels.cache.find(
       channel =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
+        channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
     let logMessage = "";
@@ -135,7 +135,7 @@ const reactionHandlers: ReactionHandlers = {
       "\n\n",
       `${truncateMessage(message.content)}`,
       "\n\n",
-      `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
+      `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
     ]
       .filter(Boolean)
       .join("");
@@ -155,7 +155,7 @@ const reactionHandlers: ReactionHandlers = {
         });
       }
     }
-  }
+  },
 };
 
 const emojiMod: ChannelHandlers = {
@@ -182,7 +182,7 @@ const emojiMod: ChannelHandlers = {
     if (reactionHandler) {
       reactionHandler(reaction, message, member);
     }
-  }
+  },
 };
 
 export default emojiMod;

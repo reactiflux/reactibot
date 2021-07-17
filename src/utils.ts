@@ -6,7 +6,7 @@ export const isStaff = (member: GuildMember | null | undefined) => {
   if (!member) return false;
 
   return member.roles.cache.some(role =>
-    staffRoles.includes(role.name.toLowerCase())
+    staffRoles.includes(role.name.toLowerCase()),
   );
 };
 
@@ -15,7 +15,7 @@ const maxMessageLength = 2000;
 
 export const truncateMessage = (
   message: string,
-  maxLength = maxMessageLength - 500
+  maxLength = maxMessageLength - 500,
 ) => {
   if (message.length > maxLength) return `${message.slice(0, maxLength)}...`;
 
