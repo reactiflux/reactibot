@@ -47,13 +47,13 @@ const handleMessage = (msg: Message | PartialMessage) => {
   const channelId = msg.channel.id;
 
   if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach(channelHandlers => {
+    channelHandlersById[channelId].forEach((channelHandlers) => {
       channelHandlers.handleMessage?.({ msg: msg as Message, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach(channelHandlers => {
+    channelHandlersById["*"].forEach((channelHandlers) => {
       channelHandlers.handleMessage?.({ msg: msg as Message, bot });
     });
   }
@@ -63,13 +63,13 @@ const handleReaction = (reaction: MessageReaction, user: User) => {
   const channelId = reaction.message.channel.id;
 
   if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach(channelHandlers => {
+    channelHandlersById[channelId].forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach(channelHandlers => {
+    channelHandlersById["*"].forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
@@ -117,7 +117,7 @@ bot.on("messageReactionAdd", async (reaction, user) => {
   handleReaction(reaction, user as User);
 });
 
-bot.on("message", async msg => {
+bot.on("message", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
@@ -126,7 +126,7 @@ bot.on("message", async msg => {
 logger.log("INI", "Bootstrap complete");
 
 bot.on("ready", () => {
-  Array.from(bot.guilds.cache.values()).forEach(guild => {
+  Array.from(bot.guilds.cache.values()).forEach((guild) => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
@@ -135,7 +135,7 @@ bot.on("ready", () => {
   scheduleMessages(bot, MESSAGE_SCHEDULE);
 });
 
-bot.on("error", err => {
+bot.on("error", (err) => {
   try {
     logger.log("ERR", err.message);
   } catch (e) {

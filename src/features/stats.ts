@@ -39,7 +39,7 @@ const stats = (client: Client) => {
     emitEvent(EVENTS.memberLeft);
   });
 
-  client.on("message", msg => {
+  client.on("message", (msg) => {
     const { member, author, channel, content } = msg;
 
     if (!channel || !author) return;
@@ -53,7 +53,7 @@ const stats = (client: Client) => {
               .map(({ name }) => name)
               // Everybody has 'everyone', so it double-counts when viewing
               // metrics charts.
-              .filter(x => x !== "@everyone")
+              .filter((x) => x !== "@everyone")
           : [],
       },
       userId: author.id,

@@ -25,8 +25,8 @@ const counterAsWord = (q: number) => {
 };
 
 const flush = (channel: TextChannel | DMChannel | NewsChannel) => {
-  prevMessagesIds.forEach(oldId =>
-    channel.messages.fetch(oldId).then(msg => msg.delete()),
+  prevMessagesIds.forEach((oldId) =>
+    channel.messages.fetch(oldId).then((msg) => msg.delete()),
   );
   prevMessagesIds = [];
 };
@@ -39,7 +39,7 @@ const prompt = (msg: Message) => {
           counter,
         )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`,
       )
-      .then(msg => {
+      .then((msg) => {
         flush(msg.channel);
         prevMessagesIds.push(msg.id);
       });
@@ -50,7 +50,7 @@ const prompt = (msg: Message) => {
           counter,
         )} questions queued.`,
       )
-      .then(msg => {
+      .then((msg) => {
         flush(msg.channel);
         prevMessagesIds.push(msg.id);
       });
@@ -62,18 +62,18 @@ type Commands = {
 };
 
 const reactionCommands: Commands = {
-  "🇶": msg => {
+  "🇶": (msg) => {
     qnaMessages[msg.id] = QnAMessageType.Question;
     counter++;
     prompt(msg);
   },
-  "🇦": msg => {
+  "🇦": (msg) => {
     qnaMessages[msg.id] = QnAMessageType.Answer;
     if (counter === 0) return;
     counter--;
     prompt(msg);
   },
-  "❌": msg => {
+  "❌": (msg) => {
     msg.author
       .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
     
@@ -94,7 +94,7 @@ const messageCommands: Commands = {
   "!qa:reset": () => {
     counter = 0;
   },
-  "!qa:count": msg => {
+  "!qa:count": (msg) => {
     prompt(msg);
   },
 };
@@ -105,7 +105,7 @@ const qna: ChannelHandlers = {
     if (!command) return;
 
     const author = msg.guild?.member(msg.author);
-    const allowed = ALLOWED_ROLES.some(allowedRole => {
+    const allowed = ALLOWED_ROLES.some((allowedRole) => {
       return author?.roles.cache.has(allowedRole);
     });
 
@@ -122,7 +122,7 @@ const qna: ChannelHandlers = {
     if (!command) return;
 
     const author = reaction.message.guild?.member(user.id);
-    const allowed = ALLOWED_ROLES.some(allowedRole => {
+    const allowed = ALLOWED_ROLES.some((allowedRole) => {
       return author?.roles.cache.has(allowedRole);
     });
 

@@ -9,24 +9,23 @@ export const stdoutLog: Logger = (type, text) => {
   );
 };
 
-export const channelLog = (bot: Client, channelID: string): Logger => (
-  type,
-  text,
-) => {
-  try {
-    const channel = bot.channels.cache.get(channelID) as TextChannel;
-    if (channel) {
-      channel.send(`[${type}] ${text}`);
+export const channelLog =
+  (bot: Client, channelID: string): Logger =>
+  (type, text) => {
+    try {
+      const channel = bot.channels.cache.get(channelID) as TextChannel;
+      if (channel) {
+        channel.send(`[${type}] ${text}`);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-};
+  };
 
 const loggers: Logger[] = [];
 
 export const logger = {
   add: (logger: Logger) => loggers.push(logger),
   log: (type: string, text: string) =>
-    loggers.map(logger => logger(type, text)),
+    loggers.map((logger) => logger(type, text)),
 };

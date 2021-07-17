@@ -13,7 +13,7 @@ const jobs = {
     }
     let content = msg.content;
     const potentialGists = [];
-    blocks.forEach(block => {
+    blocks.forEach((block) => {
       if (block.split("\n").length > maxLines + 2) {
         content = content.replace(block, "");
         potentialGists.push(block);
@@ -29,15 +29,12 @@ const jobs = {
           files: potentialGists.reduce((accumulator, item, index) => {
             return Object.assign({}, accumulator, {
               [`file-${index}.js`]: {
-                content: item
-                  .split("\n")
-                  .slice(1, -1)
-                  .join("\n"),
+                content: item.split("\n").slice(1, -1).join("\n"),
               },
             });
           }, {}),
         })
-        .then(d => {
+        .then((d) => {
           msg.channel.send(
             `It looks like you posted quite a long code block. I've removed it and created a GIST of it - please check it at ${d.body.html_url}`,
             {
@@ -46,7 +43,7 @@ const jobs = {
           );
           msg.delete();
         })
-        .catch(e => {
+        .catch((e) => {
           console.log(e);
         });
     }

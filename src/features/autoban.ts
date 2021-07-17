@@ -11,7 +11,7 @@ const autoban: ChannelHandlers = {
   handleMessage: ({ msg }) => {
     let hasToken = false;
 
-    tags.forEach(token => {
+    tags.forEach((token) => {
       if (msg.content.toLowerCase().includes(token)) hasToken = true;
     });
 

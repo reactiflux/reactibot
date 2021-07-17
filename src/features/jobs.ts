@@ -10,7 +10,7 @@ const jobs: ChannelHandlers = {
 
     if (!msg.member) return;
 
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
     });
 

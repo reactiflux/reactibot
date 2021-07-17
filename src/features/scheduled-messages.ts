@@ -35,7 +35,7 @@ export const scheduleMessages = (
   bot: discord.Client,
   messageConfigs: MessageConfig[],
 ) => {
-  const scheduledTasks = messageConfigs.map(messageConfig =>
+  const scheduledTasks = messageConfigs.map((messageConfig) =>
     scheduleMessage(bot, messageConfig),
   );
   return scheduledTasks;

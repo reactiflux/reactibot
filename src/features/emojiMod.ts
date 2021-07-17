@@ -41,25 +41,25 @@ const reactionHandlers: ReactionHandlers = {
       return;
     }
 
-    const usersWhoReacted = reaction.users.cache.map(user =>
+    const usersWhoReacted = reaction.users.cache.map((user) =>
       message.guild?.member(user.id),
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
-      channel =>
+      (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
     const userNames = usersWhoReacted
-      .filter(user => !isStaff(user))
-      .map(member => member?.user.username)
+      .filter((user) => !isStaff(user))
+      .map((member) => member?.user.username)
       .join(", ");
 
     const staffNames = usersWhoReacted
       .filter(isStaff)
-      .map(member => member?.user.username)
+      .map((member) => member?.user.username)
       .join(", ");
 
     let logMessage = "";
@@ -93,7 +93,7 @@ const reactionHandlers: ReactionHandlers = {
       if (warningMessages[message.id]) {
         warningMessages[message.id].edit(logMessage);
       } else {
-        modLogChannel.send(logMessage).then(warningMessage => {
+        modLogChannel.send(logMessage).then((warningMessage) => {
           warningMessages[message.id] = warningMessage;
         });
       }
@@ -126,7 +126,7 @@ const reactionHandlers: ReactionHandlers = {
     const numberOfTotalReactions = reactions.count;
 
     const modLogChannel = message.guild.channels.cache.find(
-      channel =>
+      (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
@@ -150,7 +150,7 @@ const reactionHandlers: ReactionHandlers = {
       if (warningMessages[message.id]) {
         warningMessages[message.id].edit(logMessage);
       } else {
-        modLogChannel.send(logMessage).then(warningMessage => {
+        modLogChannel.send(logMessage).then((warningMessage) => {
           warningMessages[message.id] = warningMessage;
         });
       }
