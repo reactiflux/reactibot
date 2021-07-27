@@ -236,7 +236,7 @@ Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
 Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
-Link a Snack to share React Native examples: https://snack.expo.io 
+Link a Snack to share React Native examples: https://snack.expo.io
 `,
           color: EMBED_COLOR
         }
@@ -423,8 +423,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
           https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
-          https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
-          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
+          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/
           `,
           color: EMBED_COLOR
         }
@@ -443,7 +443,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           description: `Redux and Context are different tools that solve different problems, with some overlap.
 
           Context is a Dependency Injection tool for a single value.
-          
+
           Redux is a tool for predictable state management outside React.
 
           See these articles for more details on the differences:
@@ -576,7 +576,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: async msg => {
       if (!msg || !msg.guild) {
         return;
       }
@@ -587,7 +587,9 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         return;
       }
 
-      msg.channel.send({
+      await msg.react("⚠️");
+
+      await msg.reply({
         embed: {
           title: "Tsk tsk.",
           type: "rich",
@@ -595,6 +597,8 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           color: "#BA0C2F"
         }
       });
+
+      await msg.delete();
     }
   }
 ];
