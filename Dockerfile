@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:14-alpine
 WORKDIR /var/scripts/reactibot
 
 RUN apk update && apk upgrade && \
