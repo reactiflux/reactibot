@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/node-cron": "^2.0.3",
-    "discord.js": "^12.5.1",
+    "discord.js": "^13.0.0-dev.30a58dc.1627387368",
     "dotenv": "^6.1.0",
     "gists": "^2.0.0",
     "node-cron": "^2.0.3",
