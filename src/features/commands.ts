@@ -573,6 +573,26 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     }
   },
   {
+    words: [`!nw`, `!notworking`],
+    help: `gives some tips on how to improve your chances at getting an answer`,
+    category: "Communication",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "State your problem",
+          type: "rich",
+          description: `To improve your chances at getting help, it's important to describe the behavior you're seeing and how it differs from your expectations. Simply saying something "doesn't work" requires too many assumptions on the helper's part, and could lead both of you astray.
+          
+Instead:
+- Tell us what you're trying to do.
+- Show us what you did with code.
+- Tell us what happened. Show us errors. Describe what unexpected behavior you're seeing.`,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",

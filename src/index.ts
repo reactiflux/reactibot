@@ -15,6 +15,7 @@ import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
+import autodelete from "./features/autodelete-spam";
 import { ChannelHandlers } from "./types";
 import {
   MESSAGE_SCHEDULE,
@@ -96,6 +97,7 @@ addHandler("*", commands);
 // addHandler('*', codeblock);
 addHandler("*", autoban);
 addHandler("*", emojiMod);
+addHandler("*", autodelete);
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
