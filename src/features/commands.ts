@@ -219,8 +219,8 @@ How to ask for programming help: http://wp.me/p2oIwo-26
 How do I ask a good question https://stackoverflow.com/help/how-to-ask
 How To Ask Questions The Smart Way https://git.io/JKscV
 `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
     },
   },
@@ -431,16 +431,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://changelog.com/posts/when-and-when-not-to-reach-for-redux
           https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!reduxvscontext`, "!context"],
     help: `Differences between Redux and Context`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "What are the differences between Redux and Context?",
@@ -581,7 +581,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     words: [`!nw`, `!notworking`],
     help: `gives some tips on how to improve your chances at getting an answer`,
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "State your problem",
@@ -592,10 +592,10 @@ Instead:
 - Tell us what you're trying to do.
 - Show us what you did with code.
 - Tell us what happened. Show us errors. Describe what unexpected behavior you're seeing.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: ["@here", "@everyone"],
