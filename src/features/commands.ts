@@ -19,7 +19,7 @@ const sortedCategories: Categories[] = [
   "Reactiflux",
   "Communication",
   "Web",
-  "React/Redux"
+  "React/Redux",
 ];
 
 const commandsList: Command[] = [
@@ -27,7 +27,7 @@ const commandsList: Command[] = [
     words: [`!commands`],
     help: `lists all available commands`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       const commandsMessage = createCommandsMessage();
 
       msg.channel.send({
@@ -35,47 +35,47 @@ const commandsList: Command[] = [
           title: "Available Help Commands",
           type: "rich",
           description: commandsMessage,
-          color: EMBED_COLOR
+          color: EMBED_COLOR,
         },
-        reply: msg.author
+        reply: msg.author,
       });
-    }
+    },
   },
   {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Helpful links",
           type: "rich",
           description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!xy`],
     help: `explains the XY problem`,
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "The XY Issue",
           type: "rich",
           description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!ymnnr`],
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "You Might Not Need Redux",
@@ -83,16 +83,16 @@ const commandsList: Command[] = [
           description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
 
 https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!derived`],
     help: `Links to the React docs advice to avoid copying props to state`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title:
@@ -101,16 +101,16 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
           description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
 https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!su`, `!stateupdates`],
     help: `Explains the implications involved with state updates being asynchronous`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "State Updates May Be Asynchronous",
@@ -128,16 +128,16 @@ Check out these resources for more information:
 https://gist.github.com/bpas247/e177a772b293025e5324219d231cf32c
 https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
 https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!bind`],
     help: `explains how and why to bind in React applications`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Binding functions",
@@ -171,16 +171,16 @@ handleClick = () => {
 \`\`\`
 
 Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/ for more informations`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!lift`],
     help: `links to the React docs regarding the common need to "lift" state`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Lifting State Up",
@@ -188,17 +188,17 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
           description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
 
 https://reactjs.org/docs/lifting-state-up.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
 
   {
     words: [`!ask`],
     help: `explains how to ask questions`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Asking to ask",
@@ -219,16 +219,16 @@ How to ask for programming help: http://wp.me/p2oIwo-26
 How do I ask a good question https://stackoverflow.com/help/how-to-ask
 How To Ask Questions The Smart Way https://git.io/JKscV
 `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!code`, `!gist`],
     help: `explains how to attach code`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Attaching Code",
@@ -243,16 +243,16 @@ Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/
 Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
 Link a Snack to share React Native examples: https://snack.expo.io
 `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!ping`],
     help: `explains how to ping politely`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Don’t ping or DM other devs you aren’t actively talking to",
@@ -260,16 +260,16 @@ Link a Snack to share React Native examples: https://snack.expo.io
           description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
 
 Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!inputs`],
     help: `provides links to uncontrolled vs controlled components`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Uncontrolled vs Controlled components",
@@ -277,21 +277,21 @@ Similarly, don’t DM other members without asking first. All of the same proble
           description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
 Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!move`],
     help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       const [, newChannel] = msg.content.split(" ");
 
       try {
         const targetChannel = msg.guild?.channels.cache.get(
-          newChannel.replace("<#", "").replace(">", "")
+          newChannel.replace("<#", "").replace(">", ""),
         ) as TextChannel;
 
         if (!msg.mentions.members) return;
@@ -299,25 +299,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         targetChannel.send(
           `${msg.author} has opened a portal from ${
             msg.channel
-          } summoning ${msg.mentions.members.map(i => i).join(" ")}`
+          } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
         );
       } catch (e) {
         console.log("Something went wrong when summoning a portal: ", e);
       }
-    }
+    },
   },
   {
     words: [`!mdn`],
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
     category: "Web",
-    handleMessage: async msg => {
+    handleMessage: async (msg) => {
       const [, ...args] = msg.content.split(" ");
       const query = args.join(" ");
       const [fetchMsg, res] = await Promise.all([
         msg.channel.send(`Fetching "${query}"...`),
         fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`
-        )
+          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
+        ),
       ]);
 
       const { documents } = await res.json();
@@ -332,7 +332,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         title,
         excerpt: description,
         mdn_url: mdnUrl,
-        locale
+        locale,
       } = topResult;
 
       await msg.channel.send({
@@ -342,23 +342,23 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             name: "MDN",
             url: "https://developer.mozilla.org",
             icon_url:
-              "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png"
+              "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
           },
           title,
           description,
           color: 0x83d0f2,
-          url: `https://developer.mozilla.org${mdnUrl}`
-        }
+          url: `https://developer.mozilla.org${mdnUrl}`,
+        },
       });
 
       fetchMsg.delete();
-    }
+    },
   },
   {
     words: [`!appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
     category: "Web",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Florinpop17s Curated App Ideas!",
@@ -367,16 +367,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://github.com/florinpop17/app-ideas
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!cors`],
     help: `provides a link to what CORS is and how to fix it`,
     category: "Web",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Understanding CORS",
@@ -388,16 +388,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
           https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!imm`, `!immutability`],
     help: `provides resources for helping with immutability`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Immutable updates",
@@ -408,16 +408,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://daveceddia.com/react-redux-immutability-guide/
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!redux`],
     help: `Info and when and why to use Redux`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "When should you use Redux?",
@@ -431,16 +431,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://changelog.com/posts/when-and-when-not-to-reach-for-redux
           https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!reduxvscontext`, "!context"],
     help: `Differences between Redux and Context`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "What are the differences between Redux and Context?",
@@ -458,16 +458,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           https://changelog.com/posts/when-and-when-not-to-reach-for-redux
           https://blog.isquaredsoftware.com/2020/01/blogged-answers-react-redux-and-context-behavior/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!render`],
     help: `Explanation of how React rendering behavior works`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "How does React rendering behavior work?",
@@ -483,16 +483,16 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!formatting`, `!prettier`],
     help: `describes Prettier and explains how to use it to format code`,
     category: "Reactiflux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Formatting code with Prettier",
@@ -504,16 +504,16 @@ Prettier is a modern and well-supported formatter that completely reformats your
 To format some code without installing anything, use the playground: https://prettier.io/playground/
 To enforce its style in your projects, use the CLI: https://prettier.io/docs/en/install.html
 To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!gender`],
     help: `reminds users to use gender-neutral language`,
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Please use gender neutral language by default",
@@ -523,16 +523,16 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 - Instead of "hey guys," try "hey folks", "hey all", or similar
 - Use "they/them/theirs" if you aren't sure of someone's pronouns
 - "thanks friend" instead of "thanks man"`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!reactts`],
     help: `Resources and tips for using React + TypeScript together`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Resources for React + TypeScript",
@@ -547,16 +547,16 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 
           https://github.com/facebook/create-react-app/pull/8177
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!hooks`],
     help: `Resources for learning React Hooks`,
     category: "React/Redux",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "Learning React Hooks",
@@ -572,16 +572,16 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           This article explains why hooks are important and what problems they solve:
           https://ui.dev/why-react-hooks/
           `,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: [`!nw`, `!notworking`],
     help: `gives some tips on how to improve your chances at getting an answer`,
     category: "Communication",
-    handleMessage: msg => {
+    handleMessage: (msg) => {
       msg.channel.send({
         embed: {
           title: "State your problem",
@@ -592,16 +592,16 @@ Instead:
 - Tell us what you're trying to do.
 - Show us what you did with code.
 - Tell us what happened. Show us errors. Describe what unexpected behavior you're seeing.`,
-          color: EMBED_COLOR
-        }
+          color: EMBED_COLOR,
+        },
       });
-    }
+    },
   },
   {
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
-    handleMessage: async msg => {
+    handleMessage: async (msg) => {
       if (!msg || !msg.guild) {
         return;
       }
@@ -619,13 +619,12 @@ Instead:
           title: "Tsk tsk.",
           type: "rich",
           description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-          color: "#BA0C2F"
-        }
+          color: "#BA0C2F",
+        },
       });
-
       await msg.delete();
-    }
-  }
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
@@ -633,17 +632,17 @@ const createCommandsMessage = () => {
     Reactiflux: [],
     Communication: [],
     Web: [],
-    "React/Redux": []
+    "React/Redux": [],
   };
 
   // Omit any commands that are internal, like the `@here` warning
-  const visibleCommands = commandsList.filter(command => !!command.help);
+  const visibleCommands = commandsList.filter((command) => !!command.help);
 
-  visibleCommands.forEach(command => {
+  visibleCommands.forEach((command) => {
     groupedMessages[command.category].push(command);
   });
 
-  const categoryDescriptions = sortedCategories.map(category => {
+  const categoryDescriptions = sortedCategories.map((category) => {
     const commands = groupedMessages[category];
     // Mutating in map(), but whatever
     commands.sort((a, b) => {
@@ -653,8 +652,8 @@ const createCommandsMessage = () => {
 
     const boldTitle = `**${category}**`;
     const commandDescriptions = commands
-      .map(command => {
-        const formattedWords = command.words.map(word => `**\`${word}\`**`);
+      .map((command) => {
+        const formattedWords = command.words.map((word) => `**\`${word}\`**`);
         return `${formattedWords.join(", ")}: ${command.help}`;
       })
       .join("\n");
@@ -672,8 +671,8 @@ const commands: ChannelHandlers = {
       return;
     }
 
-    commandsList.forEach(command => {
-      const keyword = command.words.find(word => {
+    commandsList.forEach((command) => {
+      const keyword = command.words.find((word) => {
         return msg.content.toLowerCase().includes(word);
       });
 
@@ -683,7 +682,7 @@ const commands: ChannelHandlers = {
         command.handleMessage(msg);
       }
     });
-  }
+  },
 };
 
 export default commands;

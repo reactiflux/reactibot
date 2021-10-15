@@ -10,7 +10,7 @@ const jobs: ChannelHandlers = {
 
     if (!msg.member) return;
 
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
     });
 
@@ -38,7 +38,7 @@ Thank you :)
 
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
     }
-  }
+  },
 };
 
 export default jobs;
