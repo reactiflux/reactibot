@@ -387,6 +387,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           Read more at:
           https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
           https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
+          https://jakearchibald.com/2021/cors/
           `,
           color: EMBED_COLOR,
         },
@@ -587,7 +588,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           title: "State your problem",
           type: "rich",
           description: `To improve your chances at getting help, it's important to describe the behavior you're seeing and how it differs from your expectations. Simply saying something "doesn't work" requires too many assumptions on the helper's part, and could lead both of you astray.
-          
+
 Instead:
 - Tell us what you're trying to do.
 - Show us what you did with code.
