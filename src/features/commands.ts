@@ -213,9 +213,14 @@ Good:
 > // snippet of code
 > \`\`\`
 > I'm seeing an error, but I don't know if it's related.
-> \`Uncaught TypeError: undefined is not a function\``,
-          color: EMBED_COLOR,
-        },
+> \`Uncaught TypeError: undefined is not a function\`
+
+How to ask for programming help: http://wp.me/p2oIwo-26
+How do I ask a good question https://stackoverflow.com/help/how-to-ask
+How To Ask Questions The Smart Way https://git.io/JKscV
+`,
+          color: EMBED_COLOR
+        }
       });
     },
   },
@@ -236,7 +241,7 @@ Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
 Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
-Link a Snack to share React Native examples: https://snack.expo.io 
+Link a Snack to share React Native examples: https://snack.expo.io
 `,
           color: EMBED_COLOR,
         },
@@ -422,8 +427,36 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           See these articles for advice on what Redux does and when it makes sense to use it:
 
           https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
-          https://changelog.com/posts/when-and-when-not-to-reach-for-redux 
-          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/ 
+          https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
+          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/
+          `,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
+    words: [`!reduxvscontext`, "!context"],
+    help: `Differences between Redux and Context`,
+    category: "React/Redux",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "What are the differences between Redux and Context?",
+          type: "rich",
+          description: `Redux and Context are different tools that solve different problems, with some overlap.
+
+          Context is a Dependency Injection tool for a single value.
+
+          Redux is a tool for predictable state management outside React.
+
+          See these articles for more details on the differences:
+
+          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
+          https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
+          https://blog.isquaredsoftware.com/2020/01/blogged-answers-react-redux-and-context-behavior/
           `,
           color: EMBED_COLOR,
         },
@@ -545,10 +578,30 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
+    words: [`!nw`, `!notworking`],
+    help: `gives some tips on how to improve your chances at getting an answer`,
+    category: "Communication",
+    handleMessage: msg => {
+      msg.channel.send({
+        embed: {
+          title: "State your problem",
+          type: "rich",
+          description: `To improve your chances at getting help, it's important to describe the behavior you're seeing and how it differs from your expectations. Simply saying something "doesn't work" requires too many assumptions on the helper's part, and could lead both of you astray.
+          
+Instead:
+- Tell us what you're trying to do.
+- Show us what you did with code.
+- Tell us what happened. Show us errors. Describe what unexpected behavior you're seeing.`,
+          color: EMBED_COLOR
+        }
+      });
+    }
+  },
+  {
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
-    handleMessage: (msg) => {
+    handleMessage: async (msg) => {
       if (!msg || !msg.guild) {
         return;
       }
@@ -559,7 +612,9 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         return;
       }
 
-      msg.channel.send({
+      await msg.react("⚠️");
+
+      await msg.reply({
         embed: {
           title: "Tsk tsk.",
           type: "rich",
@@ -567,6 +622,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           color: "#BA0C2F",
         },
       });
+      await msg.delete();
     },
   },
 ];

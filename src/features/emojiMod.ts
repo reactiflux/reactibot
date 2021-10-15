@@ -162,12 +162,9 @@ const emojiMod: ChannelHandlers = {
   handleReaction: ({ reaction, user, bot }) => {
     const { message } = reaction;
 
-    if (
-      !message.guild ||
-      user.id === bot.user?.id ||
-      message.author.id === bot.user?.id
-    )
+    if (!message.guild || message.author.id === bot.user?.id) {
       return;
+    }
 
     let emoji = reaction.emoji.toString();
 
