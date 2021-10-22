@@ -21,6 +21,7 @@ import {
   MESSAGE_SCHEDULE,
   scheduleMessages,
 } from "./features/scheduled-messages";
+import tsPlaygroundLinkShortener from "./features/tsplay";
 
 const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -98,6 +99,7 @@ addHandler("*", commands);
 addHandler("*", autoban);
 addHandler("*", emojiMod);
 addHandler("*", autodelete);
+addHandler("*", tsPlaygroundLinkShortener);
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
