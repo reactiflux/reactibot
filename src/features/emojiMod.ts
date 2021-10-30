@@ -30,14 +30,22 @@ type ReactionHandlers = {
 
 const reactionHandlers: ReactionHandlers = {
   "⚠️": (reaction, message, member) => {
-    // Skip if the user that reacted isn't in the staff or the post is from someone
-    // from the staff
+    // Skip if the post is from someone from the staff
     if (
       !message.guild ||
       !message.author ||
-      !isStaff(member) ||
       isStaff(message.guild.member(message.author.id))
     ) {
+      return;
+    }
+    // If the user that reacted isn't in the staff, remove the reaction, send a
+    if (!isStaff(member)) {
+      reaction.users.remove(member.id);
+      member.send([
+        "Hey there! 👋",
+        "The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.",
+        "Thanks!",
+      ]);
       return;
     }
 
