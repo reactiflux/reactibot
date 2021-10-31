@@ -566,11 +566,38 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           The official React docs are the best resource for learning hooks:
           https://reactjs.org/docs/hooks-intro.html
 
-          However, the React docs still teach classes in the tutorials. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
+          However, the React docs still teach classes in the tutorials. A rewrite is in progress here: 
+          https://beta.reactjs.org
+
+          There's also a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
           https://reactwithhooks.netlify.app/
 
           This article explains why hooks are important and what problems they solve:
           https://ui.dev/why-react-hooks/
+          `,
+          color: EMBED_COLOR,
+        },
+      });
+    },
+  },
+  {
+    words: [`!learn`],
+    help: `Resources for Learning React`,
+    category: "React/Redux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embed: {
+          title: "Learning React",
+          type: "rich",
+          description: `
+          The official (beta) React docs are the best resource for learning React:
+          https://beta.reactjs.org
+
+          The official React docs still teach classes for the examples, but the concepts are still valid:
+          https://reactjs.org/docs/getting-started.html
+
+          There's also a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
+          https://reactwithhooks.netlify.app/
           `,
           color: EMBED_COLOR,
         },
