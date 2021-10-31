@@ -8,6 +8,8 @@ export const EMBED_COLOR = 7506394;
 
 type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
 
+let autoask = ["hey can anyone help me?", "anyone good with redux?", "anyone good with", "anyone knows"]
+
 type Command = {
   words: string[];
   help: string;
@@ -212,8 +214,56 @@ Good:
 > \`\`\`js
 > // snippet of code
 > \`\`\`
+
+> or Link a Gist to upload entire files: https://gist.github.com
+>Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
+>Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
+>Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
+>Link a Snack to share React Native examples: https://snack.expo.io
+
 > I'm seeing an error, but I don't know if it's related.
 > \`Uncaught TypeError: undefined is not a function\`
+
+
+
+How to ask for programming help: http://wp.me/p2oIwo-26
+How do I ask a good question https://stackoverflow.com/help/how-to-ask
+How To Ask Questions The Smart Way https://git.io/JKscV
+`,
+          color: EMBED_COLOR,
+        },
+      });
+    },
+  },
+  {
+    words: [...autoask],
+    help: `explains how to ask questions`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.reply({
+        embed: {
+          title: "Asking to ask",
+          type: "rich",
+          description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
+
+Bad: "hey can anyone help me?"
+Bad: "anyone good with redux?"
+Good:
+> I'm trying to fire a redux action from my component, but it's not getting to the reducer.
+> \`\`\`js
+> // snippet of code
+> \`\`\`
+
+> or Link a Gist to upload entire files: https://gist.github.com
+>Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
+>Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
+>Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
+>Link a Snack to share React Native examples: https://snack.expo.io
+
+> I'm seeing an error, but I don't know if it's related.
+> \`Uncaught TypeError: undefined is not a function\`
+
+
 
 How to ask for programming help: http://wp.me/p2oIwo-26
 How do I ask a good question https://stackoverflow.com/help/how-to-ask
@@ -297,8 +347,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         if (!msg.mentions.members) return;
 
         targetChannel.send(
-          `${msg.author} has opened a portal from ${
-            msg.channel
+          `${msg.author} has opened a portal from ${msg.channel
           } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
         );
       } catch (e) {
