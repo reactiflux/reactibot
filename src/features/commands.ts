@@ -8,7 +8,12 @@ export const EMBED_COLOR = 7506394;
 
 type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
 
-let autoask = ["hey can anyone help me?", "anyone good with redux?", "anyone good with", "anyone knows"]
+let autoask = [
+  "hey can anyone help me?",
+  "anyone good with redux?",
+  "anyone good with",
+  "anyone knows",
+];
 
 type Command = {
   words: string[];
@@ -347,7 +352,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         if (!msg.mentions.members) return;
 
         targetChannel.send(
-          `${msg.author} has opened a portal from ${msg.channel
+          `${msg.author} has opened a portal from ${
+            msg.channel
           } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
         );
       } catch (e) {
