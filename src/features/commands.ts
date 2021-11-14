@@ -13,8 +13,6 @@ let autoask = [
   "anyone good with redux?",
   "anyone good with",
   "anyone knows",
-  "I have a question",
-  "I had a question"
 ];
 
 type Command = {
