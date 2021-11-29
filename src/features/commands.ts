@@ -609,15 +609,36 @@ Instead:
 
       await msg.react("⚠️");
 
-      await msg.reply({
-        embed: {
-          title: "Tsk tsk.",
-          type: "rich",
-          description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-          color: "#BA0C2F",
-        },
+      await msg.channel.messages.fetch({ limit: 10 }).then((messages) => {
+        let SendInPublic = true
+        messages.map((key) => {
+          if (key.content.startsWith("Please do **not** try to use \`@here\` or \`@everyone\` - there are ")) {
+          SendInPublic = false
+          }
+        });
+
+        if(SendInPublic != true){
+          msg.author.send({
+            embed: {
+              title: "Tsk tsk.",
+              type: "rich",
+              description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+              color: "#BA0C2F",
+            },
+          });
+          msg.delete();
+        } else {
+          msg.reply({
+            embed: {
+              title: "Tsk tsk.",
+              type: "rich",
+              description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+              color: "#BA0C2F",
+            },
+          });
+          msg.delete();
+        }
       });
-      await msg.delete();
     },
   },
 ];

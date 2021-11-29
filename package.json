@@ -21,7 +21,7 @@
     "dotenv": "^6.1.0",
     "gists": "^2.0.0",
     "node-cron": "^2.0.3",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.6",
     "query-string": "^6.2.0"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-prettier": "^3.1.2",
     "prettier": "^2.3.2",
-    "ts-node-dev": "^1.0.0-pre.44",
+    "ts-node-dev": "^1.1.8",
     "typescript": "^3.8.2"
   },
   "prettier": {
