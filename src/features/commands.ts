@@ -387,6 +387,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           Read more at:
           https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
           https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
+          https://jakearchibald.com/2021/cors/
           `,
           color: EMBED_COLOR,
         },
