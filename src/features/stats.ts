@@ -12,6 +12,14 @@ const emitEvent = (
   eventName: string,
   { data, userId }: { data?: EmitEventData; userId?: string } = {},
 ) => {
+  if (!process.env.AMPLITUDE_KEY) {
+    console.log({
+      event_type: eventName,
+      event_properties: data,
+    });
+    return;
+  }
+
   const fields = {
     api_key: process.env.AMPLITUDE_KEY,
     event: JSON.stringify({

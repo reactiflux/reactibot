@@ -26,7 +26,25 @@ import tsPlaygroundLinkShortener from "./features/tsplay";
 export const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
-bot.login(process.env.DISCORD_HASH);
+bot
+  .login(process.env.DISCORD_HASH)
+  .catch((e) => {
+    console.log({ e });
+    console.log(
+      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
+    );
+    console.log(
+      'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
+    );
+    process.exit(1);
+  })
+  .then(async () => {
+    const { id } = await bot.fetchApplication();
+    console.log("Bot started. If necessary, add it to your test server:");
+    console.log(
+      `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
+    );
+  });
 
 export type ChannelHandlersById = {
   [channelId: string]: ChannelHandlers[];
