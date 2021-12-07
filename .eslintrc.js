@@ -6,14 +6,16 @@ module.exports = {
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
   ],
   env: {
     node: true,
-    commonjs: true
+    commonjs: true,
   },
   rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/camelcase": "off"
-  }
+    "@typescript-eslint/camelcase": "off",
+  },
 };
