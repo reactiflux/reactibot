@@ -1,5 +1,4 @@
 import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
-import debounce from "debounce";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons } from "../constants";
@@ -30,13 +29,6 @@ type ReactionHandlers = {
   ) => void;
 };
 
-// Send at most 1 log per
-const sendModLog = debounce(
-  (channelInstance: TextChannel, logBody: string) =>
-    channelInstance.send(logBody),
-  1000,
-  true,
-);
 const handleReport = (
   channelInstance: TextChannel,
   reportedMessage: Message,
@@ -67,7 +59,7 @@ const handleReport = (
       cleanupInterval,
     });
   } else {
-    sendModLog(channelInstance, logBody).then((warningMessage) => {
+    channelInstance.send(logBody).then((warningMessage) => {
       warningMessages.set(simplifiedContent, {
         warnings: 1,
         message: warningMessage,
