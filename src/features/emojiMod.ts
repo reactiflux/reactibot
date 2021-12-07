@@ -3,7 +3,7 @@ import debounce from "debounce";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons } from "../constants";
-import { constructLog } from "../helpers/modLog";
+import { constructLog, simplifyString } from "../helpers/modLog";
 import { isStaff } from "../helpers/discord";
 
 const config = {
@@ -15,11 +15,10 @@ const config = {
   deletionThreshold: Infinity,
 };
 
-type WarningMessages = {
-  [messageId: string]: Message;
-};
-
-const warningMessages: WarningMessages = {};
+const warningMessages = new Map<
+  string,
+  { warnings: number; message: Message; cleanupInterval: NodeJS.Timeout }
+>();
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
@@ -43,11 +42,37 @@ const handleReport = (
   reportedMessage: Message,
   logBody: string,
 ) => {
-  if (warningMessages[reportedMessage.id]) {
-    warningMessages[reportedMessage.id].edit(logBody);
+  const simplifiedContent = simplifyString(reportedMessage.content);
+  const cached = warningMessages.get(simplifiedContent);
+
+  // Schedule cleanup for logged messages
+  const cleanupInterval = setTimeout(() => {
+    warningMessages.delete(simplifiedContent);
+  }, 60 * 1000);
+  if (cached) {
+    // If we already logged for ~ this message, reset interval and edit the log
+    const {
+      message,
+      warnings: oldWarnings,
+      cleanupInterval: oldInterval,
+    } = cached;
+    const warnings = oldWarnings + 1;
+    clearTimeout(oldInterval);
+    message.edit(
+      logBody.replace(/warned \d times/, `warned ${warnings} times`),
+    );
+    warningMessages.set(simplifiedContent, {
+      warnings,
+      message,
+      cleanupInterval,
+    });
   } else {
     sendModLog(channelInstance, logBody).then((warningMessage) => {
-      warningMessages[reportedMessage.id] = warningMessage;
+      warningMessages.set(simplifiedContent, {
+        warnings: 1,
+        message: warningMessage,
+        cleanupInterval,
+      });
     });
   }
 };
