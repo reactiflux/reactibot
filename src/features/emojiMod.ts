@@ -1,7 +1,9 @@
 import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
-import { isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
+import { ReportReasons } from "../constants";
+import { constructLog, simplifyString } from "../helpers/modLog";
+import { isStaff } from "../helpers/discord";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -12,11 +14,10 @@ const config = {
   deletionThreshold: Infinity,
 };
 
-type WarningMessages = {
-  [messageId: string]: Message;
-};
-
-const warningMessages: WarningMessages = {};
+const warningMessages = new Map<
+  string,
+  { warnings: number; message: Message; cleanupInterval: NodeJS.Timeout }
+>();
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
@@ -26,6 +27,46 @@ type ReactionHandlers = {
     message: Message,
     member: GuildMember,
   ) => void;
+};
+
+const handleReport = (
+  channelInstance: TextChannel,
+  reportedMessage: Message,
+  logBody: string,
+) => {
+  const simplifiedContent = simplifyString(reportedMessage.content);
+  const cached = warningMessages.get(simplifiedContent);
+
+  // Schedule cleanup for logged messages
+  const cleanupInterval = setTimeout(() => {
+    warningMessages.delete(simplifiedContent);
+  }, 60 * 1000);
+  if (cached) {
+    // If we already logged for ~ this message, reset interval and edit the log
+    const {
+      message,
+      warnings: oldWarnings,
+      cleanupInterval: oldInterval,
+    } = cached;
+    const warnings = oldWarnings + 1;
+    clearTimeout(oldInterval);
+    message.edit(
+      logBody.replace(/warned \d times/, `warned ${warnings} times`),
+    );
+    warningMessages.set(simplifiedContent, {
+      warnings,
+      message,
+      cleanupInterval,
+    });
+  } else {
+    channelInstance.send(logBody).then((warningMessage) => {
+      warningMessages.set(simplifiedContent, {
+        warnings: 1,
+        message: warningMessage,
+        cleanupInterval,
+      });
+    });
+  }
 };
 
 const reactionHandlers: ReactionHandlers = {
@@ -52,60 +93,36 @@ const reactionHandlers: ReactionHandlers = {
     const usersWhoReacted = reaction.users.cache.map((user) =>
       message.guild?.member(user.id),
     );
-    const numberOfTotalReactions = usersWhoReacted.length;
-    const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
+    const reactionCount = usersWhoReacted.length;
+    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
       (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
-    const userNames = usersWhoReacted
+    const members = usersWhoReacted
       .filter((user) => !isStaff(user))
-      .map((member) => member?.user.username)
-      .join(", ");
+      .map((member) => member?.user.username || "X");
 
-    const staffNames = usersWhoReacted
+    const staff = usersWhoReacted
       .filter(isStaff)
-      .map((member) => member?.user.username)
-      .join(", ");
+      .map((member) => member?.user.username || "X");
 
-    let logMessage = "";
-
-    const logMessageEnding = [
-      "\n\n",
-      `\`${truncateMessage(message.content)}\``,
-      "\n\n",
-      `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
-      "\n\n",
-      userNames && `Reactors: \`${userNames}\``,
-      staffNames && userNames && "\n",
-      staffNames && `Staff: \`${staffNames}\``,
-    ]
-      .filter(Boolean)
-      .join("");
-
-    if (numberOfTotalReactions >= config.warningThreshold) {
-      logMessage = `<@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
+    if (reactionCount < config.warningThreshold) {
+      return;
     }
 
-    if (numberOfStaffReactions >= config.deletionThreshold) {
-      logMessage = `<@${message.author.id}> has met the deletion threshold in <#${message.channel.id}> for the message:`;
+    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
 
+    if (meetsDeletion) {
       message.delete();
     }
-
-    if (logMessage) {
-      logMessage += logMessageEnding;
-
-      if (warningMessages[message.id]) {
-        warningMessages[message.id].edit(logMessage);
-      } else {
-        modLogChannel.send(logMessage).then((warningMessage) => {
-          warningMessages[message.id] = warningMessage;
-        });
-      }
-    }
+    handleReport(
+      modLogChannel,
+      message,
+      constructLog(ReportReasons.mod, members, staff, message),
+    );
   },
   "👎": (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
@@ -131,38 +148,38 @@ const reactionHandlers: ReactionHandlers = {
       },
     );
 
-    const numberOfTotalReactions = reactions.count;
+    const totalReacts = reactions.count;
+
+    if (totalReacts < config.warningThreshold) {
+      return;
+    }
+    let trigger = ReportReasons.userWarn;
+    if (totalReacts >= config.deletionThreshold) {
+      trigger = ReportReasons.userDelete;
+    }
+
+    const usersWhoReacted = reaction.users.cache.map((user) =>
+      message.guild?.member(user.id),
+    );
+
+    const members = usersWhoReacted
+      .filter((user) => !isStaff(user))
+      .map((member) => member?.user.username || "X");
+
+    const staff = usersWhoReacted
+      .filter(isStaff)
+      .map((member) => member?.user.username || "X");
 
     const modLogChannel = message.guild.channels.cache.find(
       (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
-    let logMessage = "";
-    const logMessageEnding = [
-      "\n\n",
-      `${truncateMessage(message.content)}`,
-      "\n\n",
-      `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
-    ]
-      .filter(Boolean)
-      .join("");
-
-    if (numberOfTotalReactions >= config.thumbsDownThreshold) {
-      logMessage = `<@&102870499406647296> - <@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
-    }
-
-    if (logMessage) {
-      logMessage += logMessageEnding;
-
-      if (warningMessages[message.id]) {
-        warningMessages[message.id].edit(logMessage);
-      } else {
-        modLogChannel.send(logMessage).then((warningMessage) => {
-          warningMessages[message.id] = warningMessage;
-        });
-      }
-    }
+    handleReport(
+      modLogChannel,
+      message,
+      constructLog(trigger, members, staff, message),
+    );
   },
 };
 

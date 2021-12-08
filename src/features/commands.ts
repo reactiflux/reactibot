@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { isStaff } from "../utils";
+import { isStaff } from "../helpers/discord";
 
 export const EMBED_COLOR = 7506394;
 
