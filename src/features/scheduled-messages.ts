@@ -16,11 +16,14 @@ const FREQUENCY = {
 };
 
 type MessageConfig = {
-  interval: number;
-  postTo: { guildId?: discord.Snowflake; channelId: discord.Snowflake }[];
+  postTo: {
+    guildId?: discord.Snowflake;
+    interval: number;
+    channelId: discord.Snowflake;
+  }[];
   message: discord.MessageOptions;
 };
-export const MESSAGE_SCHEDULE: MessageConfig[] = [
+const MESSAGE_SCHEDULE: MessageConfig[] = [
   /*  Example:
   {
     interval: FREQUENCY.weekly
@@ -40,8 +43,7 @@ export const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    interval: FREQUENCY.daily,
-    postTo: [{ channelId: CHANNELS.jobBoard }],
+    postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
     message: {
       content: `Messages must start with [FORHIRE] or [HIRING]. Lead with the location of the position and include LOCAL, REMOTE, INTERN, VISA, etc. and keep the message reasonably formatted & a reasonable length.
 
@@ -54,8 +56,7 @@ Job postings here do not go through an approval process. Please be diligent and 
     },
   },
   {
-    interval: FREQUENCY.often,
-    postTo: [{ channelId: CHANNELS.helpJs }],
+    postTo: [{ interval: FREQUENCY.often, channelId: CHANNELS.helpJs }],
     message: {
       content: `This channel is good for specific questions about syntax, debugging a small (< ~50 lines of code) snippet of JS, without React involved. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
 
@@ -65,8 +66,7 @@ How do I ask a good question https://stackoverflow.com/help/how-to-ask
     },
   },
   {
-    interval: FREQUENCY.often,
-    postTo: [{ channelId: CHANNELS.helpReact }],
+    postTo: [{ interval: FREQUENCY.often, channelId: CHANNELS.helpReact }],
     message: {
       content: `This channel is good for specific questions about React, how React's features work, or debugging a small (< ~50 lines of code) snippet of JS that uses React. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
 
@@ -76,8 +76,9 @@ How do I ask a good question https://stackoverflow.com/help/how-to-ask
     },
   },
   {
-    interval: FREQUENCY.moreThanWeekly,
-    postTo: [{ channelId: CHANNELS.helpReact }],
+    postTo: [
+      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.helpReact },
+    ],
     message: {
       content: `Check our the other channels too! This is our highest-traffic channel, which may mean your question gets missed as other discussions happen.
 
@@ -101,8 +102,9 @@ If you see anything that violates our rules, help alert the mods by reacting to 
     },
   },
   {
-    interval: FREQUENCY.moreThanWeekly,
-    postTo: [{ channelId: CHANNELS.random }],
+    postTo: [
+      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.random },
+    ],
     message: {
       content: `Have you read our Code of Conduct? <https://www.reactiflux.com/conduct> Is that joke you want to make really in keeping with it? Don't make dad angry.
 
@@ -113,24 +115,17 @@ If something crosses a line, give it a 👎, or if you'd prefer to remain anonym
 
 export const messages: MessageConfig[] = [];
 
-export const scheduleMessages = (
-  bot: discord.Client,
-  messageConfigs: MessageConfig[],
-) => {
-  const scheduledTasks = messageConfigs.map((messageConfig) =>
-    scheduleTask(messageConfig.interval, () => {
-      sendMessage(bot, messageConfig);
-    }),
-  );
-  return scheduledTasks;
+export const scheduleMessages = (bot: discord.Client) => {
+  MESSAGE_SCHEDULE.forEach((messageConfig) => sendMessage(bot, messageConfig));
 };
 
 const sendMessage = async (
   bot: discord.Client,
   messageConfig: MessageConfig,
 ) => {
-  messageConfig.postTo.forEach(
-    async ({ guildId = "102860784329052160", channelId }) => {
+  const { message, postTo } = messageConfig;
+  postTo.forEach(
+    async ({ guildId = "102860784329052160", channelId, interval }) => {
       const guild = await bot.guilds.fetch(guildId);
       const channel = guild.channels.resolve(channelId);
 
@@ -148,7 +143,9 @@ const sendMessage = async (
         );
         return;
       }
-      channel.send(messageConfig.message);
+      scheduleTask(interval, () => {
+        channel.send(message);
+      });
     },
   );
 };
