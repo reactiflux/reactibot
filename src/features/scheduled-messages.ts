@@ -1,29 +1,34 @@
 import type * as discord from "discord.js";
-import cron from "node-cron";
+import { CHANNELS } from "../constants";
 import { logger } from "./log";
+import { scheduleTask } from "../helpers/schedule";
 
-// By keeping these at odd divisions, we can make sure they show up at all timezones. If it were */24, for instance, it would consistently show up in the middle of the night for some timezones.
-const enum FREQUENCY {
-  "often" = "0 */10 * * *",
-  "daily" = "0 14 * * *",
-  "moreThanWeekly" = "0 14 * * 0,2,5",
-  "weekly" = "0 14 * * 3",
-}
+const HOURLY = 60 * 60 * 1000;
+// By keeping these off 24 hr, we can make sure they show up at all timezones. If
+// it were */24, for instance, it would consistently show up in the middle of the
+// night for some timezones.
+const DAILY = 20 * HOURLY;
+const FREQUENCY = {
+  often: 9 * HOURLY,
+  daily: DAILY,
+  moreThanWeekly: 2 * DAILY,
+  weekly: 6 * DAILY,
+};
 
 type MessageConfig = {
-  cronExpression: string;
+  interval: number;
   postTo: { guildId?: discord.Snowflake; channelId: discord.Snowflake }[];
   message: discord.MessageOptions;
 };
 export const MESSAGE_SCHEDULE: MessageConfig[] = [
   /*  Example:
   {
-    cronExpression: "0,30 * * * *",  // https://crontab.guru/#0,30_*_*_*_*
+    interval: FREQUENCY.weekly
+    // Find Discord channel IDs: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
     postTo: [
       {
-        // getting these IDs: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
         id: "102860784329052160",  // Reactiflux's server ID, optional
-        channelIds: ["103696749012467712"]  // #help-react
+        channelIds: [ CHANNELS.helpReact ]  // Add channel IDs to constants first!
       }
     ],
     message: {
@@ -35,7 +40,7 @@ export const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    cronExpression: FREQUENCY.daily,
+    interval: FREQUENCY.daily,
     postTo: [{ channelId: CHANNELS.jobBoard }],
     message: {
       content: `Messages must start with [FORHIRE] or [HIRING]. Lead with the location of the position and include LOCAL, REMOTE, INTERN, VISA, etc. and keep the message reasonably formatted & a reasonable length.
@@ -49,7 +54,7 @@ Job postings here do not go through an approval process. Please be diligent and 
     },
   },
   {
-    cronExpression: FREQUENCY.often,
+    interval: FREQUENCY.often,
     postTo: [{ channelId: CHANNELS.helpJs }],
     message: {
       content: `This channel is good for specific questions about syntax, debugging a small (< ~50 lines of code) snippet of JS, without React involved. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
@@ -60,7 +65,7 @@ How do I ask a good question https://stackoverflow.com/help/how-to-ask
     },
   },
   {
-    cronExpression: FREQUENCY.often,
+    interval: FREQUENCY.often,
     postTo: [{ channelId: CHANNELS.helpReact }],
     message: {
       content: `This channel is good for specific questions about React, how React's features work, or debugging a small (< ~50 lines of code) snippet of JS that uses React. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
@@ -71,10 +76,11 @@ How do I ask a good question https://stackoverflow.com/help/how-to-ask
     },
   },
   {
-    cronExpression: FREQUENCY.moreThanWeekly,
+    interval: FREQUENCY.moreThanWeekly,
     postTo: [{ channelId: CHANNELS.helpReact }],
     message: {
       content: `Check our the other channels too! This is our highest-traffic channel, which may mean your question gets missed as other discussions happen.
+
 #help-js For questions about pure Javscript problems.
 #help-styling For questions about CSS or other visual problems.
 #help-backend For questions about issues with your server code.
@@ -95,7 +101,7 @@ If you see anything that violates our rules, help alert the mods by reacting to 
     },
   },
   {
-    cronExpression: FREQUENCY.moreThanWeekly,
+    interval: FREQUENCY.moreThanWeekly,
     postTo: [{ channelId: CHANNELS.random }],
     message: {
       content: `Have you read our Code of Conduct? <https://www.reactiflux.com/conduct> Is that joke you want to make really in keeping with it? Don't make dad angry.
@@ -112,18 +118,11 @@ export const scheduleMessages = (
   messageConfigs: MessageConfig[],
 ) => {
   const scheduledTasks = messageConfigs.map((messageConfig) =>
-    scheduleMessage(bot, messageConfig),
+    scheduleTask(messageConfig.interval, () => {
+      sendMessage(bot, messageConfig);
+    }),
   );
   return scheduledTasks;
-};
-
-export const scheduleMessage = (
-  bot: discord.Client,
-  messageConfig: MessageConfig,
-) => {
-  return cron.schedule(messageConfig.cronExpression, () =>
-    sendMessage(bot, messageConfig),
-  );
 };
 
 const sendMessage = async (
@@ -133,7 +132,6 @@ const sendMessage = async (
   messageConfig.postTo.forEach(
     async ({ guildId = "102860784329052160", channelId }) => {
       const guild = await bot.guilds.fetch(guildId);
-
       const channel = guild.channels.resolve(channelId);
 
       if (channel === null) {
