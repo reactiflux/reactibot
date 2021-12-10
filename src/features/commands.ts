@@ -8,6 +8,9 @@ export const EMBED_COLOR = 7506394;
 
 type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
 
+let Last_message_time = new Date(),
+  threshold = 0
+
 type Command = {
   words: string[];
   help: string;
@@ -609,36 +612,28 @@ Instead:
 
       await msg.react("⚠️");
 
-      await msg.channel.messages.fetch({ limit: 10 }).then((messages) => {
-        let SendInPublic = true
-        messages.map((key) => {
-          if (key.content.startsWith("Please do **not** try to use \`@here\` or \`@everyone\` - there are ")) {
-          SendInPublic = false
-          }
+      if (Last_message_time.getMinutes() <= threshold) {
+        await msg.author.send({
+          embed: {
+            title: "Tsk tsk.",
+            type: "rich",
+            description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+            color: "#BA0C2F",
+          },
         });
-
-        if(SendInPublic != true){
-          msg.author.send({
-            embed: {
-              title: "Tsk tsk.",
-              type: "rich",
-              description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-              color: "#BA0C2F",
-            },
-          });
-          msg.delete();
-        } else {
-          msg.reply({
-            embed: {
-              title: "Tsk tsk.",
-              type: "rich",
-              description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-              color: "#BA0C2F",
-            },
-          });
-          msg.delete();
-        }
-      });
+        await msg.delete();
+      } else {
+        Last_message_time = new Date();
+        await msg.reply({
+          embed: {
+            title: "Tsk tsk.",
+            type: "rich",
+            description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild?.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+            color: "#BA0C2F",
+          },
+        });
+        await msg.delete();
+      }
     },
   },
 ];
