@@ -34,7 +34,9 @@ const handleReport = (
   reportedMessage: Message,
   logBody: string,
 ) => {
-  const simplifiedContent = simplifyString(reportedMessage.content);
+  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
+    reportedMessage.content,
+  )}`;
   const cached = warningMessages.get(simplifiedContent);
 
   // Schedule cleanup for logged messages
