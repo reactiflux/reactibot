@@ -16,7 +16,7 @@ const config = {
 
 const warningMessages = new Map<
   string,
-  { warnings: number; message: Message; cleanupInterval: NodeJS.Timeout }
+  { warnings: number; message: Message }
 >();
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
@@ -40,33 +40,25 @@ const handleReport = (
   )}`;
   const cached = warningMessages.get(simplifiedContent);
 
-  // Schedule cleanup for logged messages
-  const cleanupInterval = setTimeout(() => {
-    warningMessages.delete(simplifiedContent);
-  }, 60 * 1000);
   if (cached) {
-    // If we already logged for ~ this message, reset interval and edit the log
-    const {
-      message,
-      warnings: oldWarnings,
-      cleanupInterval: oldInterval,
-    } = cached;
+    // If we already logged for ~ this message, edit the log
+    const { message, warnings: oldWarnings } = cached;
     const warnings = oldWarnings + 1;
-    clearTimeout(oldInterval);
-    message.edit(
-      logBody.replace(/warned \d times/, `warned ${warnings} times`),
-    );
-    warningMessages.set(simplifiedContent, {
-      warnings,
-      message,
-      cleanupInterval,
-    });
+
+    let finalLog = logBody;
+    // If this was a mod report, increment the warning count
+    if (reason === ReportReasons.mod) {
+      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
+    }
+
+    message.edit(finalLog);
+    warningMessages.set(simplifiedContent, { warnings, message });
   } else {
+    // If this is new, send a new message
     channelInstance.send(logBody).then((warningMessage) => {
       warningMessages.set(simplifiedContent, {
         warnings: 1,
         message: warningMessage,
-        cleanupInterval,
       });
     });
   }
@@ -144,7 +136,7 @@ const reactionHandlers: ReactionHandlers = {
 
     const totalReacts = reactions.count;
 
-    if (totalReacts < config.warningThreshold) {
+    if (totalReacts < config.thumbsDownThreshold) {
       return;
     }
     let trigger = ReportReasons.userWarn;
