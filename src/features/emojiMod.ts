@@ -30,6 +30,7 @@ type ReactionHandlers = {
 };
 
 const handleReport = (
+  reason: ReportReasons,
   channelInstance: TextChannel,
   reportedMessage: Message,
   logBody: string,
@@ -96,16 +97,11 @@ const reactionHandlers: ReactionHandlers = {
       message.guild?.member(user.id),
     );
     const reactionCount = usersWhoReacted.length;
-    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
       (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
-
-    const members = usersWhoReacted
-      .filter((user) => !isStaff(user))
-      .map((member) => member?.user.username || "X");
 
     const staff = usersWhoReacted
       .filter(isStaff)
@@ -115,15 +111,11 @@ const reactionHandlers: ReactionHandlers = {
       return;
     }
 
-    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
-
-    if (meetsDeletion) {
-      message.delete();
-    }
     handleReport(
+      ReportReasons.mod,
       modLogChannel,
       message,
-      constructLog(ReportReasons.mod, members, staff, message),
+      constructLog(ReportReasons.mod, [], staff, message),
     );
   },
   "👎": (reaction, message, member) => {
@@ -163,6 +155,7 @@ const reactionHandlers: ReactionHandlers = {
     const usersWhoReacted = reaction.users.cache.map((user) =>
       message.guild?.member(user.id),
     );
+    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
     const members = usersWhoReacted
       .filter((user) => !isStaff(user))
@@ -177,7 +170,13 @@ const reactionHandlers: ReactionHandlers = {
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
+    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
+
+    if (meetsDeletion) {
+      message.delete();
+    }
     handleReport(
+      meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
       modLogChannel,
       message,
       constructLog(trigger, members, staff, message),
