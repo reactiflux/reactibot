@@ -3,6 +3,7 @@ import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
+import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
 
@@ -610,7 +611,7 @@ Instead:
 
       await msg.react("⚠️");
 
-      await msg.reply({
+      const tsk = await msg.reply({
         embed: {
           title: "Tsk tsk.",
           type: "rich",
@@ -619,6 +620,8 @@ Instead:
         },
       });
       await msg.delete();
+      await sleep(120);
+      await tsk.delete();
     },
   },
 ];
