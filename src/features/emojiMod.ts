@@ -16,7 +16,7 @@ const config = {
 
 const warningMessages = new Map<
   string,
-  { warnings: number; message: Message; cleanupInterval: NodeJS.Timeout }
+  { warnings: number; message: Message }
 >();
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
@@ -30,40 +30,35 @@ type ReactionHandlers = {
 };
 
 const handleReport = (
+  reason: ReportReasons,
   channelInstance: TextChannel,
   reportedMessage: Message,
   logBody: string,
 ) => {
-  const simplifiedContent = simplifyString(reportedMessage.content);
+  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
+    reportedMessage.content,
+  )}`;
   const cached = warningMessages.get(simplifiedContent);
 
-  // Schedule cleanup for logged messages
-  const cleanupInterval = setTimeout(() => {
-    warningMessages.delete(simplifiedContent);
-  }, 60 * 1000);
   if (cached) {
-    // If we already logged for ~ this message, reset interval and edit the log
-    const {
-      message,
-      warnings: oldWarnings,
-      cleanupInterval: oldInterval,
-    } = cached;
+    // If we already logged for ~ this message, edit the log
+    const { message, warnings: oldWarnings } = cached;
     const warnings = oldWarnings + 1;
-    clearTimeout(oldInterval);
-    message.edit(
-      logBody.replace(/warned \d times/, `warned ${warnings} times`),
-    );
-    warningMessages.set(simplifiedContent, {
-      warnings,
-      message,
-      cleanupInterval,
-    });
+
+    let finalLog = logBody;
+    // If this was a mod report, increment the warning count
+    if (reason === ReportReasons.mod) {
+      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
+    }
+
+    message.edit(finalLog);
+    warningMessages.set(simplifiedContent, { warnings, message });
   } else {
+    // If this is new, send a new message
     channelInstance.send(logBody).then((warningMessage) => {
       warningMessages.set(simplifiedContent, {
         warnings: 1,
         message: warningMessage,
-        cleanupInterval,
       });
     });
   }
@@ -94,16 +89,11 @@ const reactionHandlers: ReactionHandlers = {
       message.guild?.member(user.id),
     );
     const reactionCount = usersWhoReacted.length;
-    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
       (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
-
-    const members = usersWhoReacted
-      .filter((user) => !isStaff(user))
-      .map((member) => member?.user.username || "X");
 
     const staff = usersWhoReacted
       .filter(isStaff)
@@ -113,15 +103,11 @@ const reactionHandlers: ReactionHandlers = {
       return;
     }
 
-    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
-
-    if (meetsDeletion) {
-      message.delete();
-    }
     handleReport(
+      ReportReasons.mod,
       modLogChannel,
       message,
-      constructLog(ReportReasons.mod, members, staff, message),
+      constructLog(ReportReasons.mod, [], staff, message),
     );
   },
   "👎": (reaction, message, member) => {
@@ -150,7 +136,7 @@ const reactionHandlers: ReactionHandlers = {
 
     const totalReacts = reactions.count;
 
-    if (totalReacts < config.warningThreshold) {
+    if (totalReacts < config.thumbsDownThreshold) {
       return;
     }
     let trigger = ReportReasons.userWarn;
@@ -161,6 +147,7 @@ const reactionHandlers: ReactionHandlers = {
     const usersWhoReacted = reaction.users.cache.map((user) =>
       message.guild?.member(user.id),
     );
+    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
     const members = usersWhoReacted
       .filter((user) => !isStaff(user))
@@ -175,7 +162,13 @@ const reactionHandlers: ReactionHandlers = {
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
+    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
+
+    if (meetsDeletion) {
+      message.delete();
+    }
     handleReport(
+      meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
       modLogChannel,
       message,
       constructLog(trigger, members, staff, message),
