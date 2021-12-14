@@ -14,6 +14,7 @@ type Command = {
   help: string;
   category: Categories;
   handleMessage: (msg: Message) => void;
+  cooldown?: number;
 };
 
 const sortedCategories: Categories[] = [
@@ -598,6 +599,7 @@ Instead:
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
+    cooldown: 0,
     handleMessage: async (msg) => {
       if (!msg || !msg.guild) {
         return;
@@ -677,7 +679,11 @@ const commands: ChannelHandlers = {
 
       if (keyword) {
         if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
+        cooldown.addCooldown(
+          msg.author.id,
+          `commands.${keyword}`,
+          command.cooldown,
+        );
         command.handleMessage(msg);
       }
     });
