@@ -3,6 +3,7 @@ import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
+import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
 
@@ -13,6 +14,7 @@ type Command = {
   help: string;
   category: Categories;
   handleMessage: (msg: Message) => void;
+  cooldown?: number;
 };
 
 const sortedCategories: Categories[] = [
@@ -597,6 +599,7 @@ Instead:
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
+    cooldown: 0,
     handleMessage: async (msg) => {
       if (!msg || !msg.guild) {
         return;
@@ -610,7 +613,7 @@ Instead:
 
       await msg.react("⚠️");
 
-      await msg.reply({
+      const tsk = await msg.reply({
         embed: {
           title: "Tsk tsk.",
           type: "rich",
@@ -619,6 +622,8 @@ Instead:
         },
       });
       await msg.delete();
+      await sleep(120);
+      await tsk.delete();
     },
   },
 ];
@@ -674,7 +679,11 @@ const commands: ChannelHandlers = {
 
       if (keyword) {
         if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
+        cooldown.addCooldown(
+          msg.author.id,
+          `commands.${keyword}`,
+          command.cooldown,
+        );
         command.handleMessage(msg);
       }
     });
