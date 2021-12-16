@@ -1,4 +1,11 @@
-import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
+import {
+  MessageReaction,
+  Message,
+  GuildMember,
+  TextChannel,
+  PartialMessageReaction,
+  PartialMessage,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons } from "../constants";
@@ -23,7 +30,7 @@ const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾"
 
 type ReactionHandlers = {
   [emoji: string]: (
-    reaction: MessageReaction,
+    reaction: MessageReaction | PartialMessageReaction,
     message: Message,
     member: GuildMember,
   ) => void;
@@ -190,6 +197,9 @@ const emojiMod: ChannelHandlers = {
 
     const reactionHandler = reactionHandlers[emoji];
     if (reactionHandler) {
+      if (message instanceof PartialMessage) {
+        // TODO
+      }
       reactionHandler(reaction, message, member);
     }
   },

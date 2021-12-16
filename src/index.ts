@@ -6,6 +6,7 @@ import discord, {
   MessageReaction,
   User,
   Intents,
+  PartialMessageReaction,
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
@@ -32,8 +33,16 @@ export const bot = new discord.Client({
     Intents.FLAGS.GUILDS,
   ],
 });
+
 bot
   .login(process.env.DISCORD_HASH)
+  .then(async (thing) => {
+    console.log(thing);
+    console.log("Bot started. If necessary, add it to your test server:");
+    console.log(
+      `https://discord.com/oauth2/authorize?client_id=${bot.application?.id}&scope=bot`,
+    );
+  })
   .catch((e) => {
     console.log({ e });
     console.log(
@@ -43,13 +52,6 @@ bot
       'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
     );
     process.exit(1);
-  })
-  .then(async () => {
-    const { id } = await bot.fetchApplication();
-    console.log("Bot started. If necessary, add it to your test server:");
-    console.log(
-      `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
-    );
   });
 
 export type ChannelHandlersById = {
@@ -85,7 +87,10 @@ const handleMessage = (msg: Message | PartialMessage) => {
   }
 };
 
-const handleReaction = (reaction: MessageReaction, user: User) => {
+const handleReaction = (
+  reaction: MessageReaction | PartialMessageReaction,
+  user: User,
+) => {
   const channelId = reaction.message.channel.id;
 
   if (channelHandlersById[channelId]) {
