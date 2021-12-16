@@ -22,7 +22,7 @@ const autoban: ChannelHandlers = {
         )
         .then(() => {
           msg.delete();
-          msg.guild?.member(msg.author)?.ban();
+          msg.guild?.members.ban(msg.author);
         });
     }
   },
