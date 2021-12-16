@@ -65,32 +65,28 @@ const handleReport = (
 };
 
 const reactionHandlers: ReactionHandlers = {
-  "⚠️": (reaction, message, member) => {
+  "⚠️": async (reaction, message, member) => {
     // Skip if the post is from someone from the staff
-    if (
-      !message.guild ||
-      !message.author ||
-      isStaff(message.guild.member(message.author.id))
-    ) {
+    const { guild, author } = message;
+    if (!guild || !author || isStaff(await guild.members.fetch(author.id))) {
       return;
     }
     // If the user that reacted isn't in the staff, remove the reaction, send a
     if (!isStaff(member)) {
       reaction.users.remove(member.id);
-      member.send([
-        "Hey there! 👋",
-        "The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.",
-        "Thanks!",
-      ]);
+      member.send(`Hey there! 👋
+The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.
+Thanks!
+`);
       return;
     }
 
-    const usersWhoReacted = reaction.users.cache.map((user) =>
-      message.guild?.member(user.id),
+    const usersWhoReacted = await Promise.all(
+      reaction.users.cache.map((user) => guild.members.fetch(user.id)),
     );
     const reactionCount = usersWhoReacted.length;
 
-    const modLogChannel = message.guild?.channels.cache.find(
+    const modLogChannel = guild.channels.cache.find(
       (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
@@ -110,7 +106,7 @@ const reactionHandlers: ReactionHandlers = {
       constructLog(ReportReasons.mod, [], staff, message),
     );
   },
-  "👎": (reaction, message, member) => {
+  "👎": async (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;
     }
@@ -144,8 +140,8 @@ const reactionHandlers: ReactionHandlers = {
       trigger = ReportReasons.userDelete;
     }
 
-    const usersWhoReacted = reaction.users.cache.map((user) =>
-      message.guild?.member(user.id),
+    const usersWhoReacted = await Promise.all(
+      reaction.users.cache.map((user) => message.guild?.members.fetch(user.id)),
     );
     const staffReactionCount = usersWhoReacted.filter(isStaff).length;
 
@@ -177,10 +173,10 @@ const reactionHandlers: ReactionHandlers = {
 };
 
 const emojiMod: ChannelHandlers = {
-  handleReaction: ({ reaction, user, bot }) => {
+  handleReaction: async ({ reaction, user, bot }) => {
     const { message } = reaction;
 
-    if (!message.guild || message.author.id === bot.user?.id) {
+    if (!message.guild || message.author?.id === bot.user?.id) {
       return;
     }
 
@@ -190,8 +186,7 @@ const emojiMod: ChannelHandlers = {
       emoji = "👎";
     }
 
-    const member = message.guild.member(user.id);
-    if (!member) return;
+    const member = await message.guild.members.fetch(user.id);
 
     const reactionHandler = reactionHandlers[emoji];
     if (reactionHandler) {
