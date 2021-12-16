@@ -126,8 +126,8 @@ const sendMessage = async (
   const { message, postTo } = messageConfig;
   postTo.forEach(
     async ({ guildId = "102860784329052160", channelId, interval }) => {
-      const guild = await bot.guilds.fetch(guildId);
-      const channel = guild.channels.resolve(channelId);
+      // const guild = await bot.guilds.fetch(guildId);
+      const channel = await bot.channels.fetch(channelId);
 
       if (channel === null) {
         logger.log(
@@ -136,26 +136,20 @@ const sendMessage = async (
         );
         return;
       }
-      if (!isTextChannel(channel)) {
+      if (!channel.isText()) {
         logger.log(
           "scheduled",
           `Failed to send a scheduled message: channel ${channelId} in guild ${guildId} is not a text channel.`,
         );
         return;
       }
-      scheduleTask(interval, () => {
+      // scheduleTask(interval, () => {
+      try {
         channel.send(message);
-      });
+      } catch (e) {
+        console.log("butts", e);
+      }
+      // });
     },
-  );
-};
-
-const isTextChannel = (
-  channel: discord.Channel,
-): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
-  return (
-    channel.type === "text" ||
-    channel.type === "news" ||
-    channel.type === "store"
   );
 };
