@@ -14,7 +14,7 @@ const jobs: ChannelHandlers = {
       if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
     });
 
-    if (!hasTags && msg.mentions.members?.array().length === 0) {
+    if (!hasTags && msg.mentions.members?.size === 0) {
       if (cooldown.hasCooldown(msg.author.id, "user.jobs")) return;
 
       if (isStaff(msg.member)) {
