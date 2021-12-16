@@ -9,7 +9,6 @@ import discord, {
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import qna from "./features/qna";
 import jobs from "./features/jobs";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
@@ -105,11 +104,6 @@ setupStats(bot);
 
 // reactiflux
 addHandler("103882387330457600", jobs);
-addHandler("106168778013822976", qna); // reactiflux-admin
-addHandler("193117606629081089", qna); // #q&a
-
-// btm server
-addHandler("479862475047567361", qna); // #general
 
 // common
 addHandler("*", commands);
