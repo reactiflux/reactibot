@@ -5,6 +5,7 @@ import discord, {
   PartialMessage,
   MessageReaction,
   User,
+  Intents,
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
@@ -23,7 +24,13 @@ import {
 import tsPlaygroundLinkShortener from "./features/tsplay";
 
 export const bot = new discord.Client({
-  partials: ["MESSAGE", "CHANNEL", "REACTION"],
+  intents: [
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+    Intents.FLAGS.GUILDS,
+  ],
 });
 bot
   .login(process.env.DISCORD_HASH)
