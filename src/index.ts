@@ -165,9 +165,11 @@ bot.on("error", (err) => {
   }
 });
 
-const errorHandler = (error: Error) => {
-  if (error && error.message) {
+const errorHandler = (error: unknown) => {
+  if (error instanceof Error) {
     logger.log("ERROR", error.message);
+  } else if (typeof error === "string") {
+    logger.log("ERROR", error);
   }
 };
 
