@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --type-check src/index.ts",
     "build": "tsc",
-    "test": "prettier --check .",
+    "test": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
   },
   "repository": {
@@ -33,7 +33,6 @@
     "@typescript-eslint/parser": "^2.20.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-prettier": "^3.1.2",
     "prettier": "^2.3.2",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^4.3.5"

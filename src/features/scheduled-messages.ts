@@ -1,4 +1,3 @@
-import { MessageOptions } from "child_process";
 import * as discord from "discord.js";
 import cron from "node-cron";
 
@@ -31,22 +30,13 @@ export type MessageConfig = {
 
 export const messages: MessageConfig[] = [];
 
-export const scheduleMessages = (
-  bot: discord.Client,
-  messageConfigs: MessageConfig[],
-) => {
-  const scheduledTasks = messageConfigs.map((messageConfig) =>
-    scheduleMessage(bot, messageConfig),
-  );
-  return scheduledTasks;
-};
-
-export const scheduleMessage = (
-  bot: discord.Client,
-  messageConfig: MessageConfig,
-) => {
-  return cron.schedule(messageConfig.cronExpression, () =>
-    sendMessage(bot, messageConfig),
+const isTextChannel = (
+  channel: discord.Channel,
+): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
+  return (
+    channel.type === "GUILD_TEXT" ||
+    channel.type === "GUILD_NEWS" ||
+    channel.type === "GUILD_STORE"
   );
 };
 
@@ -75,12 +65,21 @@ const sendMessage = async (
   }
 };
 
-const isTextChannel = (
-  channel: discord.Channel,
-): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
-  return (
-    channel.type === "GUILD_TEXT" ||
-    channel.type === "GUILD_NEWS" ||
-    channel.type === "GUILD_STORE"
+export const scheduleMessage = (
+  bot: discord.Client,
+  messageConfig: MessageConfig,
+) => {
+  return cron.schedule(messageConfig.cronExpression, () =>
+    sendMessage(bot, messageConfig),
   );
+};
+
+export const scheduleMessages = (
+  bot: discord.Client,
+  messageConfigs: MessageConfig[],
+) => {
+  const scheduledTasks = messageConfigs.map((messageConfig) =>
+    scheduleMessage(bot, messageConfig),
+  );
+  return scheduledTasks;
 };

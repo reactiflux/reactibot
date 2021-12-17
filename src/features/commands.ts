@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
@@ -356,12 +357,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         return;
       }
 
-      const {
-        title,
-        excerpt: description,
-        mdn_url: mdnUrl,
-        locale,
-      } = topResult;
+      const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
 
       await msg.channel.send({
         embeds: [
