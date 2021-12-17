@@ -5,7 +5,7 @@ import { EMBED_COLOR } from "./commands";
 const DELETE_EMOJI = "🗑️";
 
 export const PLAYGROUND_REGEX =
-  /https?:\/\/(?:www\.)?(?:typescriptlang|staging-typescript)\.org\/(?:play|dev\/bug-workbench)(?:\/index\.html)?\/?(\??(?:\w+=[^\s#&]+)?(?:\&\w+=[^\s#&]+)*)#code\/([\w\-%+_]+={0,4})/;
+  /https?:\/\/(?:www\.)?(?:typescriptlang|staging-typescript)\.org\/(?:play|dev\/bug-workbench)(?:\/index\.html)?\/?(\??(?:\w+=[^\s#&]+)?(?:&\w+=[^\s#&]+)*)#code\/([\w\-%+_]+={0,4})/;
 
 // See https://github.com/typescript-community/community-bot/blob/master/src/modules/playground.ts
 const tsPlaygroundLinkShortener: ChannelHandlers = {

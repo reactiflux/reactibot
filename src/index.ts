@@ -165,7 +165,7 @@ bot.on("error", (err) => {
   }
 });
 
-const errorHandler = (error: any) => {
+const errorHandler = (error: Error) => {
   if (error && error.message) {
     logger.log("ERROR", error.message);
   }
