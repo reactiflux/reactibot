@@ -4,14 +4,14 @@ const tags = [
   "http://discord.amazingsexdating.com",
   "http://gambldiscord.bestoffersx.com",
   "http://discordbetfaq.whatsappx.com/",
-  "http://discord.bestdatingforall.com/"
+  "http://discord.bestdatingforall.com/",
 ];
 
 const autoban: ChannelHandlers = {
   handleMessage: ({ msg }) => {
     let hasToken = false;
 
-    tags.forEach(token => {
+    tags.forEach((token) => {
       if (msg.content.toLowerCase().includes(token)) hasToken = true;
     });
 
@@ -22,10 +22,10 @@ const autoban: ChannelHandlers = {
         )
         .then(() => {
           msg.delete();
-          msg.guild?.member(msg.author)?.ban();
+          msg.guild?.members.cache.get(msg.author.toString())?.ban();
         });
     }
-  }
+  },
 };
 
 export default autoban;

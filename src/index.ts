@@ -4,7 +4,8 @@ import discord, {
   Message,
   PartialMessage,
   MessageReaction,
-  User
+  User,
+  Intents
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
@@ -23,6 +24,12 @@ import {
 } from "./features/scheduled-messages";
 
 const bot = new discord.Client({
+  intents: [
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
+  ],
   partials: ["MESSAGE", "CHANNEL", "REACTION"]
 });
 bot.login(process.env.DISCORD_HASH);
@@ -116,10 +123,10 @@ bot.on("messageReactionAdd", async (reaction, user) => {
     }
   }
 
-  handleReaction(reaction, user as User);
+  handleReaction(reaction as MessageReaction, user as User);
 });
 
-bot.on("message", async msg => {
+bot.on("messageCreate", async msg => {
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);

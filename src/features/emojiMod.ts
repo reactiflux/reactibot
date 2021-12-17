@@ -36,13 +36,13 @@ const reactionHandlers: ReactionHandlers = {
       !message.guild ||
       !message.author ||
       !isStaff(member) ||
-      isStaff(message.guild.member(message.author.id))
+      isStaff(message.guild.members.cache.get(message.author.id))
     ) {
       return;
     }
 
     const usersWhoReacted = reaction.users.cache.map(user =>
-      message.guild?.member(user.id)
+      message.guild?.members.cache.get(user.id)
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
@@ -172,7 +172,7 @@ const emojiMod: ChannelHandlers = {
       emoji = "👎";
     }
 
-    const member = message.guild.member(user.id);
+    const member = message.guild.members.cache.get(user.id);
     if (!member) return;
 
     const reactionHandler = reactionHandlers[emoji];

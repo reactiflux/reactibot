@@ -54,10 +54,10 @@ const sendMessage = async (
   bot: discord.Client,
   messageConfig: MessageConfig
 ) => {
-  for (let { id, channelIds } of messageConfig.guilds) {
+  for (const { id, channelIds } of messageConfig.guilds) {
     const guild = await bot.guilds.fetch(id);
 
-    for (let channelId of channelIds) {
+    for (const channelId of channelIds) {
       const channel = guild.channels.resolve(channelId);
 
       if (channel === null) {
@@ -79,8 +79,8 @@ const isTextChannel = (
   channel: discord.Channel
 ): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
   return (
-    channel.type === "text" ||
-    channel.type === "news" ||
-    channel.type === "store"
+    channel.type === "GUILD_TEXT" ||
+    channel.type === "GUILD_NEWS" ||
+    channel.type === "GUILD_STORE"
   );
 };
