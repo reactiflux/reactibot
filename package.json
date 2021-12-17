@@ -7,7 +7,7 @@
     "start": "node dist/index.js",
     "dev": "ts-node-dev --type-check src/index.ts",
     "build": "tsc",
-    "test": "prettier --check . && eslint --ext js,ts .",
+    "test": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
   },
   "repository": {
