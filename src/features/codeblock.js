@@ -1,4 +1,4 @@
-const Gists = require("gists");
+import Gists from "gists";
 const gists = new Gists({
   token: process.env.GITHUB_TOKEN,
 });
