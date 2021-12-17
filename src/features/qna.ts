@@ -26,7 +26,7 @@ const counterAsWord = (q: number) => {
 
 const flush = (channel: TextBasedChannels) => {
   prevMessagesIds.forEach((oldId) =>
-    channel.messages.fetch(oldId).then((msg) => msg.delete())
+    channel.messages.fetch(oldId).then((msg) => msg.delete()),
   );
   prevMessagesIds = [];
 };
@@ -36,8 +36,8 @@ const prompt = (msg: Message | PartialMessage) => {
     msg.channel
       .send(
         `:robot: Please ask your question now. Our guest has ${counterAsWord(
-          counter
-        )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`
+          counter,
+        )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`,
       )
       .then((msg) => {
         flush(msg.channel);
@@ -47,8 +47,8 @@ const prompt = (msg: Message | PartialMessage) => {
     msg.channel
       .send(
         `:robot: Please stop your questions for now. Our guest has ${counterAsWord(
-          counter
-        )} questions queued.`
+          counter,
+        )} questions queued.`,
       )
       .then((msg) => {
         flush(msg.channel);

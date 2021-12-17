@@ -1,5 +1,5 @@
 import { ChannelHandlers } from "../types";
-import { isStaff } from "../utils";
+import { isStaff } from "../helpers/discord";
 import cooldown from "./cooldown";
 
 const tags = ["forhire", "for hire", "hiring", "remote", "local"];
@@ -24,7 +24,7 @@ const jobs: ChannelHandlers = {
       cooldown.addCooldown(msg.author.id, "user.jobs");
       msg.author
         .send(`Hello there! It looks like you just posted a message to the #jobs channel on our server.
-			
+
 I noticed that you've not added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find:
 
 [FOR HIRE] - you are looking for a job

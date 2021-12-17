@@ -5,7 +5,7 @@ import discord, {
   PartialMessage,
   MessageReaction,
   User,
-  Intents
+  Intents,
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
@@ -20,19 +20,41 @@ import autodelete from "./features/autodelete-spam";
 import { ChannelHandlers } from "./types";
 import {
   MESSAGE_SCHEDULE,
-  scheduleMessages
+  scheduleMessages,
 } from "./features/scheduled-messages";
+import tsPlaygroundLinkShortener from "./features/tsplay";
 
-const bot = new discord.Client({
+export const bot = new discord.Client({
   intents: [
     Intents.FLAGS.GUILD_MEMBERS,
     Intents.FLAGS.GUILD_MESSAGES,
     Intents.FLAGS.DIRECT_MESSAGES,
-    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
   ],
-  partials: ["MESSAGE", "CHANNEL", "REACTION"]
+  partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
-bot.login(process.env.DISCORD_HASH);
+bot
+  .login(process.env.DISCORD_HASH)
+  .catch((e) => {
+    console.log({ e });
+    console.log(
+      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
+    );
+    console.log(
+      'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
+    );
+    process.exit(1);
+  })
+  .then(() => {
+    console.log("Bot started. If necessary, add it to your test server:");
+
+    if (bot.application) {
+      const { id } = bot.application;
+      console.log(
+        `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
+      );
+    }
+  });
 
 export type ChannelHandlersById = {
   [channelId: string]: ChannelHandlers[];
@@ -43,7 +65,7 @@ const channelHandlersById: ChannelHandlersById = {};
 const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
   channelHandlersById[channelId] = [
     ...(channelHandlersById[channelId] || []),
-    channelHandlers
+    channelHandlers,
   ];
 };
 
@@ -55,13 +77,13 @@ const handleMessage = (msg: Message | PartialMessage) => {
   const channelId = msg.channel.id;
 
   if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach(channelHandlers => {
+    channelHandlersById[channelId].forEach((channelHandlers) => {
       channelHandlers.handleMessage?.({ msg: msg as Message, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach(channelHandlers => {
+    channelHandlersById["*"].forEach((channelHandlers) => {
       channelHandlers.handleMessage?.({ msg: msg as Message, bot });
     });
   }
@@ -71,13 +93,13 @@ const handleReaction = (reaction: MessageReaction, user: User) => {
   const channelId = reaction.message.channel.id;
 
   if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach(channelHandlers => {
+    channelHandlersById[channelId].forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach(channelHandlers => {
+    channelHandlersById["*"].forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
@@ -105,6 +127,7 @@ addHandler("*", commands);
 addHandler("*", autoban);
 addHandler("*", emojiMod);
 addHandler("*", autodelete);
+addHandler("*", tsPlaygroundLinkShortener);
 
 bot.on("messageReactionAdd", async (reaction, user) => {
   if (user.partial) {
@@ -126,7 +149,7 @@ bot.on("messageReactionAdd", async (reaction, user) => {
   handleReaction(reaction as MessageReaction, user as User);
 });
 
-bot.on("messageCreate", async msg => {
+bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
@@ -135,7 +158,7 @@ bot.on("messageCreate", async msg => {
 logger.log("INI", "Bootstrap complete");
 
 bot.on("ready", () => {
-  Array.from(bot.guilds.cache.values()).forEach(guild => {
+  Array.from(bot.guilds.cache.values()).forEach((guild) => {
     logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
   });
 
@@ -144,7 +167,7 @@ bot.on("ready", () => {
   scheduleMessages(bot, MESSAGE_SCHEDULE);
 });
 
-bot.on("error", err => {
+bot.on("error", (err) => {
   try {
     logger.log("ERR", err.message);
   } catch (e) {

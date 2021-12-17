@@ -2,9 +2,10 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { isStaff } from "../utils";
+import { isStaff } from "../helpers/discord";
+import { sleep } from "../helpers/misc";
 
-const EMBED_COLOR = 7506394;
+export const EMBED_COLOR = 7506394;
 
 type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
 
@@ -13,6 +14,7 @@ type Command = {
   help: string;
   category: Categories;
   handleMessage: (msg: Message) => void;
+  cooldown?: number;
 };
 
 const sortedCategories: Categories[] = [
@@ -232,7 +234,12 @@ Good:
 > // snippet of code
 > \`\`\`
 > I'm seeing an error, but I don't know if it's related.
-> \`Uncaught TypeError: undefined is not a function\``,
+> \`Uncaught TypeError: undefined is not a function\`
+
+How to ask for programming help: http://wp.me/p2oIwo-26
+How do I ask a good question https://stackoverflow.com/help/how-to-ask
+How To Ask Questions The Smart Way https://git.io/JKscV
+`,
             color: EMBED_COLOR,
           },
         ],
@@ -312,7 +319,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
       try {
         const targetChannel = msg.guild?.channels.cache.get(
-          newChannel.replace("<#", "").replace(">", "")
+          newChannel.replace("<#", "").replace(">", ""),
         ) as TextChannel;
 
         if (!msg.mentions.members) return;
@@ -320,7 +327,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         targetChannel.send(
           `${msg.author} has opened a portal from ${
             msg.channel
-          } summoning ${msg.mentions.members.map((i) => i).join(" ")}`
+          } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
         );
       } catch (e) {
         console.log("Something went wrong when summoning a portal: ", e);
@@ -337,7 +344,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const [fetchMsg, res] = await Promise.all([
         msg.channel.send(`Fetching "${query}"...`),
         fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`
+          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
         ),
       ]);
 
@@ -413,6 +420,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           Read more at:
           https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
           https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
+          https://jakearchibald.com/2021/cors/
           `,
             color: EMBED_COLOR,
           },
@@ -594,27 +602,22 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!hooks`],
-    help: `Resources for learning React Hooks`,
+    words: [`!hooks`, `!learn`],
+    help: `Resources for Learning React`,
     category: "React/Redux",
     handleMessage: (msg) => {
       msg.channel.send({
         embeds: [
           {
-            title: "Learning React Hooks",
+            title: "Learning React",
             type: "rich",
-            description: `React Hooks allow function components to have state, trigger side effects after rendering, and much more.  Class components still work, but function components and hooks are now the standard approach used by the React community for any new code, and there are some new React features that only work with hooks.
+            description: `
+          The official (beta) React docs are the best resource for learning React:
+          https://beta.reactjs.org
 
-          The official React docs are the best resource for learning hooks:
-          https://reactjs.org/docs/hooks-intro.html
-
-          However, the React docs still teach classes in the tutorials. A rewrite is in progress, but until then, there's a "React with Hooks" version of the React docs that uses hooks and function components for all examples:
-          https://reactwithhooks.netlify.app/
-
-          This article explains why hooks are important and what problems they solve:
-          https://ui.dev/why-react-hooks/
+          The official (stable) React docs still teach classes for the examples, but the concepts are still valid:
+          https://reactjs.org/docs/getting-started.html
           `,
-            color: EMBED_COLOR,
           },
         ],
       });
@@ -631,7 +634,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
             title: "State your problem",
             type: "rich",
             description: `To improve your chances at getting help, it's important to describe the behavior you're seeing and how it differs from your expectations. Simply saying something "doesn't work" requires too many assumptions on the helper's part, and could lead both of you astray.
-          
+
 Instead:
 - Tell us what you're trying to do.
 - Show us what you did with code.
@@ -646,6 +649,7 @@ Instead:
     words: ["@here", "@everyone"],
     help: "",
     category: "Communication",
+    cooldown: 0,
     handleMessage: async (msg) => {
       if (!msg || !msg.guild) {
         return;
@@ -659,7 +663,7 @@ Instead:
 
       await msg.react("⚠️");
 
-      await msg.reply({
+      const tsk = await msg.reply({
         embeds: [
           {
             title: "Tsk tsk.",
@@ -669,8 +673,9 @@ Instead:
           },
         ],
       });
-
       await msg.delete();
+      await sleep(120);
+      await tsk.delete();
     },
   },
 ];
@@ -726,7 +731,11 @@ const commands: ChannelHandlers = {
 
       if (keyword) {
         if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(msg.author.id, `commands.${keyword}`);
+        cooldown.addCooldown(
+          msg.author.id,
+          `commands.${keyword}`,
+          command.cooldown,
+        );
         command.handleMessage(msg);
       }
     });

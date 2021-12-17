@@ -33,26 +33,26 @@ export const messages: MessageConfig[] = [];
 
 export const scheduleMessages = (
   bot: discord.Client,
-  messageConfigs: MessageConfig[]
+  messageConfigs: MessageConfig[],
 ) => {
-  const scheduledTasks = messageConfigs.map(messageConfig =>
-    scheduleMessage(bot, messageConfig)
+  const scheduledTasks = messageConfigs.map((messageConfig) =>
+    scheduleMessage(bot, messageConfig),
   );
   return scheduledTasks;
 };
 
 export const scheduleMessage = (
   bot: discord.Client,
-  messageConfig: MessageConfig
+  messageConfig: MessageConfig,
 ) => {
   return cron.schedule(messageConfig.cronExpression, () =>
-    sendMessage(bot, messageConfig)
+    sendMessage(bot, messageConfig),
   );
 };
 
 const sendMessage = async (
   bot: discord.Client,
-  messageConfig: MessageConfig
+  messageConfig: MessageConfig,
 ) => {
   for (const { id, channelIds } of messageConfig.guilds) {
     const guild = await bot.guilds.fetch(id);
@@ -62,11 +62,11 @@ const sendMessage = async (
 
       if (channel === null) {
         console.log(
-          `Failed to send a scheduled message: channel ${channelId} does not exist in guild ${id}.`
+          `Failed to send a scheduled message: channel ${channelId} does not exist in guild ${id}.`,
         );
       } else if (!isTextChannel(channel)) {
         console.log(
-          `Failed to send a scheduled message: channel ${channelId} in guild ${id} is not a text channel.`
+          `Failed to send a scheduled message: channel ${channelId} in guild ${id} is not a text channel.`,
         );
       } else {
         channel.send(messageConfig.message);
@@ -76,7 +76,7 @@ const sendMessage = async (
 };
 
 const isTextChannel = (
-  channel: discord.Channel
+  channel: discord.Channel,
 ): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
   return (
     channel.type === "GUILD_TEXT" ||

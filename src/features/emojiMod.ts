@@ -6,8 +6,10 @@ import {
   PartialMessage,
 } from "discord.js";
 import cooldown from "./cooldown";
-import { isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
+import { ReportReasons } from "../constants";
+import { constructLog, simplifyString } from "../helpers/modLog";
+import { isStaff } from "../helpers/discord";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -18,11 +20,10 @@ const config = {
   deletionThreshold: Infinity,
 };
 
-type WarningMessages = {
-  [messageId: string]: Message;
-};
-
-const warningMessages: WarningMessages = {};
+const warningMessages = new Map<
+  string,
+  { warnings: number; message: Message }
+>();
 
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
@@ -30,83 +31,93 @@ type ReactionHandlers = {
   [emoji: string]: (
     reaction: MessageReaction,
     message: Message | PartialMessage,
-    member: GuildMember
+    member: GuildMember,
   ) => void;
+};
+
+const handleReport = (
+  reason: ReportReasons,
+  channelInstance: TextChannel,
+  reportedMessage: Message,
+  logBody: string,
+) => {
+  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
+    reportedMessage.content,
+  )}`;
+  const cached = warningMessages.get(simplifiedContent);
+
+  if (cached) {
+    // If we already logged for ~ this message, edit the log
+    const { message, warnings: oldWarnings } = cached;
+    const warnings = oldWarnings + 1;
+
+    let finalLog = logBody;
+    // If this was a mod report, increment the warning count
+    if (reason === ReportReasons.mod) {
+      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
+    }
+
+    message.edit(finalLog);
+    warningMessages.set(simplifiedContent, { warnings, message });
+  } else {
+    // If this is new, send a new message
+    channelInstance.send(logBody).then((warningMessage) => {
+      warningMessages.set(simplifiedContent, {
+        warnings: 1,
+        message: warningMessage,
+      });
+    });
+  }
 };
 
 const reactionHandlers: ReactionHandlers = {
   "⚠️": async (reaction, message, member) => {
-    // Skip if the user that reacted isn't in the staff or the post is from someone
-    // from the staff
+    // Skip if the post is from someone from the staff
     if (
       !message.guild ||
       !message.author ||
-      !isStaff(member) ||
       isStaff(message.guild.members.cache.get(message.author.id))
     ) {
       return;
     }
+    // If the user that reacted isn't in the staff, remove the reaction, send a
+    if (!isStaff(member)) {
+      reaction.users.remove(member.id);
+      member.send("Hey there! 👋");
+      member.send(
+        "The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.",
+      );
+      member.send("Thanks!");
+      return;
+    }
 
     const usersWhoReacted = reaction.users.cache.map((user) =>
-      message.guild?.members.cache.get(user.id)
+      message.guild?.members.cache.get(user.id),
     );
-    const numberOfTotalReactions = usersWhoReacted.length;
-    const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
+    const reactionCount = usersWhoReacted.length;
 
     const modLogChannel = message.guild?.channels.cache.find(
       (channel) =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
+        channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
 
-    const userNames = usersWhoReacted
-      .filter((user) => !isStaff(user))
-      .map((member) => member?.user.username)
-      .join(", ");
-
-    const staffNames = usersWhoReacted
+    const staff = usersWhoReacted
       .filter(isStaff)
-      .map((member) => member?.user.username)
-      .join(", ");
+      .map((member) => member?.user.username || "X");
+
+    if (reactionCount < config.warningThreshold) {
+      return;
+    }
 
     try {
       const fullMessage = await message.fetch();
 
-      let logMessage = "";
-
-      const logMessageEnding = [
-        "\n\n",
-        `\`${truncateMessage((fullMessage as unknown as Message).content)}\``,
-        "\n\n",
-        `Link: https://discord.com/channels/${fullMessage.guild?.id}/${fullMessage.channel.id}/${fullMessage.id}`,
-        "\n\n",
-        userNames && `Reactors: \`${userNames}\``,
-        staffNames && userNames && "\n",
-        staffNames && `Staff: \`${staffNames}\``,
-      ]
-        .filter(Boolean)
-        .join("");
-
-      if (numberOfTotalReactions >= config.warningThreshold) {
-        logMessage = `<@${fullMessage.author.id}> has met the warning threshold in <#${fullMessage.channel.id}> for the message:`;
-      }
-
-      if (numberOfStaffReactions >= config.deletionThreshold) {
-        logMessage = `<@${fullMessage.author.id}> has met the deletion threshold in <#${fullMessage.channel.id}> for the message:`;
-
-        fullMessage.delete();
-      }
-
-      if (logMessage) {
-        logMessage += logMessageEnding;
-
-        if (warningMessages[fullMessage.id]) {
-          warningMessages[fullMessage.id].edit(logMessage);
-        } else {
-          modLogChannel.send(logMessage).then((warningMessage) => {
-            warningMessages[fullMessage.id] = warningMessage;
-          });
-        }
-      }
+      handleReport(
+        ReportReasons.mod,
+        modLogChannel,
+        fullMessage,
+        constructLog(ReportReasons.mod, [], staff, fullMessage),
+      );
     } catch (error) {
       console.log("Something went wrong when fetching the message: ", error);
     }
@@ -132,46 +143,52 @@ const reactionHandlers: ReactionHandlers = {
       {
         count: 0,
         users: [],
-      }
+      },
     );
 
-    const numberOfTotalReactions = reactions.count;
+    const totalReacts = reactions.count;
+
+    if (totalReacts < config.thumbsDownThreshold) {
+      return;
+    }
+    let trigger = ReportReasons.userWarn;
+    if (totalReacts >= config.deletionThreshold) {
+      trigger = ReportReasons.userDelete;
+    }
+
+    const usersWhoReacted = reaction.users.cache.map((user) =>
+      message.guild?.members.cache.get(user.id),
+    );
+    const staffReactionCount = usersWhoReacted.filter(isStaff).length;
+
+    const members = usersWhoReacted
+      .filter((user) => !isStaff(user))
+      .map((member) => member?.user.username || "X");
+
+    const staff = usersWhoReacted
+      .filter(isStaff)
+      .map((member) => member?.user.username || "X");
 
     const modLogChannel = message.guild.channels.cache.find(
       (channel) =>
-        channel.name === "mod-log" || channel.id === "257930126145224704"
+        channel.name === "mod-log" || channel.id === "257930126145224704",
     ) as TextChannel;
+
+    const meetsDeletion = staffReactionCount >= config.deletionThreshold;
+
+    if (meetsDeletion) {
+      message.delete();
+    }
 
     try {
       const fullMessage = await message.fetch();
 
-      let logMessage = "";
-      const logMessageEnding = [
-        "\n\n",
-        `${truncateMessage(fullMessage.content)}`,
-        "\n\n",
-        `Link: https://discord.com/channels/${fullMessage.guild!.id}/${
-          fullMessage.channel.id
-        }/${fullMessage.id}`,
-      ]
-        .filter(Boolean)
-        .join("");
-
-      if (numberOfTotalReactions >= config.thumbsDownThreshold) {
-        logMessage = `<@&102870499406647296> - <@${fullMessage.author.id}> has met the warning threshold in <#${fullMessage.channel.id}> for the message:`;
-      }
-
-      if (logMessage) {
-        logMessage += logMessageEnding;
-
-        if (warningMessages[message.id]) {
-          warningMessages[fullMessage.id].edit(logMessage);
-        } else {
-          modLogChannel.send(logMessage).then((warningMessage) => {
-            warningMessages[fullMessage.id] = warningMessage;
-          });
-        }
-      }
+      handleReport(
+        meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
+        modLogChannel,
+        fullMessage,
+        constructLog(trigger, members, staff, fullMessage),
+      );
     } catch (error) {
       console.log("Something went wrong when fetching the message: ", error);
     }
