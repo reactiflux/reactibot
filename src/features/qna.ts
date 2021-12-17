@@ -1,11 +1,11 @@
-import { Message, TextChannel, DMChannel, NewsChannel } from "discord.js";
+import { Message, PartialMessage, TextBasedChannels } from "discord.js";
 import { ChannelHandlers } from "../types";
 
 const ALLOWED_ROLES = ["moderator", "Moderator", "admin", "Admin"];
 
 enum QnAMessageType {
   Question,
-  Answer
+  Answer,
 }
 
 type QnAMessages = {
@@ -24,14 +24,14 @@ const counterAsWord = (q: number) => {
   else return "more than three";
 };
 
-const flush = (channel: TextChannel | DMChannel | NewsChannel) => {
-  prevMessagesIds.forEach(oldId =>
-    channel.messages.fetch(oldId).then(msg => msg.delete())
+const flush = (channel: TextBasedChannels) => {
+  prevMessagesIds.forEach((oldId) =>
+    channel.messages.fetch(oldId).then((msg) => msg.delete())
   );
   prevMessagesIds = [];
 };
 
-const prompt = (msg: Message) => {
+const prompt = (msg: Message | PartialMessage) => {
   if (counter < 3) {
     msg.channel
       .send(
@@ -39,7 +39,7 @@ const prompt = (msg: Message) => {
           counter
         )} questions queued. As a reminder - we limit the queue to 3 questions at a time. Please remember to start your question with [Q&A] - thank you!`
       )
-      .then(msg => {
+      .then((msg) => {
         flush(msg.channel);
         prevMessagesIds.push(msg.id);
       });
@@ -50,7 +50,7 @@ const prompt = (msg: Message) => {
           counter
         )} questions queued.`
       )
-      .then(msg => {
+      .then((msg) => {
         flush(msg.channel);
         prevMessagesIds.push(msg.id);
       });
@@ -58,45 +58,51 @@ const prompt = (msg: Message) => {
 };
 
 type Commands = {
-  [trigger: string]: (msg: Message) => void;
+  [trigger: string]: (msg: Message | PartialMessage) => void;
 };
 
 const reactionCommands: Commands = {
-  "🇶": msg => {
+  "🇶": (msg) => {
     qnaMessages[msg.id] = QnAMessageType.Question;
     counter++;
     prompt(msg);
   },
-  "🇦": msg => {
+  "🇦": (msg) => {
     qnaMessages[msg.id] = QnAMessageType.Answer;
     if (counter === 0) return;
     counter--;
     prompt(msg);
   },
-  "❌": msg => {
-    msg.author
-      .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
+  "❌": async (msg) => {
+    try {
+      const fullMsg = await msg.fetch();
+
+      fullMsg.author
+        .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
     
 Most likely the message was removed, because we try to limit the current unanswered messages count to about 3, our guest(s) might need more time to answer all the questions.
     
 Please feel free to ask your question again when a slot becomes open. I've copied the question bellow for you:
     
 \`\`\`
-${msg.content}
+${fullMsg.content}
 \`\`\`
     
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
-    msg.delete();
-  }
+      fullMsg.delete();
+    } catch (error) {
+      console.log("Something went wrong when fetching the message: ", error);
+    }
+  },
 };
 
 const messageCommands: Commands = {
   "!qa:reset": () => {
     counter = 0;
   },
-  "!qa:count": msg => {
+  "!qa:count": (msg) => {
     prompt(msg);
-  }
+  },
 };
 
 const qna: ChannelHandlers = {
@@ -105,7 +111,7 @@ const qna: ChannelHandlers = {
     if (!command) return;
 
     const author = msg.guild?.members.cache.get(msg.author.toString());
-    const allowed = ALLOWED_ROLES.some(allowedRole => {
+    const allowed = ALLOWED_ROLES.some((allowedRole) => {
       return author?.roles.cache.has(allowedRole);
     });
 
@@ -122,14 +128,14 @@ const qna: ChannelHandlers = {
     if (!command) return;
 
     const author = reaction.message.guild?.members.cache.get(user.id);
-    const allowed = ALLOWED_ROLES.some(allowedRole => {
+    const allowed = ALLOWED_ROLES.some((allowedRole) => {
       return author?.roles.cache.has(allowedRole);
     });
 
     if (allowed) {
       command(reaction.message);
     }
-  }
+  },
 };
 
 export default qna;

@@ -1,4 +1,10 @@
-import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
+import {
+  MessageReaction,
+  Message,
+  GuildMember,
+  TextChannel,
+  PartialMessage,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { isStaff, truncateMessage } from "../utils";
 import { ChannelHandlers } from "../types";
@@ -9,7 +15,7 @@ const config = {
   // This is how many ️️warning reactions a post must get until mods are alerted
   thumbsDownThreshold: 2,
   // This is how many ️️warning reactions a post must get the message is deleted
-  deletionThreshold: Infinity
+  deletionThreshold: Infinity,
 };
 
 type WarningMessages = {
@@ -23,13 +29,13 @@ const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾"
 type ReactionHandlers = {
   [emoji: string]: (
     reaction: MessageReaction,
-    message: Message,
+    message: Message | PartialMessage,
     member: GuildMember
   ) => void;
 };
 
 const reactionHandlers: ReactionHandlers = {
-  "⚠️": (reaction, message, member) => {
+  "⚠️": async (reaction, message, member) => {
     // Skip if the user that reacted isn't in the staff or the post is from someone
     // from the staff
     if (
@@ -41,65 +47,71 @@ const reactionHandlers: ReactionHandlers = {
       return;
     }
 
-    const usersWhoReacted = reaction.users.cache.map(user =>
+    const usersWhoReacted = reaction.users.cache.map((user) =>
       message.guild?.members.cache.get(user.id)
     );
     const numberOfTotalReactions = usersWhoReacted.length;
     const numberOfStaffReactions = usersWhoReacted.filter(isStaff).length;
 
     const modLogChannel = message.guild?.channels.cache.find(
-      channel =>
+      (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704"
     ) as TextChannel;
 
     const userNames = usersWhoReacted
-      .filter(user => !isStaff(user))
-      .map(member => member?.user.username)
+      .filter((user) => !isStaff(user))
+      .map((member) => member?.user.username)
       .join(", ");
 
     const staffNames = usersWhoReacted
       .filter(isStaff)
-      .map(member => member?.user.username)
+      .map((member) => member?.user.username)
       .join(", ");
 
-    let logMessage = "";
+    try {
+      const fullMessage = await message.fetch();
 
-    const logMessageEnding = [
-      "\n\n",
-      `\`${truncateMessage(message.content)}\``,
-      "\n\n",
-      `Link: https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`,
-      "\n\n",
-      userNames && `Reactors: \`${userNames}\``,
-      staffNames && userNames && "\n",
-      staffNames && `Staff: \`${staffNames}\``
-    ]
-      .filter(Boolean)
-      .join("");
+      let logMessage = "";
 
-    if (numberOfTotalReactions >= config.warningThreshold) {
-      logMessage = `<@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
-    }
+      const logMessageEnding = [
+        "\n\n",
+        `\`${truncateMessage((fullMessage as unknown as Message).content)}\``,
+        "\n\n",
+        `Link: https://discord.com/channels/${fullMessage.guild?.id}/${fullMessage.channel.id}/${fullMessage.id}`,
+        "\n\n",
+        userNames && `Reactors: \`${userNames}\``,
+        staffNames && userNames && "\n",
+        staffNames && `Staff: \`${staffNames}\``,
+      ]
+        .filter(Boolean)
+        .join("");
 
-    if (numberOfStaffReactions >= config.deletionThreshold) {
-      logMessage = `<@${message.author.id}> has met the deletion threshold in <#${message.channel.id}> for the message:`;
-
-      message.delete();
-    }
-
-    if (logMessage) {
-      logMessage += logMessageEnding;
-
-      if (warningMessages[message.id]) {
-        warningMessages[message.id].edit(logMessage);
-      } else {
-        modLogChannel.send(logMessage).then(warningMessage => {
-          warningMessages[message.id] = warningMessage;
-        });
+      if (numberOfTotalReactions >= config.warningThreshold) {
+        logMessage = `<@${fullMessage.author.id}> has met the warning threshold in <#${fullMessage.channel.id}> for the message:`;
       }
+
+      if (numberOfStaffReactions >= config.deletionThreshold) {
+        logMessage = `<@${fullMessage.author.id}> has met the deletion threshold in <#${fullMessage.channel.id}> for the message:`;
+
+        fullMessage.delete();
+      }
+
+      if (logMessage) {
+        logMessage += logMessageEnding;
+
+        if (warningMessages[fullMessage.id]) {
+          warningMessages[fullMessage.id].edit(logMessage);
+        } else {
+          modLogChannel.send(logMessage).then((warningMessage) => {
+            warningMessages[fullMessage.id] = warningMessage;
+          });
+        }
+      }
+    } catch (error) {
+      console.log("Something went wrong when fetching the message: ", error);
     }
   },
-  "👎": (reaction, message, member) => {
+  "👎": async (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;
     }
@@ -119,50 +131,58 @@ const reactionHandlers: ReactionHandlers = {
       },
       {
         count: 0,
-        users: []
+        users: [],
       }
     );
 
     const numberOfTotalReactions = reactions.count;
 
     const modLogChannel = message.guild.channels.cache.find(
-      channel =>
+      (channel) =>
         channel.name === "mod-log" || channel.id === "257930126145224704"
     ) as TextChannel;
 
-    let logMessage = "";
-    const logMessageEnding = [
-      "\n\n",
-      `${truncateMessage(message.content)}`,
-      "\n\n",
-      `Link: https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`
-    ]
-      .filter(Boolean)
-      .join("");
+    try {
+      const fullMessage = await message.fetch();
 
-    if (numberOfTotalReactions >= config.thumbsDownThreshold) {
-      logMessage = `<@&102870499406647296> - <@${message.author.id}> has met the warning threshold in <#${message.channel.id}> for the message:`;
-    }
+      let logMessage = "";
+      const logMessageEnding = [
+        "\n\n",
+        `${truncateMessage(fullMessage.content)}`,
+        "\n\n",
+        `Link: https://discord.com/channels/${fullMessage.guild!.id}/${
+          fullMessage.channel.id
+        }/${fullMessage.id}`,
+      ]
+        .filter(Boolean)
+        .join("");
 
-    if (logMessage) {
-      logMessage += logMessageEnding;
-
-      if (warningMessages[message.id]) {
-        warningMessages[message.id].edit(logMessage);
-      } else {
-        modLogChannel.send(logMessage).then(warningMessage => {
-          warningMessages[message.id] = warningMessage;
-        });
+      if (numberOfTotalReactions >= config.thumbsDownThreshold) {
+        logMessage = `<@&102870499406647296> - <@${fullMessage.author.id}> has met the warning threshold in <#${fullMessage.channel.id}> for the message:`;
       }
+
+      if (logMessage) {
+        logMessage += logMessageEnding;
+
+        if (warningMessages[message.id]) {
+          warningMessages[fullMessage.id].edit(logMessage);
+        } else {
+          modLogChannel.send(logMessage).then((warningMessage) => {
+            warningMessages[fullMessage.id] = warningMessage;
+          });
+        }
+      }
+    } catch (error) {
+      console.log("Something went wrong when fetching the message: ", error);
     }
-  }
+  },
 };
 
 const emojiMod: ChannelHandlers = {
   handleReaction: ({ reaction, user, bot }) => {
     const { message } = reaction;
 
-    if (!message.guild || message.author.id === bot.user?.id) {
+    if (!message.guild || message.author?.id === bot.user?.id) {
       return;
     }
 
@@ -179,7 +199,7 @@ const emojiMod: ChannelHandlers = {
     if (reactionHandler) {
       reactionHandler(reaction, message, member);
     }
-  }
+  },
 };
 
 export default emojiMod;
