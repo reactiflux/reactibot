@@ -52,11 +52,14 @@ bot
 
     scheduleMessages(bot, MESSAGE_SCHEDULE);
 
-    const guilds = await bot.guilds.fetch();
-
-    guilds.each((guild) =>
-      logger.log("INI", `Bot connected to Discord server: ${guild.name}`),
-    );
+    try {
+      const guilds = await bot.guilds.fetch();
+      guilds.each((guild) =>
+        logger.log("INI", `Bot connected to Discord server: ${guild.name}`),
+      );
+    } catch (error) {
+      console.log("Something went wrong when fetching the guilds: ", error);
+    }
 
     if (bot.application) {
       const { id } = bot.application;
