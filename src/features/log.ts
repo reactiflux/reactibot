@@ -10,10 +10,10 @@ export const stdoutLog: Logger = (type, text) => {
 };
 
 export const channelLog =
-  (bot: Client, channelID: string): Logger =>
+  (bot: Client, channelId: string): Logger =>
   (type, text) => {
     try {
-      const channel = bot.channels.cache.get(channelID) as TextChannel;
+      const channel = bot.channels.cache.get(channelId) as TextChannel;
       if (channel) {
         channel.send(`[${type}] ${text}`);
       }
