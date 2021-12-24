@@ -46,10 +46,9 @@ bot
     process.exit(1);
   })
   .then(() => {
-    console.log("Bot started. If necessary, add it to your test server:");
-
     if (bot.application) {
       const { id } = bot.application;
+      console.log("Bot started. If necessary, add it to your test server:");
       console.log(
         `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
       );
