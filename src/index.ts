@@ -46,6 +46,16 @@ bot
     process.exit(1);
   })
   .then(() => {
+    logger.log("INI", "Bootstrap complete");
+
+    Array.from(bot.guilds.cache.values()).forEach((guild) => {
+      logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
+    });
+
+    bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
+
+    scheduleMessages(bot, MESSAGE_SCHEDULE);
+
     if (bot.application) {
       const { id } = bot.application;
       console.log("Bot started. If necessary, add it to your test server:");
@@ -152,18 +162,6 @@ bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
-});
-
-logger.log("INI", "Bootstrap complete");
-
-bot.on("ready", () => {
-  Array.from(bot.guilds.cache.values()).forEach((guild) => {
-    logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
-  });
-
-  bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
-
-  scheduleMessages(bot, MESSAGE_SCHEDULE);
 });
 
 bot.on("error", (err) => {
