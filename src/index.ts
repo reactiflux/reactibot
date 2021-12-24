@@ -45,16 +45,18 @@ bot
     );
     process.exit(1);
   })
-  .then(() => {
+  .then(async () => {
     logger.log("INI", "Bootstrap complete");
-
-    Array.from(bot.guilds.cache.values()).forEach((guild) => {
-      logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
-    });
 
     bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
 
     scheduleMessages(bot, MESSAGE_SCHEDULE);
+
+    const guilds = await bot.guilds.fetch();
+
+    guilds.each((guild) =>
+      logger.log("INI", `Bot connected to Discord server: ${guild.name}`),
+    );
 
     if (bot.application) {
       const { id } = bot.application;
