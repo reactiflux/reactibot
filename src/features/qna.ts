@@ -1,4 +1,4 @@
-import { Message, PartialMessage, TextBasedChannels } from "discord.js";
+import { Message, PartialMessage, TextBasedChannel } from "discord.js";
 import { ChannelHandlers } from "../types";
 
 const ALLOWED_ROLES = ["moderator", "Moderator", "admin", "Admin"];
@@ -24,7 +24,7 @@ const counterAsWord = (q: number) => {
   else return "more than three";
 };
 
-const flush = (channel: TextBasedChannels) => {
+const flush = (channel: TextBasedChannel) => {
   prevMessagesIds.forEach((oldId) =>
     channel.messages.fetch(oldId).then((msg) => msg.delete()),
   );
@@ -79,15 +79,15 @@ const reactionCommands: Commands = {
 
       fullMsg.author
         .send(`Hello there! Your message has been removed from the Question and Answers channel by a moderator.
-    
+
 Most likely the message was removed, because we try to limit the current unanswered messages count to about 3, our guest(s) might need more time to answer all the questions.
-    
+
 Please feel free to ask your question again when a slot becomes open. I've copied the question bellow for you:
-    
+
 \`\`\`
 ${fullMsg.content}
 \`\`\`
-    
+
 :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
       fullMsg.delete();
     } catch (error) {

@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/node-cron": "^2.0.3",
-    "discord.js": "^13.1.0",
+    "discord.js": "^13.3.1",
     "dotenv": "^6.1.0",
     "gists": "^2.0.0",
     "node-cron": "^2.0.3",
@@ -35,7 +35,7 @@
     "eslint-config-prettier": "^6.10.0",
     "prettier": "^2.3.2",
     "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^4.3.5"
+    "typescript": "^4.5.4"
   },
   "prettier": {
     "trailingComma": "all"

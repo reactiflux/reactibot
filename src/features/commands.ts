@@ -33,7 +33,7 @@ const commandsList: Command[] = [
     handleMessage: (msg) => {
       const commandsMessage = createCommandsMessage();
 
-      msg.channel.send({
+      msg.reply({
         embeds: [
           {
             title: "Available Help Commands",
@@ -42,9 +42,6 @@ const commandsList: Command[] = [
             color: EMBED_COLOR,
           },
         ],
-        reply: {
-          messageReference: msg,
-        },
       });
     },
   },
@@ -362,7 +359,6 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       await msg.channel.send({
         embeds: [
           {
-            type: "rich",
             author: {
               name: "MDN",
               url: "https://developer.mozilla.org",
@@ -651,7 +647,7 @@ Instead:
         return;
       }
 
-      const member = msg.guild.members.cache.get(msg.author.id);
+      const member = await msg.guild.members.fetch(msg.author.id);
 
       if (!member || isStaff(member)) {
         return;
@@ -663,7 +659,6 @@ Instead:
         embeds: [
           {
             title: "Tsk tsk.",
-            type: "rich",
             description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
             color: "#BA0C2F",
           },

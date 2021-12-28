@@ -1,16 +1,9 @@
 require("dotenv").config();
 
-import discord, {
-  Message,
-  PartialMessage,
-  MessageReaction,
-  User,
-  Intents,
-} from "discord.js";
+import discord, { Message, MessageReaction, User, Intents } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import qna from "./features/qna";
 import jobs from "./features/jobs";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
@@ -33,18 +26,9 @@ export const bot = new discord.Client({
   ],
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
+
 bot
   .login(process.env.DISCORD_HASH)
-  .catch((e) => {
-    console.log({ e });
-    console.log(
-      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
-    );
-    console.log(
-      'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
-    );
-    process.exit(1);
-  })
   .then(async () => {
     logger.log("INI", "Bootstrap complete");
 
@@ -68,6 +52,16 @@ bot
         `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
       );
     }
+  })
+  .catch((e) => {
+    console.log({ e });
+    console.log(
+      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
+    );
+    console.log(
+      'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
+    );
+    process.exit(1);
   });
 
 export type ChannelHandlersById = {
@@ -83,10 +77,8 @@ const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
   ];
 };
 
-const handleMessage = (msg: Message | PartialMessage) => {
-  if (msg.partial) {
-    return;
-  }
+const handleMessage = async (message: Message) => {
+  const msg = message.partial ? await message.fetch() : message;
 
   const channelId = msg.channel.id;
 
@@ -129,11 +121,6 @@ setupStats(bot);
 
 // reactiflux
 addHandler("103882387330457600", jobs);
-addHandler("106168778013822976", qna); // reactiflux-admin
-addHandler("193117606629081089", qna); // #q&a
-
-// btm server
-addHandler("479862475047567361", qna); // #general
 
 // common
 addHandler("*", commands);
