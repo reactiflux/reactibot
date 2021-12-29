@@ -1,4 +1,4 @@
-import { Client, TextChannel } from "discord.js";
+import { Client } from "discord.js";
 
 type Logger = (type: string, text: string) => void;
 
@@ -10,11 +10,12 @@ export const stdoutLog: Logger = (type, text) => {
 };
 
 export const channelLog =
-  (bot: Client, channelID: string): Logger =>
-  (type, text) => {
+  (client: Client, channelId: string): Logger =>
+  async (type, text) => {
     try {
-      const channel = bot.channels.cache.get(channelID) as TextChannel;
-      if (channel) {
+      const channel = await client.channels.fetch(channelId);
+
+      if (channel?.isText()) {
         channel.send(`[${type}] ${text}`);
       }
     } catch (error) {

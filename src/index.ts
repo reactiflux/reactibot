@@ -2,14 +2,15 @@ require("dotenv").config();
 
 import discord, {
   Message,
-  PartialMessage,
   MessageReaction,
   User,
+  Intents,
+  PartialMessageReaction,
+  PartialUser,
 } from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import qna from "./features/qna";
 import jobs from "./features/jobs";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
@@ -21,10 +22,44 @@ import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 
 export const bot = new discord.Client({
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+    Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+  ],
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
+
 bot
   .login(process.env.DISCORD_HASH)
+  .then(async () => {
+    logger.log("INI", "Bootstrap complete");
+
+    bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
+
+    scheduleMessages(bot);
+
+    try {
+      const guilds = await bot.guilds.fetch();
+      guilds.each((guild) =>
+        logger.log("INI", `Bot connected to Discord server: ${guild.name}`),
+      );
+    } catch (error) {
+      console.log("Something went wrong when fetching the guilds: ", error);
+    }
+
+    if (bot.application) {
+      const { id } = bot.application;
+      console.log("Bot started. If necessary, add it to your test server:");
+      console.log(
+        `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
+      );
+    }
+  })
   .catch((e) => {
     console.log({ e });
     console.log(
@@ -34,13 +69,6 @@ bot
       'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
     );
     process.exit(1);
-  })
-  .then(async () => {
-    const { id } = await bot.fetchApplication();
-    console.log("Bot started. If necessary, add it to your test server:");
-    console.log(
-      `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
-    );
   });
 
 export type ChannelHandlersById = {
@@ -56,40 +84,40 @@ const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
   ];
 };
 
-const handleMessage = (msg: Message | PartialMessage) => {
-  if (msg.partial) {
-    return;
-  }
+const handleMessage = async (message: Message) => {
+  const msg = message.partial ? await message.fetch() : message;
 
   const channelId = msg.channel.id;
 
   if (channelHandlersById[channelId]) {
     channelHandlersById[channelId].forEach((channelHandlers) => {
-      channelHandlers.handleMessage?.({ msg: msg as Message, bot });
+      channelHandlers.handleMessage?.({ msg, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
     channelHandlersById["*"].forEach((channelHandlers) => {
-      channelHandlers.handleMessage?.({ msg: msg as Message, bot });
+      channelHandlers.handleMessage?.({ msg, bot });
     });
   }
 };
 
-const handleReaction = (reaction: MessageReaction, user: User) => {
+const handleReaction = (
+  reaction: MessageReaction | PartialMessageReaction,
+  user: User | PartialUser,
+) => {
   const channelId = reaction.message.channel.id;
+  const handlers = channelHandlersById[channelId];
 
-  if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach((channelHandlers) => {
+  if (handlers) {
+    handlers.forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
 
-  if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach((channelHandlers) => {
-      channelHandlers.handleReaction?.({ reaction, user, bot });
-    });
-  }
+  channelHandlersById["*"].forEach((channelHandlers) => {
+    channelHandlers.handleReaction?.({ reaction, user, bot });
+  });
 };
 
 logger.add(stdoutLog);
@@ -102,11 +130,6 @@ setupStats(bot);
 
 // reactiflux
 addHandler("103882387330457600", jobs);
-addHandler("106168778013822976", qna); // reactiflux-admin
-addHandler("193117606629081089", qna); // #q&a
-
-// btm server
-addHandler("479862475047567361", qna); // #general
 
 // common
 addHandler("*", commands);
@@ -116,42 +139,12 @@ addHandler("*", emojiMod);
 addHandler("*", autodelete);
 addHandler("*", tsPlaygroundLinkShortener);
 
-bot.on("messageReactionAdd", async (reaction, user) => {
-  if (user.partial) {
-    try {
-      await user.fetch();
-    } catch (error) {
-      console.log("Something went wrong when fetching the user: ", error);
-    }
-  }
+bot.on("messageReactionAdd", handleReaction);
 
-  if (reaction.partial) {
-    try {
-      await reaction.fetch();
-    } catch (error) {
-      console.log("Something went wrong when fetching the reaction: ", error);
-    }
-  }
-
-  handleReaction(reaction, user as User);
-});
-
-bot.on("message", async (msg) => {
+bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
   handleMessage(msg);
-});
-
-logger.log("INI", "Bootstrap complete");
-
-bot.on("ready", () => {
-  Array.from(bot.guilds.cache.values()).forEach((guild) => {
-    logger.log("INI", `Bot connected to Discord server: ${guild.name}`);
-  });
-
-  bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
-
-  scheduleMessages(bot);
 });
 
 bot.on("error", (err) => {
@@ -162,9 +155,11 @@ bot.on("error", (err) => {
   }
 });
 
-const errorHandler = (error: any) => {
-  if (error && error.message) {
+const errorHandler = (error: unknown) => {
+  if (error instanceof Error) {
     logger.log("ERROR", error.message);
+  } else if (typeof error === "string") {
+    logger.log("ERROR", error);
   }
 };
 
