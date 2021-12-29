@@ -116,7 +116,11 @@ If something crosses a line, give it a 👎, or if you'd prefer to remain anonym
 export const messages: MessageConfig[] = [];
 
 export const scheduleMessages = (bot: discord.Client) => {
-  MESSAGE_SCHEDULE.forEach((messageConfig) => sendMessage(bot, messageConfig));
+  bot.on("ready", () => {
+    MESSAGE_SCHEDULE.forEach((messageConfig) =>
+      sendMessage(bot, messageConfig),
+    );
+  });
 };
 
 const sendMessage = async (
@@ -126,7 +130,6 @@ const sendMessage = async (
   const { message, postTo } = messageConfig;
   postTo.forEach(
     async ({ guildId = "102860784329052160", channelId, interval }) => {
-      // const guild = await bot.guilds.fetch(guildId);
       const channel = await bot.channels.fetch(channelId);
 
       if (channel === null) {
@@ -143,13 +146,9 @@ const sendMessage = async (
         );
         return;
       }
-      // scheduleTask(interval, () => {
-      try {
+      scheduleTask(interval, () => {
         channel.send(message);
-      } catch (e) {
-        console.log("butts", e);
-      }
-      // });
+      });
     },
   );
 };

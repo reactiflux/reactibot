@@ -10,7 +10,6 @@ import { subDays, parseISO, format } from "date-fns";
  * Sunday at midnight.
  */
 const getFirstRun = (interval: number, now = new Date()) => {
-  return 0;
   const dayOfWeek = now.getDay();
   const sundayMidnight = subDays(
     parseISO(format(now, "yyyy-MM-dd")),
