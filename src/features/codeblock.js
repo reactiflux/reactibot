@@ -1,4 +1,5 @@
 import Gists from "gists";
+
 const gists = new Gists({
   token: process.env.GITHUB_TOKEN,
 });
@@ -6,7 +7,11 @@ const gists = new Gists({
 const maxLines = 15;
 
 const jobs = {
-  handleMessage: ({ msg, user }) => {
+  handleMessage: async ({ msg: maybeMessage, user }) => {
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
+
     const blocks = msg.content.toString().match(/```([\s\S]*?)```/g);
     if (!blocks || blocks.length === 0) {
       return;

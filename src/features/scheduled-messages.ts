@@ -34,9 +34,9 @@ const isTextChannel = (
   channel: discord.Channel,
 ): channel is discord.TextChannel | discord.DMChannel | discord.NewsChannel => {
   return (
-    channel.type === "text" ||
-    channel.type === "news" ||
-    channel.type === "store"
+    channel.type === "GUILD_TEXT" ||
+    channel.type === "GUILD_NEWS" ||
+    channel.type === "GUILD_STORE"
   );
 };
 

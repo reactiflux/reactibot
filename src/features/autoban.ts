@@ -8,12 +8,13 @@ const tags = [
 ];
 
 const autoban: ChannelHandlers = {
-  handleMessage: ({ msg }) => {
-    let hasToken = false;
+  handleMessage: async ({ msg: maybeMessage }) => {
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
 
-    tags.forEach((token) => {
-      if (msg.content.toLowerCase().includes(token)) hasToken = true;
-    });
+    const content = msg.content.toLowerCase();
+    const hasToken = tags.some((token) => content.includes(token));
 
     if (hasToken) {
       msg.author
@@ -22,7 +23,7 @@ const autoban: ChannelHandlers = {
         )
         .then(() => {
           msg.delete();
-          msg.guild?.member(msg.author)?.ban();
+          msg.guild?.members.ban(msg.author);
         });
     }
   },

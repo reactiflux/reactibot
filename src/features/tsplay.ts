@@ -9,7 +9,10 @@ export const PLAYGROUND_REGEX =
 
 // See https://github.com/typescript-community/community-bot/blob/master/src/modules/playground.ts
 const tsPlaygroundLinkShortener: ChannelHandlers = {
-  async handleMessage({ msg }) {
+  handleMessage: async ({ msg: maybeMessage }) => {
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
     const match = PLAYGROUND_REGEX.exec(msg.content);
     if (!match) return;
 
@@ -19,15 +22,17 @@ const tsPlaygroundLinkShortener: ChannelHandlers = {
     if (url.length !== msg.content.trim().length) return;
 
     const sent = await msg.channel.send({
-      embed: {
-        title: "Shortened Playground Link",
-        url,
-        color: EMBED_COLOR,
-        author: {
-          name: msg.author.tag,
-          iconURL: msg.author.displayAvatarURL(),
+      embeds: [
+        {
+          title: "Shortened Playground Link",
+          url,
+          color: EMBED_COLOR,
+          author: {
+            name: msg.author.tag,
+            iconURL: msg.author.displayAvatarURL(),
+          },
         },
-      },
+      ],
     });
     sent.react(DELETE_EMOJI);
     msg.delete();
