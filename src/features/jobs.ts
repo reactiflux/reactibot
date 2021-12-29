@@ -5,13 +5,18 @@ import cooldown from "./cooldown";
 const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
 const jobs: ChannelHandlers = {
-  handleMessage: ({ msg }) => {
+  handleMessage: async ({ msg: maybeMessage }) => {
     let hasTags = false;
 
-    if (!msg.member) return;
+    if (!maybeMessage.member) return;
+
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
+    const content = msg.content.toLowerCase();
 
     tags.forEach((tag) => {
-      if (msg.content.toLowerCase().includes(`[${tag}]`)) hasTags = true;
+      if (content.includes(`[${tag}]`)) hasTags = true;
     });
 
     if (!hasTags && msg.mentions.members?.size === 0) {

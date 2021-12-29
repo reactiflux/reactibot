@@ -9,7 +9,10 @@ export const PLAYGROUND_REGEX =
 
 // See https://github.com/typescript-community/community-bot/blob/master/src/modules/playground.ts
 const tsPlaygroundLinkShortener: ChannelHandlers = {
-  async handleMessage({ msg }) {
+  handleMessage: async ({ msg: maybeMessage }) => {
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
     const match = PLAYGROUND_REGEX.exec(msg.content);
     if (!match) return;
 

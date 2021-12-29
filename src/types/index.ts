@@ -1,16 +1,24 @@
-import { Message, User, Client, MessageReaction } from "discord.js";
+import {
+  Message,
+  User,
+  Client,
+  MessageReaction,
+  PartialMessageReaction,
+  PartialUser,
+  PartialMessage,
+} from "discord.js";
 
 type CommonArgs = {
   bot: Client;
 };
 
 export type HandleMessageArgs = CommonArgs & {
-  msg: Message;
+  msg: Message | PartialMessage;
 };
 
 export type HandleReactionArgs = CommonArgs & {
-  reaction: MessageReaction;
-  user: User;
+  reaction: MessageReaction | PartialMessageReaction;
+  user: User | PartialUser;
 };
 
 export type ChannelHandlers = {
