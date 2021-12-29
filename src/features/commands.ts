@@ -710,10 +710,13 @@ const createCommandsMessage = () => {
 };
 
 const commands: ChannelHandlers = {
-  handleMessage: ({ msg }) => {
-    if (!msg.guild && msg.channel.type !== "DM") {
+  handleMessage: async ({ msg: maybeMessage }) => {
+    if (!maybeMessage.guild && maybeMessage.channel.type !== "DM") {
       return;
     }
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {

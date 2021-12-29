@@ -199,6 +199,10 @@ const emojiMod: ChannelHandlers = {
       emoji = "👎";
     }
 
+    if (!reactionHandlers[emoji]) {
+      return;
+    }
+
     const [fullReaction, fullMessage, member] = await Promise.all([
       reaction.partial ? reaction.fetch() : reaction,
       message.partial ? message.fetch() : message,

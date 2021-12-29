@@ -4,6 +4,8 @@ import {
   Client,
   MessageReaction,
   PartialMessageReaction,
+  PartialUser,
+  PartialMessage,
 } from "discord.js";
 
 type CommonArgs = {
@@ -11,12 +13,12 @@ type CommonArgs = {
 };
 
 export type HandleMessageArgs = CommonArgs & {
-  msg: Message;
+  msg: Message | PartialMessage;
 };
 
 export type HandleReactionArgs = CommonArgs & {
   reaction: MessageReaction | PartialMessageReaction;
-  user: User;
+  user: User | PartialUser;
 };
 
 export type ChannelHandlers = {

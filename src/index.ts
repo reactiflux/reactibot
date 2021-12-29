@@ -1,6 +1,13 @@
 require("dotenv").config();
 
-import discord, { Message, MessageReaction, User, Intents } from "discord.js";
+import discord, {
+  Message,
+  MessageReaction,
+  User,
+  Intents,
+  PartialMessageReaction,
+  PartialUser,
+} from "discord.js";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
@@ -87,31 +94,33 @@ const handleMessage = async (message: Message) => {
 
   if (channelHandlersById[channelId]) {
     channelHandlersById[channelId].forEach((channelHandlers) => {
-      channelHandlers.handleMessage?.({ msg: msg as Message, bot });
+      channelHandlers.handleMessage?.({ msg, bot });
     });
   }
 
   if (channelHandlersById["*"]) {
     channelHandlersById["*"].forEach((channelHandlers) => {
-      channelHandlers.handleMessage?.({ msg: msg as Message, bot });
+      channelHandlers.handleMessage?.({ msg, bot });
     });
   }
 };
 
-const handleReaction = (reaction: MessageReaction, user: User) => {
+const handleReaction = (
+  reaction: MessageReaction | PartialMessageReaction,
+  user: User | PartialUser,
+) => {
   const channelId = reaction.message.channel.id;
+  const handlers = channelHandlersById[channelId];
 
-  if (channelHandlersById[channelId]) {
-    channelHandlersById[channelId].forEach((channelHandlers) => {
+  if (handlers) {
+    handlers.forEach((channelHandlers) => {
       channelHandlers.handleReaction?.({ reaction, user, bot });
     });
   }
 
-  if (channelHandlersById["*"]) {
-    channelHandlersById["*"].forEach((channelHandlers) => {
-      channelHandlers.handleReaction?.({ reaction, user, bot });
-    });
-  }
+  channelHandlersById["*"].forEach((channelHandlers) => {
+    channelHandlers.handleReaction?.({ reaction, user, bot });
+  });
 };
 
 logger.add(stdoutLog);
@@ -133,25 +142,7 @@ addHandler("*", emojiMod);
 addHandler("*", autodelete);
 addHandler("*", tsPlaygroundLinkShortener);
 
-bot.on("messageReactionAdd", async (reaction, user) => {
-  if (user.partial) {
-    try {
-      await user.fetch();
-    } catch (error) {
-      console.log("Something went wrong when fetching the user: ", error);
-    }
-  }
-
-  if (reaction.partial) {
-    try {
-      await reaction.fetch();
-    } catch (error) {
-      console.log("Something went wrong when fetching the reaction: ", error);
-    }
-  }
-
-  handleReaction(reaction as MessageReaction, user as User);
-});
+bot.on("messageReactionAdd", handleReaction);
 
 bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
