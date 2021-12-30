@@ -18,10 +18,7 @@ import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
 import { ChannelHandlers } from "./types";
-import {
-  MESSAGE_SCHEDULE,
-  scheduleMessages,
-} from "./features/scheduled-messages";
+import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 
 export const bot = new discord.Client({
@@ -44,7 +41,7 @@ bot
 
     bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
 
-    scheduleMessages(bot, MESSAGE_SCHEDULE);
+    scheduleMessages(bot);
 
     try {
       const guilds = await bot.guilds.fetch();
