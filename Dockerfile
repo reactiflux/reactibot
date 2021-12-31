@@ -1,15 +1,15 @@
 FROM node:16-alpine
-WORKDIR /var/scripts/reactibot
+WORKDIR /build/reactibot
 
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
 COPY package*.json ./
 
-RUN npm install
+RUN yarn
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
-CMD ["npm", "run", "start"]
+CMD ["yarn", "start"]
