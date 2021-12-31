@@ -79,19 +79,23 @@ const channelHandlersById: ChannelHandlersById = {};
 
 const addHandler = (
   oneOrMoreChannels: string | string[],
-  channelHandlers: ChannelHandlers,
+  oneOrMoreHandlers: ChannelHandlers | ChannelHandlers[],
 ) => {
   const channels =
     typeof oneOrMoreChannels === "string"
       ? [oneOrMoreChannels]
       : oneOrMoreChannels;
+  const handlers =
+    oneOrMoreHandlers instanceof Array
+      ? oneOrMoreHandlers
+      : [oneOrMoreHandlers];
 
   channels.forEach((channelId) => {
-    const handlers = channelHandlersById[channelId];
-    if (handlers) {
-      handlers.push(channelHandlers);
+    const existingHandlers = channelHandlersById[channelId];
+    if (existingHandlers) {
+      existingHandlers.concat(handlers);
     } else {
-      channelHandlersById[channelId] = [channelHandlers];
+      channelHandlersById[channelId] = handlers;
     }
   });
 };
@@ -144,12 +148,13 @@ setupStats(bot);
 addHandler("103882387330457600", jobs);
 
 // common
-addHandler("*", commands);
-// addHandler('*', codeblock);
-addHandler("*", autoban);
-addHandler("*", emojiMod);
-addHandler("*", autodelete);
-addHandler("*", tsPlaygroundLinkShortener);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  autodelete,
+  tsPlaygroundLinkShortener,
+]);
 
 bot.on("messageReactionAdd", handleReaction);
 
