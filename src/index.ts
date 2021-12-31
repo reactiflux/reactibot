@@ -20,6 +20,7 @@ import autodelete from "./features/autodelete-spam";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
+import { CHANNELS } from "./constants";
 
 export const bot = new discord.Client({
   intents: [
@@ -145,7 +146,7 @@ if (process.env.BOT_LOG) {
 setupStats(bot);
 
 // reactiflux
-addHandler("103882387330457600", jobs);
+addHandler(CHANNELS.jobBoard, jobs);
 
 // common
 addHandler("*", [
