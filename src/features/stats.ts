@@ -50,7 +50,7 @@ const stats = (client: Client) => {
   client.on("messageCreate", (msg) => {
     const { member, author, channel, content } = msg;
 
-    if (!channel || !author) return;
+    if (!channel || !author || author.id === client.user?.id) return;
 
     emitEvent(EVENTS.message, {
       data: {

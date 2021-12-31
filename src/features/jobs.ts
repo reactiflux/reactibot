@@ -8,7 +8,7 @@ const jobs: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     let hasTags = false;
 
-    if (!maybeMessage.member) return;
+    if (!maybeMessage.member || isStaff(maybeMessage.member)) return;
 
     const msg = maybeMessage.partial
       ? await maybeMessage.fetch()
@@ -21,10 +21,6 @@ const jobs: ChannelHandlers = {
 
     if (!hasTags && msg.mentions.members?.size === 0) {
       if (cooldown.hasCooldown(msg.author.id, "user.jobs")) return;
-
-      if (isStaff(msg.member)) {
-        return;
-      }
 
       cooldown.addCooldown(msg.author.id, "user.jobs");
       msg.author
