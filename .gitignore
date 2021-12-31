@@ -3,3 +3,5 @@ node_modules
 .env*
 dist
 .vscode
+package-lock.json
+*.log
