@@ -77,11 +77,23 @@ export type ChannelHandlersById = {
 
 const channelHandlersById: ChannelHandlersById = {};
 
-const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
-  channelHandlersById[channelId] = [
-    ...(channelHandlersById[channelId] || []),
-    channelHandlers,
-  ];
+const addHandler = (
+  oneOrMoreChannels: string | string[],
+  channelHandlers: ChannelHandlers,
+) => {
+  const channels =
+    typeof oneOrMoreChannels === "string"
+      ? [oneOrMoreChannels]
+      : oneOrMoreChannels;
+
+  channels.forEach((channelId) => {
+    const handlers = channelHandlersById[channelId];
+    if (handlers) {
+      handlers.push(channelHandlers);
+    } else {
+      channelHandlersById[channelId] = [channelHandlers];
+    }
+  });
 };
 
 const handleMessage = async (message: Message) => {
