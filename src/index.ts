@@ -141,6 +141,10 @@ addHandler("*", tsPlaygroundLinkShortener);
 
 bot.on("messageReactionAdd", handleReaction);
 
+bot.on("threadCreate", (thread) => {
+  thread.join();
+});
+
 bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
