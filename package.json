@@ -15,6 +15,7 @@
     "url": "https://github.com/reactiflux/reactibot.git"
   },
   "license": "MIT",
+  "packageManager": "yarn@3.1.1",
   "dependencies": {
     "@types/node-cron": "^2.0.3",
     "date-fns": "^2.27.0",
