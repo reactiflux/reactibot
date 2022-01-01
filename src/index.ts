@@ -17,6 +17,8 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
+import autothread from "./features/autothread";
+
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
@@ -156,6 +158,8 @@ addHandler("*", [
   autodelete,
   tsPlaygroundLinkShortener,
 ]);
+
+addHandler([CHANNELS.helpJs, CHANNELS.helpThreadsReact], autothread);
 
 bot.on("messageReactionAdd", handleReaction);
 
