@@ -94,7 +94,7 @@ const addHandler = (
   channels.forEach((channelId) => {
     const existingHandlers = channelHandlersById[channelId];
     if (existingHandlers) {
-      existingHandlers.concat(handlers);
+      existingHandlers.push(...handlers);
     } else {
       channelHandlersById[channelId] = handlers;
     }
