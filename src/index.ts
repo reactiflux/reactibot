@@ -125,7 +125,11 @@ const handleReaction = (
   reaction: MessageReaction | PartialMessageReaction,
   user: User | PartialUser,
 ) => {
-  const channelId = reaction.message.channel.id;
+  // if reaction is in a thread, use the parent channel ID
+  const { channel } = reaction.message;
+  const channelId = channel.isThread()
+    ? channel.parentId || channel.id
+    : channel.id;
   const handlers = channelHandlersById[channelId];
 
   if (handlers) {
