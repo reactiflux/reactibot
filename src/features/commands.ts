@@ -637,39 +637,34 @@ Instead:
       });
     },
   },
-  {
-    words: ["@here", "@everyone"],
-    help: "",
-    category: "Communication",
-    cooldown: 0,
-    handleMessage: async (msg) => {
-      if (!msg || !msg.guild) {
-        return;
-      }
-
-      const member = await msg.guild.members.fetch(msg.author.id);
-
-      if (!member || isStaff(member)) {
-        return;
-      }
-
-      await msg.react("⚠️");
-
-      const tsk = await msg.reply({
-        embeds: [
-          {
-            title: "Tsk tsk.",
-            description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-            color: "#BA0C2F",
-          },
-        ],
-      });
-      await msg.delete();
-      await sleep(120);
-      await tsk.delete();
-    },
-  },
 ];
+
+const handleEveryone: Command["handleMessage"] = async (msg) => {
+  if (!msg.guild) {
+    return;
+  }
+
+  const member = await msg.guild.members.fetch(msg.author.id);
+
+  if (!member || isStaff(member)) {
+    return;
+  }
+
+  await msg.react("⚠️");
+
+  const tsk = await msg.reply({
+    embeds: [
+      {
+        title: "Tsk tsk.",
+        description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+        color: "#BA0C2F",
+      },
+    ],
+  });
+  await msg.delete();
+  await sleep(120);
+  await tsk.delete();
+};
 
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
@@ -733,6 +728,14 @@ const commands: ChannelHandlers = {
         command.handleMessage(msg);
       }
     });
+
+    const everyoneUsed = ["@here", "@everyone"].find((word) => {
+      return msg.content.toLowerCase().includes(word);
+    });
+
+    if (everyoneUsed) {
+      handleEveryone(msg);
+    }
   },
 };
 
