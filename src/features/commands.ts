@@ -27,7 +27,7 @@ const sortedCategories: Categories[] = [
 
 const commandsList: Command[] = [
   {
-    words: [`!commands`],
+    words: [`commands`],
     help: `lists all available commands`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -46,7 +46,7 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!rrlinks`],
+    words: [`rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -63,7 +63,7 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!xy`],
+    words: [`xy`],
     help: `explains the XY problem`,
     category: "Communication",
     handleMessage: (msg) => {
@@ -80,7 +80,7 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!ymnnr`],
+    words: [`ymnnr`],
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -99,7 +99,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
     },
   },
   {
-    words: [`!derived`],
+    words: [`derived`],
     help: `Links to the React docs advice to avoid copying props to state`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -107,7 +107,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
         embeds: [
           {
             title:
-              "You might not need getDerivedStateFrom props or state at all!",
+              "You might not need getDerivedStateFrom props or state at all",
             type: "rich",
             description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
@@ -119,7 +119,7 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     },
   },
   {
-    words: [`!su`, `!stateupdates`],
+    words: [`su`, `stateupdates`],
     help: `Explains the implications involved with state updates being asynchronous`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -148,7 +148,7 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
     },
   },
   {
-    words: [`!bind`],
+    words: [`bind`],
     help: `explains how and why to bind in React applications`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -193,7 +193,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
     },
   },
   {
-    words: [`!lift`],
+    words: [`lift`],
     help: `links to the React docs regarding the common need to "lift" state`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -213,7 +213,7 @@ https://reactjs.org/docs/lifting-state-up.html`,
   },
 
   {
-    words: [`!ask`],
+    words: [`ask`],
     help: `explains how to ask questions`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -245,7 +245,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
     },
   },
   {
-    words: [`!code`, `!gist`],
+    words: [`code`, `gist`],
     help: `explains how to attach code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -271,7 +271,7 @@ Link a Snack to share React Native examples: https://snack.expo.io
     },
   },
   {
-    words: [`!ping`],
+    words: [`ping`],
     help: `explains how to ping politely`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -290,7 +290,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
     },
   },
   {
-    words: [`!inputs`],
+    words: [`inputs`],
     help: `provides links to uncontrolled vs controlled components`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -309,7 +309,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!move`],
+    words: [`move`],
     help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -333,7 +333,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!mdn`],
+    words: [`mdn`],
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
     category: "Web",
     handleMessage: async (msg) => {
@@ -377,7 +377,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!appideas`],
+    words: [`appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
     category: "Web",
     handleMessage: (msg) => {
@@ -397,7 +397,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!cors`],
+    words: [`cors`],
     help: `provides a link to what CORS is and how to fix it`,
     category: "Web",
     handleMessage: (msg) => {
@@ -421,7 +421,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!imm`, `!immutability`],
+    words: [`imm`, `immutability`],
     help: `provides resources for helping with immutability`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -443,7 +443,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!redux`],
+    words: [`redux`],
     help: `Info and when and why to use Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -468,7 +468,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!reduxvscontext`, "!context"],
+    words: [`reduxvscontext`, "context"],
     help: `Differences between Redux and Context`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -497,7 +497,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!render`],
+    words: [`render`],
     help: `Explanation of how React rendering behavior works`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -524,7 +524,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!formatting`, `!prettier`],
+    words: [`formatting`, `prettier`],
     help: `describes Prettier and explains how to use it to format code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -547,7 +547,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!gender`],
+    words: [`gender`],
     help: `reminds users to use gender-neutral language`,
     category: "Communication",
     handleMessage: (msg) => {
@@ -568,7 +568,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!reactts`],
+    words: [`reactts`],
     help: `Resources and tips for using React + TypeScript together`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -594,7 +594,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!hooks`, `!learn`],
+    words: [`hooks`, `learn`],
     help: `Resources for Learning React`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -616,7 +616,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!nw`, `!notworking`],
+    words: [`nw`, `notworking`],
     help: `gives some tips on how to improve your chances at getting an answer`,
     category: "Communication",
     handleMessage: (msg) => {
@@ -692,7 +692,7 @@ const createCommandsMessage = () => {
     const boldTitle = `**${category}**`;
     const commandDescriptions = commands
       .map((command) => {
-        const formattedWords = command.words.map((word) => `**\`${word}\`**`);
+        const formattedWords = command.words.map((word) => `**\`!${word}\`**`);
         return `${formattedWords.join(", ")}: ${command.help}`;
       })
       .join("\n");
@@ -715,7 +715,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        return msg.content.toLowerCase().includes(`!${word}`);
       });
 
       if (keyword) {
@@ -729,8 +729,8 @@ const commands: ChannelHandlers = {
       }
     });
 
-    const everyoneUsed = ["@here", "@everyone"].find((word) => {
-      return msg.content.toLowerCase().includes(word);
+    const everyoneUsed = ["here", "everyone"].find((word) => {
+      return msg.content.toLowerCase().includes(`@${word}`);
     });
 
     if (everyoneUsed) {
