@@ -20,6 +20,7 @@ import autodelete from "./features/autodelete-spam";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
+import { CHANNELS } from "./constants";
 
 export const bot = new discord.Client({
   intents: [
@@ -77,11 +78,27 @@ export type ChannelHandlersById = {
 
 const channelHandlersById: ChannelHandlersById = {};
 
-const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
-  channelHandlersById[channelId] = [
-    ...(channelHandlersById[channelId] || []),
-    channelHandlers,
-  ];
+const addHandler = (
+  oneOrMoreChannels: string | string[],
+  oneOrMoreHandlers: ChannelHandlers | ChannelHandlers[],
+) => {
+  const channels =
+    typeof oneOrMoreChannels === "string"
+      ? [oneOrMoreChannels]
+      : oneOrMoreChannels;
+  const handlers =
+    oneOrMoreHandlers instanceof Array
+      ? oneOrMoreHandlers
+      : [oneOrMoreHandlers];
+
+  channels.forEach((channelId) => {
+    const existingHandlers = channelHandlersById[channelId];
+    if (existingHandlers) {
+      existingHandlers.push(...handlers);
+    } else {
+      channelHandlersById[channelId] = handlers;
+    }
+  });
 };
 
 const handleMessage = async (message: Message) => {
@@ -129,15 +146,16 @@ if (process.env.BOT_LOG) {
 setupStats(bot);
 
 // reactiflux
-addHandler("103882387330457600", jobs);
+addHandler(CHANNELS.jobBoard, jobs);
 
 // common
-addHandler("*", commands);
-// addHandler('*', codeblock);
-addHandler("*", autoban);
-addHandler("*", emojiMod);
-addHandler("*", autodelete);
-addHandler("*", tsPlaygroundLinkShortener);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  autodelete,
+  tsPlaygroundLinkShortener,
+]);
 
 bot.on("messageReactionAdd", handleReaction);
 
