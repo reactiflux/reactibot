@@ -1,5 +1,5 @@
-import { format } from "date-fns";
-import { Message, PartialMessage } from "discord.js";
+import { differenceInHours, format } from "date-fns";
+import { Client, Message, PartialMessage } from "discord.js";
 import { constructDiscordLink } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
@@ -85,3 +85,41 @@ const autoThread: ChannelHandlers = {
   },
 };
 export default autoThread;
+
+export const cleanupThreads = async (channelIds: string[], bot: Client) => {
+  channelIds.forEach(async (id) => {
+    const channel = await bot.channels.fetch(id);
+    if (!channel?.isText()) return;
+
+    const now = new Date();
+
+    const messages = await channel.messages.fetch({ limit: 100 });
+    messages.forEach(async (m) => {
+      // Since this is a thread-only channel, all messages should have threads
+      if (!m.hasThread) return;
+
+      const thread = await bot.channels.fetch(m.id);
+      // Skip anything already archived
+      if (!thread?.isThread() || thread.archived) return;
+
+      const [tempCollection, starter] = await Promise.all([
+        thread.messages.fetch({ limit: 1 }),
+        thread.fetchStarterMessage(),
+      ]);
+      const mostRecent = tempCollection.at(0);
+
+      // If the thread has no messages, check time for initial message
+      const toCompare = mostRecent || starter;
+
+      if (differenceInHours(now, toCompare.createdAt) >= 6) {
+        lockWithReply({
+          content:
+            "This thread hasn’t had any activity in 6 hours, so it’s now locked.",
+          message: toCompare,
+          starter,
+          shouldReply: false,
+        });
+      }
+    });
+  });
+};

@@ -17,12 +17,13 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
-import autothread from "./features/autothread";
+import autothread, { cleanupThreads } from "./features/autothread";
 
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS } from "./constants";
+import { scheduleTask } from "./helpers/schedule";
 
 export const bot = new discord.Client({
   intents: [
@@ -163,7 +164,14 @@ addHandler("*", [
   tsPlaygroundLinkShortener,
 ]);
 
-addHandler([CHANNELS.helpJs, CHANNELS.helpThreadsReact], autothread);
+const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
+
+addHandler(threadChannels, autothread);
+bot.on("ready", () => {
+  scheduleTask(1000 * 60 * 30, () => {
+    cleanupThreads(threadChannels, bot);
+  });
+});
 
 bot.on("messageReactionAdd", handleReaction);
 
