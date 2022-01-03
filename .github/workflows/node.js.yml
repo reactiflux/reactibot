@@ -26,7 +26,32 @@ jobs:
         uses: actions/checkout@v1
         with:
           ref: ${{ github.ref }}
-      - name: Push to server
+      - name: Update server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          envs: GITHUB_HEAD_REF
+          script: |
+            cd reactibot
+            sudo git config --global url."https://".insteadOf git://
+            sudo git config --global url."https://github.com/".insteadOf git@github.com
+            sudo git checkout $GITHUB_HEAD_REF
+            sudo git pull
+      - name: Build image server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd reactibot
+            sudo docker container stop $(sudo docker container ls -aq)
+            sudo docker container rm $(sudo docker container ls -aq)
+            sudo docker image prune -f
+            sudo docker build -t reactiflux/reactibot:latest .
+      - name: Start server
         uses: appleboy/ssh-action@master
         env:
           AMPLITUDE_KEY: ${{ secrets.AMPLITUDE_KEY }}
@@ -39,13 +64,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_HEAD_REF,BOT_LOG
           script: |
-            cd reactibot
-            sudo git config --global url."https://".insteadOf git://
-            sudo git config --global url."https://github.com/".insteadOf git@github.com
-            sudo git checkout $GITHUB_HEAD_REF
-            sudo git pull
-            sudo docker container stop $(sudo docker container ls -aq)
-            sudo docker container rm $(sudo docker container ls -aq)
-            sudo docker image prune -f
-            sudo docker build -t reactiflux/reactibot:latest .
             sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH -e BOT_LOG=$BOT_LOG reactiflux/reactibot:latest
