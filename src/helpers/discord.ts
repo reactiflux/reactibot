@@ -1,4 +1,4 @@
-import { Message, GuildMember } from "discord.js";
+import { Message, GuildMember, PartialMessage } from "discord.js";
 import { staffRoles } from "../constants";
 
 export const isStaff = (member: GuildMember | null | undefined) => {
@@ -9,5 +9,5 @@ export const isStaff = (member: GuildMember | null | undefined) => {
   );
 };
 
-export const constructDiscordLink = (message: Message) =>
+export const constructDiscordLink = (message: Message | PartialMessage) =>
   `https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`;

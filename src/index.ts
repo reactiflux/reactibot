@@ -17,10 +17,13 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
+import autothread, { cleanupThreads } from "./features/autothread";
+
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS } from "./constants";
+import { scheduleTask } from "./helpers/schedule";
 
 export const bot = new discord.Client({
   intents: [
@@ -123,7 +126,11 @@ const handleReaction = (
   reaction: MessageReaction | PartialMessageReaction,
   user: User | PartialUser,
 ) => {
-  const channelId = reaction.message.channel.id;
+  // if reaction is in a thread, use the parent channel ID
+  const { channel } = reaction.message;
+  const channelId = channel.isThread()
+    ? channel.parentId || channel.id
+    : channel.id;
   const handlers = channelHandlersById[channelId];
 
   if (handlers) {
@@ -156,6 +163,15 @@ addHandler("*", [
   autodelete,
   tsPlaygroundLinkShortener,
 ]);
+
+const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
+
+addHandler(threadChannels, autothread);
+bot.on("ready", () => {
+  scheduleTask(1000 * 60 * 30, () => {
+    cleanupThreads(threadChannels, bot);
+  });
+});
 
 bot.on("messageReactionAdd", handleReaction);
 
