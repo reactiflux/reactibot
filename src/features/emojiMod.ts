@@ -8,7 +8,8 @@ import {
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { CHANNELS, ReportReasons } from "../constants";
-import { constructLog, simplifyString } from "../helpers/modLog";
+import { constructLog } from "../helpers/modLog";
+import { simplifyString } from "../helpers/string";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
