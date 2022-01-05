@@ -25,7 +25,7 @@ const lockWithReply = ({
 
   const content = `${msg}
 
-If you have a a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
+If you have a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
     starter,
   )}
 
