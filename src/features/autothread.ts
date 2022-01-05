@@ -5,6 +5,7 @@ import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
 
 const CHECKS = ["☑️", "✔️", "✅"];
+const IDLE_TIMEOUT = 12;
 
 const lockWithReply = ({
   content: msg,
@@ -24,11 +25,11 @@ const lockWithReply = ({
 
   const content = `${msg}
 
-If you have a a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
+If you have a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
     starter,
   )}
 
-Threads are closed automatically after 6 hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`;
+Threads are closed automatically after ${IDLE_TIMEOUT} hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`;
 
   (shouldReply
     ? message.reply({ content, allowedMentions: { repliedUser: false } })
@@ -111,10 +112,9 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
       // If the thread has no messages, check time for initial message
       const toCompare = mostRecent || starter;
 
-      if (differenceInHours(now, toCompare.createdAt) >= 6) {
+      if (differenceInHours(now, toCompare.createdAt) >= IDLE_TIMEOUT) {
         lockWithReply({
-          content:
-            "This thread hasn’t had any activity in 6 hours, so it’s now locked.",
+          content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.`,
           message: toCompare,
           starter,
           shouldReply: false,
