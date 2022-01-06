@@ -670,7 +670,7 @@ Instead:
     },
   },
   {
-    words: ["!block"],
+    words: ["!lock"],
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
@@ -695,7 +695,7 @@ Instead:
     },
   },
   {
-    words: ["!unblock"],
+    words: ["!unlock"],
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
