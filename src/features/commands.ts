@@ -308,74 +308,74 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       });
     },
   },
-  {
-    words: [`move`],
-    help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
-    category: "Reactiflux",
-    handleMessage: (msg) => {
-      const [, newChannel] = msg.content.split(" ");
+  // {
+  //   words: [`move`],
+  //   help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
+  //   category: "Reactiflux",
+  //   handleMessage: (msg) => {
+  //     const [, newChannel] = msg.content.split(" ");
 
-      try {
-        const targetChannel = msg.guild?.channels.cache.get(
-          newChannel.replace("<#", "").replace(">", ""),
-        ) as TextChannel;
+  //     try {
+  //       const targetChannel = msg.guild?.channels.cache.get(
+  //         newChannel.replace("<#", "").replace(">", ""),
+  //       ) as TextChannel;
 
-        if (!msg.mentions.members) return;
+  //       if (!msg.mentions.members) return;
 
-        targetChannel.send(
-          `${msg.author} has opened a portal from ${
-            msg.channel
-          } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
-        );
-      } catch (e) {
-        console.log("Something went wrong when summoning a portal: ", e);
-      }
-    },
-  },
-  {
-    words: [`mdn`],
-    help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
-    category: "Web",
-    handleMessage: async (msg) => {
-      const [, ...args] = msg.content.split(" ");
-      const query = args.join(" ");
-      const [fetchMsg, res] = await Promise.all([
-        msg.channel.send(`Fetching "${query}"...`),
-        fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
-        ),
-      ]);
+  //       targetChannel.send(
+  //         `${msg.author} has opened a portal from ${
+  //           msg.channel
+  //         } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
+  //       );
+  //     } catch (e) {
+  //       console.log("Something went wrong when summoning a portal: ", e);
+  //     }
+  //   },
+  // },
+  // {
+  //   words: [`mdn`],
+  //   help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
+  //   category: "Web",
+  //   handleMessage: async (msg) => {
+  //     const [, ...args] = msg.content.split(" ");
+  //     const query = args.join(" ");
+  //     const [fetchMsg, res] = await Promise.all([
+  //       msg.channel.send(`Fetching "${query}"...`),
+  //       fetch(
+  //         `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
+  //       ),
+  //     ]);
 
-      const { documents } = await res.json();
-      const [topResult] = documents;
+  //     const { documents } = await res.json();
+  //     const [topResult] = documents;
 
-      if (!topResult) {
-        fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
-        return;
-      }
+  //     if (!topResult) {
+  //       fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
+  //       return;
+  //     }
 
-      const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
+  //     const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
 
-      await msg.channel.send({
-        embeds: [
-          {
-            author: {
-              name: "MDN",
-              url: "https://developer.mozilla.org",
-              icon_url:
-                "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
-            },
-            title,
-            description,
-            color: 0x83d0f2,
-            url: `https://developer.mozilla.org${mdnUrl}`,
-          },
-        ],
-      });
+  //     await msg.channel?.send({
+  //       embeds: [
+  //         {
+  //           author: {
+  //             name: "MDN",
+  //             url: "https://developer.mozilla.org",
+  //             icon_url:
+  //               "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
+  //           },
+  //           title,
+  //           description,
+  //           color: 0x83d0f2,
+  //           url: `https://developer.mozilla.org${mdnUrl}`,
+  //         },
+  //       ],
+  //     });
 
-      fetchMsg.delete();
-    },
-  },
+  //     fetchMsg.delete();
+  //   },
+  // },
   {
     words: [`appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
