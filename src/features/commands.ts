@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { isStaff } from "../helpers/discord";
+import { isStaff, isStaffAdmin } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
@@ -667,6 +667,56 @@ Instead:
       await msg.delete();
       await sleep(120);
       await tsk.delete();
+    },
+  },
+  {
+    words: ["!block"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild) {
+        return;
+      }
+
+      if (!isStaffAdmin(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: false,
+          },
+        );
+      }
+    },
+  },
+  {
+    words: ["!unblock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild) {
+        return;
+      }
+
+      if (!isStaffAdmin(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: null, // null will inherit the permission from the parent channel category
+          },
+        );
+      }
     },
   },
 ];

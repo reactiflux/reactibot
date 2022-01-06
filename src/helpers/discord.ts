@@ -9,5 +9,11 @@ export const isStaff = (member: GuildMember | null | undefined) => {
   );
 };
 
+export const isStaffAdmin = (member: GuildMember | null | undefined) => {
+  if (!member) return false;
+
+  return member.permissions.has("ADMINISTRATOR");
+};
+
 export const constructDiscordLink = (message: Message | PartialMessage) =>
   `https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`;
