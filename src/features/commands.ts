@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import fetch from "node-fetch";
-import { Message, TextChannel } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
@@ -14,7 +13,7 @@ type Command = {
   words: string[];
   help: string;
   category: Categories;
-  handleMessage: (msg: Message) => void;
+  handleMessage: (msg: Message | CommandInteraction) => void;
   cooldown?: number;
 };
 
@@ -25,7 +24,7 @@ const sortedCategories: Categories[] = [
   "React/Redux",
 ];
 
-const commandsList: Command[] = [
+export const commandsList: Command[] = [
   {
     words: [`commands`],
     help: `lists all available commands`,
@@ -50,7 +49,7 @@ const commandsList: Command[] = [
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Helpful links",
@@ -67,7 +66,7 @@ const commandsList: Command[] = [
     help: `explains the XY problem`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "The XY Issue",
@@ -84,7 +83,7 @@ const commandsList: Command[] = [
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "You Might Not Need Redux",
@@ -103,7 +102,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
     help: `Links to the React docs advice to avoid copying props to state`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title:
@@ -123,7 +122,7 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     help: `Explains the implications involved with state updates being asynchronous`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "State Updates May Be Asynchronous",
@@ -152,7 +151,7 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
     help: `explains how and why to bind in React applications`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Binding functions",
@@ -197,7 +196,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
     help: `links to the React docs regarding the common need to "lift" state`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Lifting State Up",
@@ -217,7 +216,7 @@ https://reactjs.org/docs/lifting-state-up.html`,
     help: `explains how to ask questions`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Asking to ask",
@@ -249,7 +248,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
     help: `explains how to attach code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Attaching Code",
@@ -275,7 +274,7 @@ Link a Snack to share React Native examples: https://snack.expo.io
     help: `explains how to ping politely`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Don’t ping or DM other devs you aren’t actively talking to",
@@ -294,7 +293,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
     help: `provides links to uncontrolled vs controlled components`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Uncontrolled vs Controlled components",
@@ -381,7 +380,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
     category: "Web",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Florinpop17s Curated App Ideas!",
@@ -401,7 +400,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `provides a link to what CORS is and how to fix it`,
     category: "Web",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Understanding CORS",
@@ -425,7 +424,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `provides resources for helping with immutability`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Immutable updates",
@@ -447,7 +446,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `Info and when and why to use Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "When should you use Redux?",
@@ -472,7 +471,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `Differences between Redux and Context`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "What are the differences between Redux and Context?",
@@ -501,7 +500,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `Explanation of how React rendering behavior works`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "How does React rendering behavior work?",
@@ -528,7 +527,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `describes Prettier and explains how to use it to format code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Formatting code with Prettier",
@@ -551,7 +550,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     help: `reminds users to use gender-neutral language`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Please use gender neutral language by default",
@@ -572,7 +571,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     help: `Resources and tips for using React + TypeScript together`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Resources for React + TypeScript",
@@ -598,7 +597,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     help: `Resources for Learning React`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Learning React",
@@ -620,7 +619,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     help: `gives some tips on how to improve your chances at getting an answer`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "State your problem",
@@ -639,7 +638,7 @@ Instead:
   },
 ];
 
-const handleEveryone: Command["handleMessage"] = async (msg) => {
+const handleEveryone = async (msg: Message) => {
   if (!msg.guild) {
     return;
   }
