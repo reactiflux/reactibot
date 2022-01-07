@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "ts-node-dev -r dotenv/config src/index.ts",
     "build": "tsc",
     "test": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
@@ -18,7 +18,7 @@
   "dependencies": {
     "date-fns": "^2.27.0",
     "discord.js": "^13.5.0",
-    "dotenv": "^6.1.0",
+    "dotenv": "^10.0.0",
     "gists": "^2.0.0",
     "node-fetch": "^2.2.0",
     "query-string": "^6.2.0"
