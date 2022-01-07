@@ -20,8 +20,7 @@ const autodelete: ChannelHandlers = {
       .some((word) => spamKeywords.includes(word.toLowerCase()));
 
     if (msgHasPingKeywords && msgHasSpamKeywords) {
-      await msg.react("⚠️");
-      await msg.delete();
+      await msg.react("💩");
     }
   },
 };

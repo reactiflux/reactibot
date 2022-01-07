@@ -112,6 +112,42 @@ Thanks!
       console.log("Something went wrong when fetching the message: ", error);
     }
   },
+  "💩": async (reaction, message) => {
+    // Skip if the post is from someone from the staff
+    const { guild, author } = message;
+    if (!guild || !author || isStaff(await guild.members.fetch(author.id))) {
+      return;
+    }
+    console.log(0);
+
+    const usersWhoReacted = await Promise.all(
+      reaction.users.cache.map((user) => message.guild?.members.fetch(user.id)),
+    );
+
+    const modLogChannel = guild.channels.cache.find(
+      (channel) =>
+        channel.name === "mod-log" || channel.id === "257930126145224704",
+    ) as TextChannel;
+
+    const staff = usersWhoReacted
+      .filter(isStaff)
+      .map((member) => member?.user.username || "X");
+
+    try {
+      const fullMessage = await message.fetch();
+
+      fullMessage.delete();
+
+      handleReport(
+        ReportReasons.spam,
+        modLogChannel,
+        fullMessage,
+        constructLog(ReportReasons.spam, [], staff, fullMessage),
+      );
+    } catch (error) {
+      console.log("Something went wrong when fetching the message: ", error);
+    }
+  },
   "👎": async (reaction, message, member) => {
     if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
       return;

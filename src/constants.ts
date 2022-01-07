@@ -14,4 +14,5 @@ export const enum ReportReasons {
   userWarn = "userWarn",
   userDelete = "userDelete",
   mod = "mod",
+  spam = "spam",
 }

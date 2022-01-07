@@ -62,6 +62,11 @@ ${postfix}`;
 \`${reportedMessage}\`
 
 ${postfix}`;
+    case ReportReasons.spam:
+      return `${preface}, reported for spam:
 
+\`${reportedMessage}\`
+
+${postfix}`;
   }
 };

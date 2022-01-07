@@ -653,7 +653,7 @@ Instead:
         return;
       }
 
-      await msg.react("⚠️");
+      await msg.react("💩");
 
       const tsk = await msg.reply({
         embeds: [
