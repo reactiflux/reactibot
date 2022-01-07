@@ -33,38 +33,35 @@ export const constructLog = (
   message: Message,
 ) => {
   const modAlert = `<@${modRoleId}>`;
-  const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times:`;
+  const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
+  const postfix = `Link: ${constructDiscordLink(message)}
+
+${members.length && `Reactors: ${members.join(", ")}`}
+${staff.length && `Staff: ${staff.join(", ")}`}
+`;
   const reportedMessage = truncateMessage(message.content);
-  const link = constructDiscordLink(message);
 
   switch (trigger) {
     case ReportReasons.mod:
-      return `${preface}
+      return `${preface}:
 
-${reportedMessage}
+\`${reportedMessage}\`
 
-Link: ${link}`;
+${postfix}`;
 
     case ReportReasons.userWarn:
-      return `${modAlert} – ${preface} met the warning threshold for the message:
+      return `${modAlert} – ${preface}, met the warning threshold for the message:
 
 \`${reportedMessage}\`
 
-Link: ${link}
-
-${members && `Reactors: ${members.join(", ")}`}
-${staff && `Staff: ${staff.join(", ")}`}
-`;
+${postfix}`;
 
     case ReportReasons.userDelete:
-      return `${modAlert} – ${preface} met the deletion threshold for the message:
+      return `${modAlert} – ${preface}, met the deletion threshold for the message:
 
 \`${reportedMessage}\`
 
-Link: ${link}
+${postfix}`;
 
-${members && `Reactors: ${members.join(", ")}`}
-${staff && `Staff: ${staff.join(", ")}`}
-`;
   }
 };
