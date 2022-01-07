@@ -12,6 +12,7 @@ import { constructLog, simplifyString } from "../helpers/modLog";
 import { isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
+const AUTOBAN_SPAM_THRESHOLD = 5;
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
@@ -64,6 +65,17 @@ const handleReport = (
 
     message.edit(finalLog);
     warningMessages.set(simplifiedContent, { warnings, message });
+
+    if (warnings >= AUTOBAN_SPAM_THRESHOLD) {
+      reportedMessage.guild?.members
+        .fetch(reportedMessage.author.id)
+        .then((member) => {
+          member.ban({ reason: "Autobanned for spamming" });
+          channelInstance.send(
+            `Automatically banned <@${reportedMessage.author.id}> for spam`,
+          );
+        });
+    }
   } else {
     // If this is new, send a new message
     channelInstance.send(logBody).then((warningMessage) => {
