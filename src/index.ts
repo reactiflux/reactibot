@@ -1,4 +1,4 @@
-require("dotenv").config();
+import config from "dotenv";
 
 import discord, {
   Message,
@@ -24,6 +24,8 @@ import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS } from "./constants";
 import { scheduleTask } from "./helpers/schedule";
+
+config();
 
 export const bot = new discord.Client({
   intents: [
