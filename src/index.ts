@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import discord, {
   Message,
   MessageReaction,
