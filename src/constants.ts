@@ -8,6 +8,7 @@ export const enum CHANNELS {
   "helpJs" = "565213527673929729",
   "random" = "103325358643752960",
   "jobBoard" = "103882387330457600",
+  "modLog" = "257930126145224704",
 }
 
 export const enum ReportReasons {

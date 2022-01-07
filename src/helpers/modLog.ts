@@ -36,8 +36,8 @@ export const constructLog = (
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
   const postfix = `Link: ${constructDiscordLink(message)}
 
-${members.length && `Reactors: ${members.join(", ")}`}
-${staff.length && `Staff: ${staff.join(", ")}`}
+${members.length ? `Reactors: ${members.join(", ")}` : ""}
+${staff.length ? `Staff: ${staff.join(", ")}` : ""}
 `;
   const reportedMessage = truncateMessage(message.content);
 
