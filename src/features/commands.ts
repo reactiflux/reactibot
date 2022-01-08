@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { isStaff, isStaffAdmin } from "../helpers/discord";
+import { isStaff } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
@@ -674,11 +674,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild) {
-        return;
-      }
-
-      if (!isStaffAdmin(msg.member)) {
+      if (!msg.guild || isStaff(msg.member)) {
         return;
       }
 
@@ -699,11 +695,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild) {
-        return;
-      }
-
-      if (!isStaffAdmin(msg.member)) {
+      if (!msg.guild || !isStaff(msg.member)) {
         return;
       }
 
