@@ -669,6 +669,48 @@ Instead:
       await tsk.delete();
     },
   },
+  {
+    words: ["!lock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: false,
+          },
+        );
+      }
+    },
+  },
+  {
+    words: ["!unlock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: null, // null will inherit the permission from the parent channel category
+          },
+        );
+      }
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
