@@ -674,19 +674,20 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild || isStaff(msg.member)) {
+      if (!msg.guild || !isStaff(msg.member)) {
         return;
       }
 
       // permission overwrites can only be applied on Guild Text Channels
       if (msg.channel.type === "GUILD_TEXT") {
         const { channel: guildTextChannel } = msg;
-        guildTextChannel.permissionOverwrites.create(
+        await guildTextChannel.permissionOverwrites.create(
           guildTextChannel.guild.roles.everyone,
           {
             SEND_MESSAGES: false,
           },
         );
+        guildTextChannel.send("This channel has been locked by a moderator");
       }
     },
   },
