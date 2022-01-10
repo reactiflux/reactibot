@@ -12,7 +12,7 @@ import { constructLog, simplifyString } from "../helpers/modLog";
 import { isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
-const AUTOBAN_SPAM_THRESHOLD = 5;
+const AUTO_SPAM_THRESHOLD = 5;
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
@@ -145,11 +145,11 @@ Thanks!
       ),
     );
 
-    if (warnings >= AUTOBAN_SPAM_THRESHOLD) {
+    if (warnings >= AUTO_SPAM_THRESHOLD) {
       guild.members.fetch(message.author.id).then((member) => {
-        member.ban({ reason: "Autobanned for spamming" });
+        member.kick("Autokicked for spamming");
         logChannel.send(
-          `Automatically banned <@${message.author.id}> for spam`,
+          `Automatically kicked <@${message.author.id}> for spam`,
         );
       });
     }
