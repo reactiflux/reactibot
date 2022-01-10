@@ -59,7 +59,7 @@ const handleReport = (
 
     let finalLog = logBody;
     // If this was a mod report, increment the warning count
-    if (reason === ReportReasons.mod) {
+    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
       finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
     }
 
