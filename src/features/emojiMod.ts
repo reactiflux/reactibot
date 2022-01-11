@@ -12,7 +12,7 @@ import { constructLog, simplifyString } from "../helpers/modLog";
 import { isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
-const AUTOBAN_SPAM_THRESHOLD = 5;
+const AUTO_SPAM_THRESHOLD = 5;
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
@@ -59,23 +59,13 @@ const handleReport = (
 
     let finalLog = logBody;
     // If this was a mod report, increment the warning count
-    if (reason === ReportReasons.mod) {
+    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
       finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
     }
 
     message.edit(finalLog);
     warningMessages.set(simplifiedContent, { warnings, message });
-
-    if (warnings >= AUTOBAN_SPAM_THRESHOLD) {
-      reportedMessage.guild?.members
-        .fetch(reportedMessage.author.id)
-        .then((member) => {
-          member.ban({ reason: "Autobanned for spamming" });
-          channelInstance.send(
-            `Automatically banned <@${reportedMessage.author.id}> for spam`,
-          );
-        });
-    }
+    return warnings;
   } else {
     // If this is new, send a new message
     channelInstance.send(logBody).then((warningMessage) => {
@@ -84,21 +74,21 @@ const handleReport = (
         message: warningMessage,
       });
     });
+    return 1;
   }
 };
 
 const reactionHandlers: ReactionHandlers = {
   "⚠️": async ({
-    reaction,
-    message,
-    reactor,
     author,
-    logChannel,
+    reactor,
+    message,
+    reaction,
     usersWhoReacted,
+    logChannel,
   }) => {
     // Skip if the post is from someone from the staff
-    const { guild } = message;
-    if (!guild || !author || isStaff(author)) {
+    if (isStaff(author)) {
       return;
     }
     // If the user that reacted isn't in the staff, remove the reaction, send a
@@ -127,7 +117,14 @@ Thanks!
       constructLog(ReportReasons.mod, [], staff, message),
     );
   },
-  "💩": async ({ usersWhoReacted, message, reactor, logChannel, author }) => {
+  "💩": async ({
+    guild,
+    author,
+    reactor,
+    message,
+    usersWhoReacted,
+    logChannel,
+  }) => {
     // Skip if the post is from someone from the staff or reactor is not staff
     if (isStaff(author) || !isStaff(reactor)) {
       return;
@@ -136,7 +133,7 @@ Thanks!
     const [members, staff] = partition(isStaff, usersWhoReacted);
 
     message.delete();
-    handleReport(
+    const warnings = handleReport(
       ReportReasons.spam,
       logChannel,
       message,
@@ -147,9 +144,18 @@ Thanks!
         message,
       ),
     );
+
+    if (warnings >= AUTO_SPAM_THRESHOLD) {
+      guild.members.fetch(message.author.id).then((member) => {
+        member.kick("Autokicked for spamming");
+        logChannel.send(
+          `Automatically kicked <@${message.author.id}> for spam`,
+        );
+      });
+    }
   },
-  "👎": async ({ usersWhoReacted, message, reactor, logChannel }) => {
-    if (!message.guild || cooldown.hasCooldown(reactor.id, "thumbsdown")) {
+  "👎": async ({ message, reactor, usersWhoReacted, logChannel }) => {
+    if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
       return;
     }
 
@@ -217,17 +223,17 @@ const emojiMod: ChannelHandlers = {
 
     reactionHandlers[emoji]?.({
       guild,
+      author: authorMember,
+      reactor,
+      message: fullMessage,
+      reaction: fullReaction,
+      usersWhoReacted: usersWhoReacted.filter((x): x is GuildMember =>
+        Boolean(x),
+      ),
       logChannel: guild.channels.cache.find(
         (channel) =>
           channel.name === "mod-log" || channel.id === CHANNELS.modLog,
       ) as TextChannel,
-      reaction: fullReaction,
-      message: fullMessage,
-      reactor,
-      author: authorMember,
-      usersWhoReacted: usersWhoReacted.filter((x): x is GuildMember =>
-        Boolean(x),
-      ),
     });
   },
 };
