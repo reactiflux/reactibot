@@ -60,9 +60,14 @@ const autoThread: ChannelHandlers = {
         return;
       }
     }
-    msg.startThread({
+    const newThread = await msg.startThread({
       name: `${msg.author.username} – ${format(new Date(), "HH-mm MMM d")}`,
     });
+    const message = await newThread.send(
+      "React to someone with ✅ to mark their response as the accepted answer and close this thread",
+    );
+    await sleep(30);
+    message.delete();
   },
   handleReaction: async ({ reaction }) => {
     if (!CHECKS.includes(reaction.emoji.toString())) {
