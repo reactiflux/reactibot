@@ -47,14 +47,19 @@ const stats = (client: Client) => {
     emitEvent(EVENTS.memberLeft);
   });
 
-  client.on("messageCreate", (msg) => {
+  client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 
     if (!channel || !author || author.id === client.user?.id) return;
 
+    const channelId =
+      channel.isThread() && channel.parent
+        ? (await channel.parent.fetch()).id
+        : channel.id;
+
     emitEvent(EVENTS.message, {
       data: {
-        channel: channel.id,
+        channel: channelId,
         messageLength: content?.length ?? 0,
         roles: member
           ? [...member.roles.cache.values()]
