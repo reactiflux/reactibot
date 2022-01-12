@@ -1,5 +1,6 @@
 import { differenceInHours, format } from "date-fns";
 import { Client, Message, PartialMessage } from "discord.js";
+import { CHANNELS } from "../constants";
 import { constructDiscordLink } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
@@ -64,7 +65,7 @@ const autoThread: ChannelHandlers = {
       name: `${msg.author.username} – ${format(new Date(), "HH-mm MMM d")}`,
     });
     const message = await newThread.send(
-      "React to someone with ✅ to mark their response as the accepted answer and close this thread",
+      `React to someone with ✅ to mark their response as the accepted answer and close this thread. If someone has been really helpful, give them a shoutout in <#${CHANNELS.thanks}>!`,
     );
     await sleep(30);
     message.delete();
