@@ -9,39 +9,6 @@ import { threadStats } from "../features/stats";
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 12;
 
-const lockWithReply = ({
-  content: msg,
-  message,
-  starter,
-  shouldReply,
-}: {
-  content: string;
-  message: Message | PartialMessage;
-  starter: Message | PartialMessage;
-  shouldReply: boolean;
-}) => {
-  const { channel: thread } = message;
-  if (!thread.isThread()) {
-    return;
-  }
-
-  const content = `${msg}
-
-If you have a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
-    starter,
-  )}
-
-Threads are closed automatically after ${IDLE_TIMEOUT} hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`;
-
-  (shouldReply
-    ? message.reply({ content, allowedMentions: { repliedUser: false } })
-    : thread.send(content)
-  ).then(() => {
-    thread.setLocked(true);
-    thread.setArchived(true);
-  });
-};
-
 const autoThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     const msg = maybeMessage.partial
@@ -89,11 +56,13 @@ const autoThread: ChannelHandlers = {
     // If the reaction was sent by the original thread author, lock the thread
     if (starter && reaction.users.cache.has(starter.author.id)) {
       threadStats.threadResolved(starter.channelId, author.id ?? "unknown");
-      lockWithReply({
-        content: `This question has an answer! Thank you for helping 😄`,
-        message: reaction.message,
-        starter,
-        shouldReply: true,
+      reaction.message.reply({
+        allowedMentions: { repliedUser: false },
+        content: `This question has an answer! Thank you for helping 😄
+
+If you have a followup question, you may want to reply to this thread so other members know they're related. ${constructDiscordLink(
+          starter,
+        )}`,
       });
     }
   },
@@ -127,12 +96,16 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
 
       if (differenceInHours(now, toCompare.createdAt) >= IDLE_TIMEOUT) {
         threadStats.threadTimeout(starter.channelId);
-        lockWithReply({
-          content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.`,
-          message: toCompare,
-          starter,
-          shouldReply: false,
-        });
+        thread
+          .send({
+            content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.
+
+Threads are closed automatically after ${IDLE_TIMEOUT} hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`,
+          })
+          .then(() => {
+            thread.setLocked(true);
+            thread.setArchived(true);
+          });
       }
     });
   });
