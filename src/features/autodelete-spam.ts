@@ -21,7 +21,12 @@ const autodelete: ChannelHandlers = {
 
     const msgHasLink = msg.content.includes("http");
 
-    if (msgHasPingKeywords + msgHasSpamKeywords + msgHasLink >= 2) {
+    if (
+      Number(msgHasPingKeywords) +
+        Number(msgHasSpamKeywords) +
+        Number(msgHasLink) >=
+      2
+    ) {
       await msg.react("💩");
     }
   },
