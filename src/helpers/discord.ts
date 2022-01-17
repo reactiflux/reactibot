@@ -6,14 +6,27 @@ import {
   MessageReaction,
   PartialMessageReaction,
 } from "discord.js";
-import { staffRoles } from "../constants";
+
+const staffRoles = ["mvp", "moderator", "admin", "admins"];
+const helpfulRoles = ["mvp", "star helper"];
+
+const hasRole = (member: GuildMember, roles: string | string[]) =>
+  member.roles.cache.some((role) => {
+    const normalizedRole = role.name.toLowerCase();
+    return typeof roles === "string"
+      ? roles === normalizedRole
+      : roles.includes(normalizedRole);
+  });
 
 export const isStaff = (member: GuildMember | null | undefined) => {
   if (!member) return false;
 
-  return member.roles.cache.some((role) =>
-    staffRoles.includes(role.name.toLowerCase()),
-  );
+  return hasRole(member, staffRoles);
+};
+export const isHelpful = (member: GuildMember | null | undefined) => {
+  if (!member) return false;
+
+  return hasRole(member, helpfulRoles);
 };
 
 export const constructDiscordLink = (message: Message | PartialMessage) =>

@@ -1,13 +1,19 @@
 import { differenceInHours, format } from "date-fns";
 import { Client, Message, PartialMessage } from "discord.js";
 import { CHANNELS } from "../constants";
-import { constructDiscordLink } from "../helpers/discord";
+import {
+  constructDiscordLink,
+  fetchReactionMembers,
+  isHelpful,
+  isStaff,
+} from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
 
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 12;
+const STAFF_ACCEPT_THRESHOLD = 2;
 
 const autoThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -48,14 +54,29 @@ const autoThread: ChannelHandlers = {
       return;
     }
 
-    const { channel: thread, author } = await reaction.message.fetch();
+    const { channel: thread, author, guild } = await reaction.message.fetch();
     const starter = thread.isThread()
       ? await thread.fetchStarterMessage()
       : undefined;
 
-    // If the reaction was sent by the original thread author, lock the thread
-    if (starter && reaction.users.cache.has(starter.author.id)) {
-      threadStats.threadResolved(starter.channelId, author.id ?? "unknown");
+    if (!starter || !guild) {
+      return;
+    }
+
+    const reactors = await fetchReactionMembers(guild, reaction);
+    const roledReactors = reactors.filter((r) => isStaff(r) || isHelpful(r));
+
+    // If the reaction was from the author or there are enough known people
+    // responding, mark that answer as the accepted one
+    if (
+      roledReactors.length >= STAFF_ACCEPT_THRESHOLD ||
+      reaction.users.cache.has(starter.author.id)
+    ) {
+      threadStats.threadResolved(
+        starter.channelId,
+        starter.author.id,
+        author.id,
+      );
       reaction.message.reply({
         allowedMentions: { repliedUser: false },
         content: `This question has an answer! Thank you for helping 😄

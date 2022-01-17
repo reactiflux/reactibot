@@ -44,8 +44,14 @@ export const threadStats = {
     emitEvent(threadReplyRemoved, { data: { channel } }),
   threadTimeout: (channel: string) =>
     emitEvent(threadTimeout, { data: { channel } }),
-  threadResolved: (channel: string, userId: string) =>
-    emitEvent(threadResolved, { data: { channel, userId } }),
+  threadResolved: (
+    channel: string,
+    threadAuthor: string,
+    answerAuthor: string,
+  ) =>
+    emitEvent(threadResolved, {
+      data: { channel, threadAuthor, answerAuthor },
+    }),
 };
 
 const stats = (client: Client) => {
