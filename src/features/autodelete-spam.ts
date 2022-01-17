@@ -3,6 +3,8 @@ import { isStaff } from "../helpers/discord";
 
 const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
 
+const atLeastTwo = (...bools: boolean[]) => bools.filter(Boolean).length >= 2;
+
 const autodelete: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (isStaff(maybeMessage.member)) return;
@@ -21,12 +23,7 @@ const autodelete: ChannelHandlers = {
 
     const msgHasLink = msg.content.includes("http");
 
-    if (
-      Number(msgHasPingKeywords) +
-        Number(msgHasSpamKeywords) +
-        Number(msgHasLink) >=
-      2
-    ) {
+    if (atLeastTwo(msgHasPingKeywords, msgHasSpamKeywords, msgHasLink)) {
       await msg.react("💩");
     }
   },
