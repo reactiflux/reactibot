@@ -9,7 +9,7 @@ import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { CHANNELS, ReportReasons } from "../constants";
 import { constructLog, simplifyString } from "../helpers/modLog";
-import { isStaff } from "../helpers/discord";
+import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
 const AUTO_SPAM_THRESHOLD = 5;
@@ -212,14 +212,14 @@ const emojiMod: ChannelHandlers = {
       return;
     }
 
-    const [fullReaction, fullMessage, reactor, authorMember, usersWhoReacted] =
+    const [fullReaction, fullMessage, reactor, authorMember] =
       await Promise.all([
         reaction.partial ? reaction.fetch() : reaction,
         message.partial ? message.fetch() : message,
         guild.members.fetch(user.id),
         guild.members.fetch(author.id),
-        Promise.all(users.cache.map((user) => guild.members.fetch(user.id))),
       ]);
+    const usersWhoReacted = await fetchReactionMembers(guild, fullReaction);
 
     reactionHandlers[emoji]?.({
       guild,
