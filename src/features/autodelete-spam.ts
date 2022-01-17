@@ -18,8 +18,10 @@ const autodelete: ChannelHandlers = {
     const msgHasSpamKeywords = msg.content
       .split(" ")
       .some((word) => spamKeywords.includes(word.toLowerCase()));
+    
+    const msgHasLink = msg.content.includes("http");
 
-    if (msgHasPingKeywords && msgHasSpamKeywords) {
+    if (msgHasPingKeywords + msgHasSpamKeywords + msgHasLink >= 2) {
       await msg.react("💩");
     }
   },
