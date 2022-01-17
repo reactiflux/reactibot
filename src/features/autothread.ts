@@ -121,12 +121,16 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
           .send({
             content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.
 
+Threads are closed automatically after ${IDLE_TIMEOUT} hours. If you have a followup question, you may want to reply to this thread so other members know they're related. ${constructDiscordLink(
+              starter,
+            )}
+
 ${
-  toCompare === starter
+  toCompare.content === ""
     ? `Question not getting answered? Maybe it's hard to answer, or maybe you asked at a slow time. Check out these resources for help asking a good question:
 
-https://stackoverflow.com/help/how-to-ask
-http://wp.me/p2oIwo-26`
+<https://stackoverflow.com/help/how-to-ask>
+<http://wp.me/p2oIwo-26>`
     : ""
 }`,
           })
