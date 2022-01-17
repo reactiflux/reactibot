@@ -1,7 +1,9 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 
-const spamKeywords = ["discord", "nitro", "steam", "free", "gift"];
+const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
+
+const atLeastTwo = (...bools: boolean[]) => bools.filter(Boolean).length >= 2;
 
 const autodelete: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -19,7 +21,9 @@ const autodelete: ChannelHandlers = {
       .split(" ")
       .some((word) => spamKeywords.includes(word.toLowerCase()));
 
-    if (msgHasPingKeywords && msgHasSpamKeywords) {
+    const msgHasLink = msg.content.includes("http");
+
+    if (atLeastTwo(msgHasPingKeywords, msgHasSpamKeywords, msgHasLink)) {
       await msg.react("💩");
     }
   },
