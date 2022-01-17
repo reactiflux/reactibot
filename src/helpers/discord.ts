@@ -36,4 +36,8 @@ export const fetchReactionMembers = (
   guild: Guild,
   reaction: MessageReaction | PartialMessageReaction,
 ) =>
-  Promise.all(reaction.users.cache.map((user) => guild.members.fetch(user.id)));
+  reaction.users
+    .fetch()
+    .then((users) =>
+      Promise.all(users.map((user) => guild.members.fetch(user.id))),
+    );
