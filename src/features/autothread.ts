@@ -100,7 +100,14 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
           .send({
             content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.
 
-Threads are closed automatically after ${IDLE_TIMEOUT} hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`,
+${
+  toCompare === starter
+    ? `Question not getting answered? Maybe it's hard to answer, or maybe you asked at a slow time. Check out these resources for help asking a good question:
+
+https://stackoverflow.com/help/how-to-ask
+http://wp.me/p2oIwo-26`
+    : ""
+}`,
           })
           .then(() => {
             thread.setLocked(true);
