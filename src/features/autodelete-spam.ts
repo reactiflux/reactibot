@@ -1,5 +1,6 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
+import { simplifyString } from "../helpers/modLog";
 
 const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];
 
@@ -18,11 +19,6 @@ const safeDomains = [
 const checkWords = (message: string, wordList: string[]) =>
   message.split(/\b/).some((word) => wordList.includes(word.toLowerCase()));
 
-const atLeast =
-  (count: number) =>
-  (...bools: boolean[]) =>
-    bools.filter(Boolean).length >= count;
-
 const autodelete: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (isStaff(maybeMessage.member)) return;
@@ -35,22 +31,27 @@ const autodelete: ChannelHandlers = {
       msg.content.includes(pingKeyword),
     );
 
-    const msgHasSpamKeywords = checkWords(msg.content, spamKeywords);
+    const content = simplifyString(msg.content);
+    const words = content.split(" ");
+    const msgSpamKeywords = words
+      .map((word) => spamKeywords.includes(word))
+      .filter(Boolean);
 
-    const msgHasNoSafeKeywords = !checkWords(msg.content, safeKeywords);
+    const msgHasSafeKeywords = checkWords(msg.content, safeKeywords);
 
     const msgHasLink =
       msg.content.includes("http") &&
       !safeDomains.some((domain) => msg.content.includes(domain));
 
-    if (
-      atLeast(3)(
-        msgHasPingKeywords,
-        msgHasSpamKeywords,
-        msgHasNoSafeKeywords,
-        msgHasLink,
-      )
-    ) {
+    const spamScore =
+      Number(msgHasLink) +
+      msgSpamKeywords.length +
+      // Pinging everyone is always treated as spam
+      Number(msgHasPingKeywords) * 5 -
+      // If it's a job post, then it's probably  not spam
+      Number(msgHasSafeKeywords) * 10;
+
+    if (spamScore > 3) {
       await msg.react("💩");
     }
   },
