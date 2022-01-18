@@ -3,6 +3,14 @@ import { isStaff } from "../helpers/discord";
 
 const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
 
+const safeDomains = [
+  "reactiflux.com",
+  "github.com",
+  "mozilla.org",
+  "reactjs.org",
+  "nextjs.org",
+];
+
 const atLeastTwo = (...bools: boolean[]) => bools.filter(Boolean).length >= 2;
 
 const autodelete: ChannelHandlers = {
@@ -21,7 +29,9 @@ const autodelete: ChannelHandlers = {
       .split(" ")
       .some((word) => spamKeywords.includes(word.toLowerCase()));
 
-    const msgHasLink = msg.content.includes("http");
+    const msgHasLink =
+      msg.content.includes("http") &&
+      !safeDomains.some((domain) => msg.content.includes(domain));
 
     if (atLeastTwo(msgHasPingKeywords, msgHasSpamKeywords, msgHasLink)) {
       await msg.react("💩");
