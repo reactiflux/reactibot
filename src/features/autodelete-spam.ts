@@ -13,6 +13,10 @@ const safeDomains = [
   "nextjs.org",
 ];
 
+const checkWords = (message: string, wordList: string[]) => message
+  .split(/\b/)
+  .some((word) => wordList.includes(word.toLowerCase()));
+
 const atLeast =
   (count: number) =>
   (...bools: boolean[]) =>
@@ -30,13 +34,9 @@ const autodelete: ChannelHandlers = {
       msg.content.includes(pingKeyword),
     );
 
-    const msgHasSpamKeywords = msg.content
-      .split(/\b/)
-      .some((word) => spamKeywords.includes(word.toLowerCase()));
+    const msgHasSpamKeywords = checkWords(msg.content, spamKeywords);
 
-    const msgHasNoSafeKeywords = !msg.content
-      .split(/\b/)
-      .some((word) => safeKeywords.includes(word.toLowerCase()));
+    const msgHasNoSafeKeywords = !checkWords(msg.content, safeKeywords);
 
     const msgHasLink =
       msg.content.includes("http") &&
