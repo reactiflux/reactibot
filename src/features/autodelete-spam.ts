@@ -1,7 +1,7 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 
-const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
+const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];
 
 const safeKeywords = ["hiring", "remote", "onsite"];
 
