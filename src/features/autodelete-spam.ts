@@ -6,12 +6,13 @@ const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
 const safeKeywords = ["hiring", "remote", "onsite"];
 
 const safeDomains = [
-  "discord.com",
-  "reactiflux.com",
-  "github.com",
-  "mozilla.org",
-  "reactjs.org",
-  "nextjs.org",
+  "https://discord.com",
+  "https://www.reactiflux.com",
+  "https://github.com",
+  "https://developer.mozilla.org",
+  "https://reactjs.org",
+  "https://beta.reactjs.org",
+  "https://nextjs.org",
 ];
 
 const checkWords = (message: string, wordList: string[]) => message
