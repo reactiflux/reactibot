@@ -15,9 +15,8 @@ const safeDomains = [
   "https://nextjs.org",
 ];
 
-const checkWords = (message: string, wordList: string[]) => message
-  .split(/\b/)
-  .some((word) => wordList.includes(word.toLowerCase()));
+const checkWords = (message: string, wordList: string[]) =>
+  message.split(/\b/).some((word) => wordList.includes(word.toLowerCase()));
 
 const atLeast =
   (count: number) =>
