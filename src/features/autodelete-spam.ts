@@ -3,7 +3,7 @@ import { isStaff } from "../helpers/discord";
 
 const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];
 
-const safeKeywords = ["hiring", "remote", "onsite"];
+const safeKeywords = ["forhire", "hiring", "remote", "onsite"];
 
 const safeDomains = [
   "https://discord.com",
