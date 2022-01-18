@@ -1,5 +1,5 @@
 import { differenceInHours, format } from "date-fns";
-import { Client, Message, PartialMessage } from "discord.js";
+import { Client } from "discord.js";
 import { CHANNELS } from "../constants";
 import {
   constructDiscordLink,

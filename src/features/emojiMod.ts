@@ -195,7 +195,7 @@ Thanks!
 
 const emojiMod: ChannelHandlers = {
   handleReaction: async ({ reaction, user, bot }) => {
-    const { message, users } = reaction;
+    const { message } = reaction;
     const { author, guild } = message;
 
     if (!guild || !author || author?.id === bot.user?.id) {
