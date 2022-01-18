@@ -6,6 +6,7 @@ const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
 const safeKeywords = ["hiring", "remote", "onsite"];
 
 const safeDomains = [
+  "discord.com",
   "reactiflux.com",
   "github.com",
   "mozilla.org",
