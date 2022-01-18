@@ -1,6 +1,7 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 import { simplifyString } from "../helpers/modLog";
+import { sleep } from "../helpers/misc";
 
 const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];
 
@@ -26,10 +27,28 @@ const autodelete: ChannelHandlers = {
     const msg = maybeMessage.partial
       ? await maybeMessage.fetch()
       : maybeMessage;
+    if (!msg.guild) return;
 
     const msgHasPingKeywords = ["@everyone", "@here"].some((pingKeyword) =>
       msg.content.includes(pingKeyword),
     );
+
+    if (msgHasPingKeywords) {
+      msg
+        .reply({
+          embeds: [
+            {
+              title: "Tsk tsk.",
+              description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
+              color: "#BA0C2F",
+            },
+          ],
+        })
+        .then(async (tsk) => {
+          await sleep(15);
+          tsk.delete();
+        });
+    }
 
     const content = simplifyString(msg.content);
     const words = content.split(" ");

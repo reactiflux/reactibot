@@ -4,7 +4,6 @@ import { Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
 
@@ -635,38 +634,6 @@ Instead:
           },
         ],
       });
-    },
-  },
-  {
-    words: ["@here", "@everyone"],
-    help: "",
-    category: "Communication",
-    cooldown: 0,
-    handleMessage: async (msg) => {
-      if (!msg || !msg.guild) {
-        return;
-      }
-
-      const member = await msg.guild.members.fetch(msg.author.id);
-
-      if (!member || isStaff(member)) {
-        return;
-      }
-
-      await msg.react("💩");
-
-      const tsk = await msg.reply({
-        embeds: [
-          {
-            title: "Tsk tsk.",
-            description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-            color: "#BA0C2F",
-          },
-        ],
-      });
-      await msg.delete();
-      await sleep(120);
-      await tsk.delete();
     },
   },
   {
