@@ -1,45 +1,19 @@
 import { differenceInHours, format } from "date-fns";
 import { Client, Message, PartialMessage } from "discord.js";
 import { CHANNELS } from "../constants";
-import { constructDiscordLink } from "../helpers/discord";
+import {
+  constructDiscordLink,
+  fetchReactionMembers,
+  isHelpful,
+  isStaff,
+} from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
+import { threadStats } from "../features/stats";
 
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 12;
-
-const lockWithReply = ({
-  content: msg,
-  message,
-  starter,
-  shouldReply,
-}: {
-  content: string;
-  message: Message | PartialMessage;
-  starter: Message | PartialMessage;
-  shouldReply: boolean;
-}) => {
-  const { channel: thread } = message;
-  if (!thread.isThread()) {
-    return;
-  }
-
-  const content = `${msg}
-
-If you have a followup question, you may reply to this thread so other members know they're related. ${constructDiscordLink(
-    starter,
-  )}
-
-Threads are closed automatically after ${IDLE_TIMEOUT} hours, or if the member who started it reacts to a message with ✅ to mark that as the accepted answer.`;
-
-  (shouldReply
-    ? message.reply({ content, allowedMentions: { repliedUser: false } })
-    : thread.send(content)
-  ).then(() => {
-    thread.setLocked(true);
-    thread.setArchived(true);
-  });
-};
+const STAFF_ACCEPT_THRESHOLD = 2;
 
 const autoThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -47,6 +21,7 @@ const autoThread: ChannelHandlers = {
       ? await maybeMessage.fetch()
       : maybeMessage;
 
+    // Delete top-level replies
     if (msg.type === "REPLY") {
       const repliedTo = await msg.fetchReference();
       // Allow members to reply to their own messages, as "followup" threads
@@ -57,13 +32,17 @@ const autoThread: ChannelHandlers = {
           "This is a thread-only channel! Please reply in that message’s thread. Your message has been DM’d to you.",
         );
         msg.delete();
+        threadStats.threadReplyRemoved(msg.channelId);
         sleep(5).then(() => reply.delete());
         return;
       }
     }
+    // Create threads
     const newThread = await msg.startThread({
       name: `${msg.author.username} – ${format(new Date(), "HH-mm MMM d")}`,
     });
+    threadStats.threadCreated(msg.channelId);
+    // Send short-lived instructions
     const message = await newThread.send(
       `React to someone with ✅ to mark their response as the accepted answer and close this thread. If someone has been really helpful, give them a shoutout in <#${CHANNELS.thanks}>!`,
     );
@@ -75,18 +54,36 @@ const autoThread: ChannelHandlers = {
       return;
     }
 
-    const { channel: thread } = reaction.message;
+    const { channel: thread, author, guild } = await reaction.message.fetch();
     const starter = thread.isThread()
       ? await thread.fetchStarterMessage()
       : undefined;
 
-    // If the reaction was sent by the original thread author, lock the thread
-    if (starter && reaction.users.cache.has(starter.author.id)) {
-      lockWithReply({
-        content: `This question has an answer! Thank you for helping 😄`,
-        message: reaction.message,
-        starter,
-        shouldReply: true,
+    if (!starter || !guild) {
+      return;
+    }
+
+    const reactors = await fetchReactionMembers(guild, reaction);
+    const roledReactors = reactors.filter((r) => isStaff(r) || isHelpful(r));
+
+    // If the reaction was from the author or there are enough known people
+    // responding, mark that answer as the accepted one
+    if (
+      roledReactors.length >= STAFF_ACCEPT_THRESHOLD ||
+      reaction.users.cache.has(starter.author.id)
+    ) {
+      threadStats.threadResolved(
+        starter.channelId,
+        starter.author.id,
+        author.id,
+      );
+      reaction.message.reply({
+        allowedMentions: { repliedUser: false },
+        content: `This question has an answer! Thank you for helping 😄
+
+If you have a followup question, you may want to reply to this thread so other members know they're related. ${constructDiscordLink(
+          starter,
+        )}`,
       });
     }
   },
@@ -119,12 +116,28 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
       const toCompare = mostRecent || starter;
 
       if (differenceInHours(now, toCompare.createdAt) >= IDLE_TIMEOUT) {
-        lockWithReply({
-          content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.`,
-          message: toCompare,
-          starter,
-          shouldReply: false,
-        });
+        threadStats.threadTimeout(starter.channelId);
+        thread
+          .send({
+            content: `This thread hasn’t had any activity in ${IDLE_TIMEOUT} hours, so it’s now locked.
+
+Threads are closed automatically after ${IDLE_TIMEOUT} hours. If you have a followup question, you may want to reply to this thread so other members know they're related. ${constructDiscordLink(
+              starter,
+            )}
+
+${
+  toCompare.content === ""
+    ? `Question not getting answered? Maybe it's hard to answer, or maybe you asked at a slow time. Check out these resources for help asking a good question:
+
+<https://stackoverflow.com/help/how-to-ask>
+<http://wp.me/p2oIwo-26>`
+    : ""
+}`,
+          })
+          .then(() => {
+            thread.setLocked(true);
+            thread.setArchived(true);
+          });
       }
     });
   });
