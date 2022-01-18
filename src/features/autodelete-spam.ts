@@ -3,6 +3,8 @@ import { isStaff } from "../helpers/discord";
 
 const spamKeywords = ["discord", "nitro", "steam", "free", "gift", "airdrop"];
 
+const safeKeywords = ["hiring", "remote", "onsite"];
+
 const safeDomains = [
   "reactiflux.com",
   "github.com",
@@ -11,7 +13,10 @@ const safeDomains = [
   "nextjs.org",
 ];
 
-const atLeastTwo = (...bools: boolean[]) => bools.filter(Boolean).length >= 2;
+const atLeast =
+  (count: number) =>
+  (...bools: boolean[]) =>
+    bools.filter(Boolean).length >= count;
 
 const autodelete: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -26,14 +31,25 @@ const autodelete: ChannelHandlers = {
     );
 
     const msgHasSpamKeywords = msg.content
-      .split(" ")
+      .split(/\b/)
       .some((word) => spamKeywords.includes(word.toLowerCase()));
+
+    const msgHasNoSafeKeywords = !msg.content
+      .split(/\b/)
+      .some((word) => safeKeywords.includes(word.toLowerCase()));
 
     const msgHasLink =
       msg.content.includes("http") &&
       !safeDomains.some((domain) => msg.content.includes(domain));
 
-    if (atLeastTwo(msgHasPingKeywords, msgHasSpamKeywords, msgHasLink)) {
+    if (
+      atLeast(3)(
+        msgHasPingKeywords,
+        msgHasSpamKeywords,
+        msgHasNoSafeKeywords,
+        msgHasLink,
+      )
+    ) {
       await msg.react("💩");
     }
   },
