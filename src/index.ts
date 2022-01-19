@@ -9,7 +9,6 @@ import discord, {
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import jobs from "./features/jobs";
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
@@ -150,9 +149,6 @@ if (process.env.BOT_LOG) {
 
 // Amplitude metrics
 setupStats(bot);
-
-// reactiflux
-addHandler(CHANNELS.jobBoard, jobs);
 
 // common
 addHandler("*", [

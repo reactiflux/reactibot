@@ -2,12 +2,15 @@ import { compareAsc, differenceInDays, format } from "date-fns";
 import { Client, Message, TextChannel } from "discord.js";
 import { CHANNELS } from "../constants";
 import { sleep } from "../helpers/misc";
+import cooldown from "./cooldown";
 
 const storedMessages: Message[] = [];
 const moderatedMessageIds: Set<string> = new Set();
 
 const DAYS_OF_POSTS = 7; // days
 const MINIMUM_JOIN_AGE = 3; // days
+
+const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
 const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
@@ -111,6 +114,32 @@ const jobModeration = async (bot: Client) => {
 
       return;
     }
+
+    // Handle missing tags
+    const content = message.content.toLowerCase();
+    const hasTags = tags.some((tag) => content.includes(`[${tag}]`));
+    if (!hasTags && message.mentions.members?.size === 0) {
+      if (cooldown.hasCooldown(message.author.id, "user.jobs")) return;
+
+      cooldown.addCooldown(message.author.id, "user.jobs");
+      message.author
+        .send(`Hello there! It looks like you just posted a message to the #jobs channel on our server.
+
+I noticed that you've not added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find:
+
+[FOR HIRE] - you are looking for a job
+[HIRING] - you are looking to hire someone
+[INTERN] - this is an intern position, no experience required
+[REMOTE] - only remote work is possible
+[LOCAL] - only local work is possible (please remember to provide the country / city!)
+[VISA] - Your company will help with the visa process in case of successful hire
+
+Thank you :)
+
+:robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`);
+    }
+
+    // Last, update the list of tracked messages.
     updateJobs(message);
   });
   bot.on("messageDelete", (message) => {
