@@ -123,9 +123,7 @@ const jobModeration = async (bot: Client) => {
 
       cooldown.addCooldown(message.author.id, "user.jobs");
       message.author
-        .send(`Hello there! It looks like you just posted a message to the #jobs channel on our server.
-
-I noticed that you've not added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find:
+        .send(`Hello there! You’ve just posted a message to the #jobs-board channel, but you haven’t added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
 
 [FOR HIRE] - you are looking for a job
 [HIRING] - you are looking to hire someone
