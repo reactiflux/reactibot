@@ -1,4 +1,4 @@
-import { compareAsc, differenceInDays } from "date-fns";
+import { compareAsc, differenceInDays, format } from "date-fns";
 import {
   AnyChannel,
   Client,
@@ -113,6 +113,28 @@ const jobModeration = async (bot: Client) => {
       return;
     }
     updateJobs(message);
+  });
+  bot.on("messageDelete", (message) => {
+    if (
+      message.channelId !== CHANNELS.jobBoard ||
+      !message.author ||
+      message.author.id === bot.user?.id
+    ) {
+      return;
+    }
+    // Don't trigger a message for auto-removed messages
+    if (moderatedMessageIds.has(message.id)) {
+      moderatedMessageIds.delete(message.id);
+      return;
+    }
+
+    // Log deleted job posts publicly
+    message.channel.send(
+      `<@${message.author.id}> deleted their job post from ${format(
+        new Date(message.createdAt),
+        "PPPP",
+      )}`,
+    );
   });
 };
 
