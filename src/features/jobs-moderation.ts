@@ -1,8 +1,16 @@
 import { compareAsc, differenceInDays } from "date-fns";
-import { Client, Message } from "discord.js";
+import {
+  AnyChannel,
+  Client,
+  Message,
+  PartialMessage,
+  TextChannel,
+} from "discord.js";
 import { CHANNELS } from "../constants";
+import { sleep } from "../helpers/misc";
 
 const storedMessages: Message[] = [];
+const moderatedMessageIds: Set<string> = new Set();
 
 const DAYS_OF_POSTS = 7;
 
@@ -70,6 +78,21 @@ const jobModeration = async (bot: Client) => {
       (m) => m.author.id === message.author.id,
     );
     if (existingMessage) {
+      moderatedMessageIds.add(message.id);
+      message.author.send(message.content);
+      message
+        .reply(
+          `Please only post every 7 days. Your last post here was only ${differenceInDays(
+            now,
+            existingMessage.createdAt,
+          )} day(s) ago. Your post has been DM’d to you.`,
+        )
+        .then(async (reply) => {
+          await sleep(15);
+          reply.delete();
+        });
+      message.delete();
+
       return;
     }
     updateJobs(message);
