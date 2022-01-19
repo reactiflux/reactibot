@@ -1,11 +1,5 @@
 import { compareAsc, differenceInDays, format } from "date-fns";
-import {
-  AnyChannel,
-  Client,
-  Message,
-  PartialMessage,
-  TextChannel,
-} from "discord.js";
+import { Client, Message, TextChannel } from "discord.js";
 import { CHANNELS } from "../constants";
 import { sleep } from "../helpers/misc";
 
@@ -71,6 +65,7 @@ const jobModeration = async (bot: Client) => {
       return;
     }
 
+    // Handle joining and posting too quickly
     const now = new Date();
     const member = await message.guild?.members.fetch({
       user: message.author.id,
@@ -81,7 +76,6 @@ const jobModeration = async (bot: Client) => {
     ) {
       moderatedMessageIds.add(message.id);
       message.author.send(message.content);
-      message.delete();
       message
         .reply(
           "You joined too recently to post a job, please try again in a few days. Your post has been DM’d to you.",
@@ -90,7 +84,12 @@ const jobModeration = async (bot: Client) => {
           await sleep(15);
           reply.delete();
         });
+      message.delete();
+
+      return;
     }
+
+    // Handle posting too frequently
     const existingMessage = storedMessages.find(
       (m) => m.author.id === message.author.id,
     );
