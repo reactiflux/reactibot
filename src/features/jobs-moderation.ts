@@ -12,7 +12,8 @@ import { sleep } from "../helpers/misc";
 const storedMessages: Message[] = [];
 const moderatedMessageIds: Set<string> = new Set();
 
-const DAYS_OF_POSTS = 7;
+const DAYS_OF_POSTS = 7; // days
+const MINIMUM_JOIN_AGE = 3; // days
 
 const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
@@ -74,6 +75,22 @@ const jobModeration = async (bot: Client) => {
     const member = await message.guild?.members.fetch({
       user: message.author.id,
     });
+    if (
+      member?.joinedAt &&
+      differenceInDays(now, member.joinedAt) < MINIMUM_JOIN_AGE
+    ) {
+      moderatedMessageIds.add(message.id);
+      message.author.send(message.content);
+      message.delete();
+      message
+        .reply(
+          "You joined too recently to post a job, please try again in a few days. Your post has been DM’d to you.",
+        )
+        .then(async (reply) => {
+          await sleep(15);
+          reply.delete();
+        });
+    }
     const existingMessage = storedMessages.find(
       (m) => m.author.id === message.author.id,
     );
