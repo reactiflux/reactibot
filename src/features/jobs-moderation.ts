@@ -1,6 +1,7 @@
 import { compareAsc, differenceInDays, format } from "date-fns";
 import { Client, Message, TextChannel } from "discord.js";
 import { CHANNELS } from "../constants";
+import { isStaff } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import cooldown from "./cooldown";
 
@@ -63,6 +64,7 @@ const jobModeration = async (bot: Client) => {
   bot.on("messageCreate", async (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
+      isStaff(message.member) ||
       message.author.id === bot.user?.id
     ) {
       return;
@@ -70,12 +72,9 @@ const jobModeration = async (bot: Client) => {
 
     // Handle joining and posting too quickly
     const now = new Date();
-    const member = await message.guild?.members.fetch({
-      user: message.author.id,
-    });
     if (
-      member?.joinedAt &&
-      differenceInDays(now, member.joinedAt) < MINIMUM_JOIN_AGE
+      message.member?.joinedAt &&
+      differenceInDays(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
     ) {
       moderatedMessageIds.add(message.id);
       message.author.send(message.content);
