@@ -1,6 +1,6 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { simplifyString } from "../helpers/modLog";
+import { simplifyString } from "../helpers/string";
 import { sleep } from "../helpers/misc";
 
 const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];

@@ -9,7 +9,7 @@ import discord, {
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import jobs from "./features/jobs";
+import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -150,9 +150,6 @@ if (process.env.BOT_LOG) {
 // Amplitude metrics
 setupStats(bot);
 
-// reactiflux
-addHandler(CHANNELS.jobBoard, jobs);
-
 // common
 addHandler("*", [
   commands,
@@ -166,6 +163,7 @@ const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 
 addHandler(threadChannels, autothread);
 bot.on("ready", () => {
+  jobsMod(bot);
   scheduleTask(1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });
