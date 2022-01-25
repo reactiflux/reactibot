@@ -106,7 +106,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
         embeds: [
           {
             title:
-              "You might not need getDerivedStateFrom props or state at all",
+              "You might not need getDerivedStateFrom props or state at all!",
             type: "rich",
             description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
