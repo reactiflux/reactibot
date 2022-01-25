@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
@@ -22,6 +22,18 @@ const sortedCategories: Categories[] = [
   "Web",
   "React/Redux",
 ];
+
+async function isStaffMsg(msg: Message | CommandInteraction) {
+  return Boolean(
+    msg.guild &&
+      msg.member &&
+      isStaff(
+        msg.member instanceof GuildMember
+          ? msg.member
+          : await msg.guild.members.fetch(msg.member.user.id),
+      ),
+  );
+}
 
 export const commandsList: Command[] = [
   {
@@ -640,7 +652,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild || !isStaff(msg.member)) {
+      if (!isStaffMsg(msg)) {
         return;
       }
 
@@ -662,7 +674,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild || !isStaff(msg.member)) {
+      if (!isStaffMsg(msg)) {
         return;
       }
 
