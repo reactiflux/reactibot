@@ -649,7 +649,7 @@ Instead:
   },
   {
     words: ["lock"],
-    help: "",
+    help: "locks a channel",
     category: "Communication",
     handleMessage: async (msg) => {
       if (!(await isStaffMsg(msg))) {
@@ -671,7 +671,7 @@ Instead:
   },
   {
     words: ["unlock"],
-    help: "",
+    help: "unlocks a channel",
     category: "Communication",
     handleMessage: async (msg) => {
       if (!(await isStaffMsg(msg))) {
