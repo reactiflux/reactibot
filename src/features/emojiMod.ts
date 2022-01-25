@@ -1,10 +1,19 @@
-import { MessageReaction, Message, GuildMember, TextChannel } from "discord.js";
+import {
+  MessageReaction,
+  Message,
+  GuildMember,
+  TextChannel,
+  Guild,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { ReportReasons } from "../constants";
-import { constructLog, simplifyString } from "../helpers/modLog";
-import { isStaff } from "../helpers/discord";
+import { CHANNELS, ReportReasons } from "../constants";
+import { constructLog } from "../helpers/modLog";
+import { simplifyString } from "../helpers/string";
+import { fetchReactionMembers, isStaff } from "../helpers/discord";
+import { partition } from "../helpers/array";
 
+const AUTO_SPAM_THRESHOLD = 5;
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
@@ -22,11 +31,15 @@ const warningMessages = new Map<
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
 type ReactionHandlers = {
-  [emoji: string]: (
-    reaction: MessageReaction,
-    message: Message,
-    member: GuildMember,
-  ) => void;
+  [emoji: string]: (args: {
+    guild: Guild;
+    logChannel: TextChannel;
+    reaction: MessageReaction;
+    message: Message;
+    reactor: GuildMember;
+    author: GuildMember;
+    usersWhoReacted: GuildMember[];
+  }) => void;
 };
 
 const handleReport = (
@@ -47,12 +60,13 @@ const handleReport = (
 
     let finalLog = logBody;
     // If this was a mod report, increment the warning count
-    if (reason === ReportReasons.mod) {
+    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
       finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
     }
 
     message.edit(finalLog);
     warningMessages.set(simplifiedContent, { warnings, message });
+    return warnings;
   } else {
     // If this is new, send a new message
     channelInstance.send(logBody).then((warningMessage) => {
@@ -61,36 +75,34 @@ const handleReport = (
         message: warningMessage,
       });
     });
+    return 1;
   }
 };
 
 const reactionHandlers: ReactionHandlers = {
-  "⚠️": async (reaction, message, member) => {
+  "⚠️": async ({
+    author,
+    reactor,
+    message,
+    reaction,
+    usersWhoReacted,
+    logChannel,
+  }) => {
     // Skip if the post is from someone from the staff
-    const { guild, author } = message;
-    if (!guild || !author || isStaff(await guild.members.fetch(author.id))) {
+    if (isStaff(author)) {
       return;
     }
     // If the user that reacted isn't in the staff, remove the reaction, send a
-    if (!isStaff(member)) {
-      reaction.users.remove(member.id);
-      member.send(`Hey there! 👋
+    if (!isStaff(reactor)) {
+      reaction.users.remove(reactor.id);
+      reactor.send(`Hey there! 👋
 The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.
 Thanks!
 `);
       return;
     }
 
-    const usersWhoReacted = await Promise.all(
-      reaction.users.cache.map((user) => message.guild?.members.fetch(user.id)),
-    );
     const reactionCount = usersWhoReacted.length;
-
-    const modLogChannel = guild.channels.cache.find(
-      (channel) =>
-        channel.name === "mod-log" || channel.id === "257930126145224704",
-    ) as TextChannel;
-
     const staff = usersWhoReacted
       .filter(isStaff)
       .map((member) => member?.user.username || "X");
@@ -99,44 +111,58 @@ Thanks!
       return;
     }
 
-    try {
-      const fullMessage = await message.fetch();
-
-      handleReport(
-        ReportReasons.mod,
-        modLogChannel,
-        fullMessage,
-        constructLog(ReportReasons.mod, [], staff, fullMessage),
-      );
-    } catch (error) {
-      console.log("Something went wrong when fetching the message: ", error);
-    }
+    handleReport(
+      ReportReasons.mod,
+      logChannel,
+      message,
+      constructLog(ReportReasons.mod, [], staff, message),
+    );
   },
-  "👎": async (reaction, message, member) => {
-    if (!message.guild || cooldown.hasCooldown(member.id, "thumbsdown")) {
+  "💩": async ({
+    guild,
+    author,
+    reactor,
+    message,
+    usersWhoReacted,
+    logChannel,
+  }) => {
+    // Skip if the post is from someone from the staff or reactor is not staff
+    if (isStaff(author) || !isStaff(reactor)) {
       return;
     }
 
-    cooldown.addCooldown(member.id, "thumbsdown", 60); // 1 minute
+    const [members, staff] = partition(isStaff, usersWhoReacted);
 
-    const reactions = thumbsDownEmojis.reduce(
-      (acc, emoji) => {
-        if (message.reactions.cache.get(emoji)) {
-          acc.count += message.reactions.cache.get(emoji)?.count || 0;
-
-          // todo: figure out how to do this
-          // acc.users.push(Object.values(message.reactions.get(emoji).users));
-        }
-
-        return acc;
-      },
-      {
-        count: 0,
-        users: [],
-      },
+    message.delete();
+    const warnings = handleReport(
+      ReportReasons.spam,
+      logChannel,
+      message,
+      constructLog(
+        ReportReasons.spam,
+        members.map(({ user }) => user.username),
+        staff.map(({ user }) => user.username),
+        message,
+      ),
     );
 
-    const totalReacts = reactions.count;
+    if (warnings >= AUTO_SPAM_THRESHOLD) {
+      guild.members.fetch(message.author.id).then((member) => {
+        member.kick("Autokicked for spamming");
+        logChannel.send(
+          `Automatically kicked <@${message.author.id}> for spam`,
+        );
+      });
+    }
+  },
+  "👎": async ({ message, reactor, usersWhoReacted, logChannel }) => {
+    if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
+      return;
+    }
+
+    cooldown.addCooldown(reactor.id, "thumbsdown", 60); // 1 minute
+
+    const totalReacts = usersWhoReacted.length;
 
     if (totalReacts < config.thumbsDownThreshold) {
       return;
@@ -146,50 +172,34 @@ Thanks!
       trigger = ReportReasons.userDelete;
     }
 
-    const usersWhoReacted = await Promise.all(
-      reaction.users.cache.map((user) => message.guild?.members.fetch(user.id)),
-    );
     const staffReactionCount = usersWhoReacted.filter(isStaff).length;
-
-    const members = usersWhoReacted
-      .filter((user) => !isStaff(user))
-      .map((member) => member?.user.username || "X");
-
-    const staff = usersWhoReacted
-      .filter(isStaff)
-      .map((member) => member?.user.username || "X");
-
-    const modLogChannel = message.guild.channels.cache.find(
-      (channel) =>
-        channel.name === "mod-log" || channel.id === "257930126145224704",
-    ) as TextChannel;
-
+    const [members, staff] = partition(isStaff, usersWhoReacted);
     const meetsDeletion = staffReactionCount >= config.deletionThreshold;
 
     if (meetsDeletion) {
       message.delete();
     }
 
-    try {
-      const fullMessage = await message.fetch();
-
-      handleReport(
-        meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
-        modLogChannel,
-        fullMessage,
-        constructLog(trigger, members, staff, fullMessage),
-      );
-    } catch (error) {
-      console.log("Something went wrong when fetching the message: ", error);
-    }
+    handleReport(
+      meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
+      logChannel,
+      message,
+      constructLog(
+        trigger,
+        members.map(({ user }) => user.username),
+        staff.map(({ user }) => user.username),
+        message,
+      ),
+    );
   },
 };
 
 const emojiMod: ChannelHandlers = {
   handleReaction: async ({ reaction, user, bot }) => {
     const { message } = reaction;
+    const { guild } = message;
 
-    if (!message.guild || message.author?.id === bot.user?.id) {
+    if (!guild) {
       return;
     }
 
@@ -203,13 +213,34 @@ const emojiMod: ChannelHandlers = {
       return;
     }
 
-    const [fullReaction, fullMessage, member] = await Promise.all([
+    const [fullReaction, fullMessage, reactor] = await Promise.all([
       reaction.partial ? reaction.fetch() : reaction,
       message.partial ? message.fetch() : message,
-      message.guild.members.fetch(user.id),
+      guild.members.fetch(user.id),
+    ]);
+    const [usersWhoReacted, authorMember] = await Promise.all([
+      fetchReactionMembers(guild, fullReaction),
+      guild.members.fetch(fullMessage.author.id),
     ]);
 
-    reactionHandlers[emoji]?.(fullReaction, fullMessage, member);
+    if (authorMember.id === bot.user?.id) return;
+
+    if (authorMember.id === bot.user?.id) return;
+
+    reactionHandlers[emoji]?.({
+      guild,
+      author: authorMember,
+      reactor,
+      message: fullMessage,
+      reaction: fullReaction,
+      usersWhoReacted: usersWhoReacted.filter((x): x is GuildMember =>
+        Boolean(x),
+      ),
+      logChannel: guild.channels.cache.find(
+        (channel) =>
+          channel.name === "mod-log" || channel.id === CHANNELS.modLog,
+      ) as TextChannel,
+    });
   },
 };
 

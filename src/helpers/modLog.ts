@@ -13,19 +13,6 @@ export const truncateMessage = (
   return message;
 };
 
-const NORMALIZED_CODEPOINTS = /[\u0300-\u036f]/g;
-const EMOJI_RANGE =
-  /[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g;
-const SPECIAL_CHARACTERS =
-  /[\s≤≥¯˘÷¿…“”‘’«»–—≠±ºª•¶§∞¢£™¡`~`∑´®†¨ˆØ∏\-=_+<>?,./;':"[\]\\{}|!@#$%^&*()]/g;
-export const simplifyString = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(NORMALIZED_CODEPOINTS, "")
-    .replace(EMOJI_RANGE, "")
-    .replace(SPECIAL_CHARACTERS, "");
-
 export const constructLog = (
   trigger: ReportReasons,
   members: string[],
@@ -33,38 +20,40 @@ export const constructLog = (
   message: Message,
 ) => {
   const modAlert = `<@${modRoleId}>`;
-  const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times:`;
+  const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
+  const postfix = `Link: ${constructDiscordLink(message)}
+
+${members.length ? `Reactors: ${members.join(", ")}` : ""}
+${staff.length ? `Staff: ${staff.join(", ")}` : ""}
+`;
   const reportedMessage = truncateMessage(message.content);
-  const link = constructDiscordLink(message);
 
   switch (trigger) {
     case ReportReasons.mod:
-      return `${preface}
+      return `${preface}:
 
-${reportedMessage}
+\`${reportedMessage}\`
 
-Link: ${link}`;
+${postfix}`;
 
     case ReportReasons.userWarn:
-      return `${modAlert} – ${preface} met the warning threshold for the message:
+      return `${modAlert} – ${preface}, met the warning threshold for the message:
 
 \`${reportedMessage}\`
 
-Link: ${link}
-
-${members && `Reactors: ${members.join(", ")}`}
-${staff && `Staff: ${staff.join(", ")}`}
-`;
+${postfix}`;
 
     case ReportReasons.userDelete:
-      return `${modAlert} – ${preface} met the deletion threshold for the message:
+      return `${modAlert} – ${preface}, met the deletion threshold for the message:
 
 \`${reportedMessage}\`
 
-Link: ${link}
+${postfix}`;
+    case ReportReasons.spam:
+      return `${preface}, reported for spam:
 
-${members && `Reactors: ${members.join(", ")}`}
-${staff && `Staff: ${staff.join(", ")}`}
-`;
+\`${reportedMessage}\`
+
+${postfix}`;
   }
 };

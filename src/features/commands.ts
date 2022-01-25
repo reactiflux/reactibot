@@ -3,7 +3,6 @@ import { CommandInteraction, Message } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
 
@@ -636,34 +635,50 @@ Instead:
       });
     },
   },
+  {
+    words: ["lock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel?.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        await guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: false,
+          },
+        );
+        guildTextChannel.send("This channel has been locked by a moderator");
+      }
+    },
+  },
+  {
+    words: ["unlock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel?.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: null, // null will inherit the permission from the parent channel category
+          },
+        );
+      }
+    },
+  },
 ];
-
-const handleEveryone = async (msg: Message) => {
-  if (!msg.guild) {
-    return;
-  }
-
-  const member = await msg.guild.members.fetch(msg.author.id);
-
-  if (!member || isStaff(member)) {
-    return;
-  }
-
-  await msg.react("⚠️");
-
-  const tsk = await msg.reply({
-    embeds: [
-      {
-        title: "Tsk tsk.",
-        description: `Please do **not** try to use \`@here\` or \`@everyone\` - there are ${msg.guild.memberCount} members in Reactiflux. Everybody here is a volunteer, and somebody will respond when they can.`,
-        color: "#BA0C2F",
-      },
-    ],
-  });
-  await msg.delete();
-  await sleep(120);
-  await tsk.delete();
-};
 
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
@@ -727,14 +742,6 @@ const commands: ChannelHandlers = {
         command.handleMessage(msg);
       }
     });
-
-    const everyoneUsed = ["here", "everyone"].find((word) => {
-      return msg.content.toLowerCase().includes(`@${word}`);
-    });
-
-    if (everyoneUsed) {
-      handleEveryone(msg);
-    }
   },
 };
 
