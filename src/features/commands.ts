@@ -652,7 +652,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!isStaffMsg(msg)) {
+      if (!(await isStaffMsg(msg))) {
         return;
       }
 
@@ -674,7 +674,7 @@ Instead:
     help: "",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!isStaffMsg(msg)) {
+      if (!(await isStaffMsg(msg))) {
         return;
       }
 
