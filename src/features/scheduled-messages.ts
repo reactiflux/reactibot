@@ -11,7 +11,7 @@ const DAILY = 20 * HOURLY;
 const FREQUENCY = {
   often: 9 * HOURLY,
   daily: DAILY,
-  moreThanWeekly: 2 * DAILY,
+  moreThanWeekly: 3 * DAILY,
   weekly: 6 * DAILY,
 };
 
@@ -100,13 +100,11 @@ If you see anything that violates our rules, help alert the mods by reacting to 
     },
   },
   {
-    postTo: [
-      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.random },
-    ],
+    postTo: [{ interval: FREQUENCY.weekly, channelId: CHANNELS.random }],
     message: {
-      content: `Have you read our Code of Conduct? <https://reactiflux.com/conduct> Don't make dad angry.
+      content: `Have you read our Code of Conduct? <https://reactiflux.com/conduct>
 
-If something crosses a line, give it a 👎, or if you'd prefer to remain anonymous, let mods know with the form at <https://reactiflux.com/contact>`,
+Let us know if anything crosses a line: give it a 👎, or if you'd prefer to remain anonymous, let mods know with the form at <https://reactiflux.com/contact>`,
     },
   },
 ];

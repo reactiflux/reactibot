@@ -3,7 +3,6 @@ import { CommandInteraction, Message } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { sleep } from "../helpers/misc";
 
 export const EMBED_COLOR = 7506394;
 
@@ -634,6 +633,49 @@ Instead:
           },
         ],
       });
+    },
+  },
+  {
+    words: ["lock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel?.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        await guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: false,
+          },
+        );
+        guildTextChannel.send("This channel has been locked by a moderator");
+      }
+    },
+  },
+  {
+    words: ["unlock"],
+    help: "",
+    category: "Communication",
+    handleMessage: async (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) {
+        return;
+      }
+
+      // permission overwrites can only be applied on Guild Text Channels
+      if (msg.channel?.type === "GUILD_TEXT") {
+        const { channel: guildTextChannel } = msg;
+        guildTextChannel.permissionOverwrites.create(
+          guildTextChannel.guild.roles.everyone,
+          {
+            SEND_MESSAGES: null, // null will inherit the permission from the parent channel category
+          },
+        );
+      }
     },
   },
 ];

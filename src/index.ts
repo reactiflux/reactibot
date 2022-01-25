@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 import discord, {
   Message,
   MessageReaction,
@@ -15,16 +13,20 @@ import { Routes } from "discord-api-types/v9";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import jobs from "./features/jobs";
+import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
 import commands, { commandsList } from "./features/commands";
 import cooldown from "./features/cooldown";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
+import autothread, { cleanupThreads } from "./features/autothread";
+
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
+import { CHANNELS } from "./constants";
+import { scheduleTask } from "./helpers/schedule";
 
 export const bot = new discord.Client({
   intents: [
@@ -97,11 +99,27 @@ export type ChannelHandlersById = {
 
 const channelHandlersById: ChannelHandlersById = {};
 
-const addHandler = (channelId: string, channelHandlers: ChannelHandlers) => {
-  channelHandlersById[channelId] = [
-    ...(channelHandlersById[channelId] || []),
-    channelHandlers,
-  ];
+const addHandler = (
+  oneOrMoreChannels: string | string[],
+  oneOrMoreHandlers: ChannelHandlers | ChannelHandlers[],
+) => {
+  const channels =
+    typeof oneOrMoreChannels === "string"
+      ? [oneOrMoreChannels]
+      : oneOrMoreChannels;
+  const handlers =
+    oneOrMoreHandlers instanceof Array
+      ? oneOrMoreHandlers
+      : [oneOrMoreHandlers];
+
+  channels.forEach((channelId) => {
+    const existingHandlers = channelHandlersById[channelId];
+    if (existingHandlers) {
+      existingHandlers.push(...handlers);
+    } else {
+      channelHandlersById[channelId] = handlers;
+    }
+  });
 };
 
 const handleMessage = async (message: Message) => {
@@ -126,7 +144,11 @@ const handleReaction = (
   reaction: MessageReaction | PartialMessageReaction,
   user: User | PartialUser,
 ) => {
-  const channelId = reaction.message.channel.id;
+  // if reaction is in a thread, use the parent channel ID
+  const { channel } = reaction.message;
+  const channelId = channel.isThread()
+    ? channel.parentId || channel.id
+    : channel.id;
   const handlers = channelHandlersById[channelId];
 
   if (handlers) {
@@ -170,18 +192,30 @@ const handleInteraction = async (interaction: Interaction) => {
 // Amplitude metrics
 setupStats(bot);
 
-// reactiflux
-addHandler("103882387330457600", jobs);
-
 // common
-addHandler("*", commands);
-// addHandler('*', codeblock);
-addHandler("*", autoban);
-addHandler("*", emojiMod);
-addHandler("*", autodelete);
-addHandler("*", tsPlaygroundLinkShortener);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  autodelete,
+  tsPlaygroundLinkShortener,
+]);
+
+const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
+
+addHandler(threadChannels, autothread);
+bot.on("ready", () => {
+  jobsMod(bot);
+  scheduleTask(1000 * 60 * 30, () => {
+    cleanupThreads(threadChannels, bot);
+  });
+});
 
 bot.on("messageReactionAdd", handleReaction);
+
+bot.on("threadCreate", (thread) => {
+  thread.join();
+});
 
 bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
