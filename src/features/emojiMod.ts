@@ -223,6 +223,8 @@ const emojiMod: ChannelHandlers = {
       guild.members.fetch(fullMessage.author.id),
     ]);
 
+    if (authorMember.id === bot.user?.id) return;
+
     reactionHandlers[emoji]?.({
       guild,
       author: authorMember,
