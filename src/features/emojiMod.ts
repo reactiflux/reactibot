@@ -222,6 +222,8 @@ const emojiMod: ChannelHandlers = {
       ]);
     const usersWhoReacted = await fetchReactionMembers(guild, fullReaction);
 
+    if (authorMember.id === bot.user?.id) return;
+
     reactionHandlers[emoji]?.({
       guild,
       author: authorMember,
