@@ -8,7 +8,8 @@ import {
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { CHANNELS, ReportReasons } from "../constants";
-import { constructLog, simplifyString } from "../helpers/modLog";
+import { constructLog } from "../helpers/modLog";
+import { simplifyString } from "../helpers/string";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
@@ -196,9 +197,9 @@ Thanks!
 const emojiMod: ChannelHandlers = {
   handleReaction: async ({ reaction, user, bot }) => {
     const { message } = reaction;
-    const { author, guild } = message;
+    const { guild } = message;
 
-    if (!guild || !author || author?.id === bot.user?.id) {
+    if (!guild) {
       return;
     }
 
@@ -212,14 +213,19 @@ const emojiMod: ChannelHandlers = {
       return;
     }
 
-    const [fullReaction, fullMessage, reactor, authorMember] =
-      await Promise.all([
-        reaction.partial ? reaction.fetch() : reaction,
-        message.partial ? message.fetch() : message,
-        guild.members.fetch(user.id),
-        guild.members.fetch(author.id),
-      ]);
-    const usersWhoReacted = await fetchReactionMembers(guild, fullReaction);
+    const [fullReaction, fullMessage, reactor] = await Promise.all([
+      reaction.partial ? reaction.fetch() : reaction,
+      message.partial ? message.fetch() : message,
+      guild.members.fetch(user.id),
+    ]);
+    const [usersWhoReacted, authorMember] = await Promise.all([
+      fetchReactionMembers(guild, fullReaction),
+      guild.members.fetch(fullMessage.author.id),
+    ]);
+
+    if (authorMember.id === bot.user?.id) return;
+
+    if (authorMember.id === bot.user?.id) return;
 
     reactionHandlers[emoji]?.({
       guild,
