@@ -652,6 +652,9 @@ Instead:
           guildTextChannel.guild.roles.everyone,
           {
             SEND_MESSAGES: false,
+            CREATE_PUBLIC_THREADS: false,
+            CREATE_PRIVATE_THREADS: false,
+            SEND_MESSAGES_IN_THREADS: false,
           },
         );
         guildTextChannel.send("This channel has been locked by a moderator");
