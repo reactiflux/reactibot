@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import fetch from "node-fetch";
-import { Message, TextChannel } from "discord.js";
+import { CommandInteraction, GuildMember, Message } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
@@ -13,7 +12,7 @@ type Command = {
   words: string[];
   help: string;
   category: Categories;
-  handleMessage: (msg: Message) => void;
+  handleMessage: (msg: Message | CommandInteraction) => void;
   cooldown?: number;
 };
 
@@ -24,9 +23,21 @@ const sortedCategories: Categories[] = [
   "React/Redux",
 ];
 
-const commandsList: Command[] = [
+async function isStaffMsg(msg: Message | CommandInteraction) {
+  return Boolean(
+    msg.guild &&
+      msg.member &&
+      isStaff(
+        msg.member instanceof GuildMember
+          ? msg.member
+          : await msg.guild.members.fetch(msg.member.user.id),
+      ),
+  );
+}
+
+export const commandsList: Command[] = [
   {
-    words: [`!commands`],
+    words: [`commands`],
     help: `lists all available commands`,
     category: "Reactiflux",
     handleMessage: (msg) => {
@@ -45,11 +56,11 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!rrlinks`],
+    words: [`rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Helpful links",
@@ -62,11 +73,11 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!xy`],
+    words: [`xy`],
     help: `explains the XY problem`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "The XY Issue",
@@ -79,11 +90,11 @@ const commandsList: Command[] = [
     },
   },
   {
-    words: [`!ymnnr`],
+    words: [`ymnnr`],
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "You Might Not Need Redux",
@@ -98,11 +109,11 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
     },
   },
   {
-    words: [`!derived`],
+    words: [`derived`],
     help: `Links to the React docs advice to avoid copying props to state`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title:
@@ -118,11 +129,11 @@ https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
     },
   },
   {
-    words: [`!su`, `!stateupdates`],
+    words: [`su`, `stateupdates`],
     help: `Explains the implications involved with state updates being asynchronous`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "State Updates May Be Asynchronous",
@@ -147,11 +158,11 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
     },
   },
   {
-    words: [`!bind`],
+    words: [`bind`],
     help: `explains how and why to bind in React applications`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Binding functions",
@@ -192,11 +203,11 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
     },
   },
   {
-    words: [`!lift`],
+    words: [`lift`],
     help: `links to the React docs regarding the common need to "lift" state`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Lifting State Up",
@@ -212,11 +223,11 @@ https://reactjs.org/docs/lifting-state-up.html`,
   },
 
   {
-    words: [`!ask`],
+    words: [`ask`],
     help: `explains how to ask questions`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Asking to ask",
@@ -244,11 +255,11 @@ How To Ask Questions The Smart Way https://git.io/JKscV
     },
   },
   {
-    words: [`!code`, `!gist`],
+    words: [`code`, `gist`],
     help: `explains how to attach code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Attaching Code",
@@ -270,11 +281,11 @@ Link a Snack to share React Native examples: https://snack.expo.io
     },
   },
   {
-    words: [`!ping`],
+    words: [`ping`],
     help: `explains how to ping politely`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Don’t ping or DM other devs you aren’t actively talking to",
@@ -289,11 +300,11 @@ Similarly, don’t DM other members without asking first. All of the same proble
     },
   },
   {
-    words: [`!inputs`],
+    words: [`inputs`],
     help: `provides links to uncontrolled vs controlled components`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Uncontrolled vs Controlled components",
@@ -307,80 +318,80 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       });
     },
   },
+  // {
+  //   words: [`move`],
+  //   help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
+  //   category: "Reactiflux",
+  //   handleMessage: (msg) => {
+  //     const [, newChannel] = msg.content.split(" ");
+
+  //     try {
+  //       const targetChannel = msg.guild?.channels.cache.get(
+  //         newChannel.replace("<#", "").replace(">", ""),
+  //       ) as TextChannel;
+
+  //       if (!msg.mentions.members) return;
+
+  //       targetChannel.send(
+  //         `${msg.author} has opened a portal from ${
+  //           msg.channel
+  //         } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
+  //       );
+  //     } catch (e) {
+  //       console.log("Something went wrong when summoning a portal: ", e);
+  //     }
+  //   },
+  // },
+  // {
+  //   words: [`mdn`],
+  //   help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
+  //   category: "Web",
+  //   handleMessage: async (msg) => {
+  //     const [, ...args] = msg.content.split(" ");
+  //     const query = args.join(" ");
+  //     const [fetchMsg, res] = await Promise.all([
+  //       msg.channel.send(`Fetching "${query}"...`),
+  //       fetch(
+  //         `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
+  //       ),
+  //     ]);
+
+  //     const { documents } = await res.json();
+  //     const [topResult] = documents;
+
+  //     if (!topResult) {
+  //       fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
+  //       return;
+  //     }
+
+  //     const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
+
+  //     await msg.channel?.send({
+  //       embeds: [
+  //         {
+  //           author: {
+  //             name: "MDN",
+  //             url: "https://developer.mozilla.org",
+  //             icon_url:
+  //               "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
+  //           },
+  //           title,
+  //           description,
+  //           color: 0x83d0f2,
+  //           url: `https://developer.mozilla.org${mdnUrl}`,
+  //         },
+  //       ],
+  //     });
+
+  //     fetchMsg.delete();
+  //   },
+  // },
   {
-    words: [`!move`],
-    help: `allows you to move the conversation to another channel \n\t(usage: \`!move #toChannel @person1 @person2 @person3\`)`,
-    category: "Reactiflux",
-    handleMessage: (msg) => {
-      const [, newChannel] = msg.content.split(" ");
-
-      try {
-        const targetChannel = msg.guild?.channels.cache.get(
-          newChannel.replace("<#", "").replace(">", ""),
-        ) as TextChannel;
-
-        if (!msg.mentions.members) return;
-
-        targetChannel.send(
-          `${msg.author} has opened a portal from ${
-            msg.channel
-          } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
-        );
-      } catch (e) {
-        console.log("Something went wrong when summoning a portal: ", e);
-      }
-    },
-  },
-  {
-    words: [`!mdn`],
-    help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
-    category: "Web",
-    handleMessage: async (msg) => {
-      const [, ...args] = msg.content.split(" ");
-      const query = args.join(" ");
-      const [fetchMsg, res] = await Promise.all([
-        msg.channel.send(`Fetching "${query}"...`),
-        fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
-        ),
-      ]);
-
-      const { documents } = await res.json();
-      const [topResult] = documents;
-
-      if (!topResult) {
-        fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
-        return;
-      }
-
-      const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
-
-      await msg.channel.send({
-        embeds: [
-          {
-            author: {
-              name: "MDN",
-              url: "https://developer.mozilla.org",
-              icon_url:
-                "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
-            },
-            title,
-            description,
-            color: 0x83d0f2,
-            url: `https://developer.mozilla.org${mdnUrl}`,
-          },
-        ],
-      });
-
-      fetchMsg.delete();
-    },
-  },
-  {
-    words: [`!appideas`],
+    words: [`appideas`],
     help: `provides a link to the best curated app ideas for beginners to advanced devs`,
     category: "Web",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Florinpop17s Curated App Ideas!",
@@ -396,11 +407,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!cors`],
+    words: [`cors`],
     help: `provides a link to what CORS is and how to fix it`,
     category: "Web",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Understanding CORS",
@@ -420,11 +431,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!imm`, `!immutability`],
+    words: [`imm`, `immutability`],
     help: `provides resources for helping with immutability`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Immutable updates",
@@ -442,11 +453,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!redux`],
+    words: [`redux`],
     help: `Info and when and why to use Redux`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "When should you use Redux?",
@@ -467,11 +478,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!reduxvscontext`, "!context"],
+    words: [`reduxvscontext`, "context"],
     help: `Differences between Redux and Context`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "What are the differences between Redux and Context?",
@@ -496,11 +507,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!render`],
+    words: [`render`],
     help: `Explanation of how React rendering behavior works`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "How does React rendering behavior work?",
@@ -523,11 +534,11 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!formatting`, `!prettier`],
+    words: [`formatting`, `prettier`],
     help: `describes Prettier and explains how to use it to format code`,
     category: "Reactiflux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Formatting code with Prettier",
@@ -546,11 +557,11 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!gender`],
+    words: [`gender`],
     help: `reminds users to use gender-neutral language`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Please use gender neutral language by default",
@@ -567,11 +578,11 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!reactts`],
+    words: [`reactts`],
     help: `Resources and tips for using React + TypeScript together`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Resources for React + TypeScript",
@@ -593,11 +604,11 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!hooks`, `!learn`],
+    words: [`hooks`, `learn`],
     help: `Resources for Learning React`,
     category: "React/Redux",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "Learning React",
@@ -615,11 +626,11 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
     },
   },
   {
-    words: [`!nw`, `!notworking`],
+    words: [`nw`, `notworking`],
     help: `gives some tips on how to improve your chances at getting an answer`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.channel.send({
+      msg.channel?.send({
         embeds: [
           {
             title: "State your problem",
@@ -637,16 +648,16 @@ Instead:
     },
   },
   {
-    words: ["!lock"],
-    help: "",
+    words: ["lock"],
+    help: "locks a channel",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild || !isStaff(msg.member)) {
+      if (!(await isStaffMsg(msg))) {
         return;
       }
 
       // permission overwrites can only be applied on Guild Text Channels
-      if (msg.channel.type === "GUILD_TEXT") {
+      if (msg.channel?.type === "GUILD_TEXT") {
         const { channel: guildTextChannel } = msg;
         await guildTextChannel.permissionOverwrites.create(
           guildTextChannel.guild.roles.everyone,
@@ -662,16 +673,16 @@ Instead:
     },
   },
   {
-    words: ["!unlock"],
-    help: "",
+    words: ["unlock"],
+    help: "unlocks a channel",
     category: "Communication",
     handleMessage: async (msg) => {
-      if (!msg.guild || !isStaff(msg.member)) {
+      if (!(await isStaffMsg(msg))) {
         return;
       }
 
       // permission overwrites can only be applied on Guild Text Channels
-      if (msg.channel.type === "GUILD_TEXT") {
+      if (msg.channel?.type === "GUILD_TEXT") {
         const { channel: guildTextChannel } = msg;
         guildTextChannel.permissionOverwrites.create(
           guildTextChannel.guild.roles.everyone,
@@ -710,7 +721,7 @@ const createCommandsMessage = () => {
     const boldTitle = `**${category}**`;
     const commandDescriptions = commands
       .map((command) => {
-        const formattedWords = command.words.map((word) => `**\`${word}\`**`);
+        const formattedWords = command.words.map((word) => `**\`!${word}\`**`);
         return `${formattedWords.join(", ")}: ${command.help}`;
       })
       .join("\n");
@@ -733,7 +744,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        return msg.content.toLowerCase().includes(`!${word}`);
       });
 
       if (keyword) {

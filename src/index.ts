@@ -5,13 +5,18 @@ import discord, {
   Intents,
   PartialMessageReaction,
   PartialUser,
+  Interaction,
 } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v9";
 
 import { logger, stdoutLog, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
-import commands from "./features/commands";
+import commands, { commandsList } from "./features/commands";
+import cooldown from "./features/cooldown";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
@@ -36,6 +41,9 @@ export const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
 
+const api = new REST({ version: "9" });
+if (process.env.DISCORD_HASH) api.setToken(process.env.DISCORD_HASH);
+
 bot
   .login(process.env.DISCORD_HASH)
   .then(async () => {
@@ -56,6 +64,18 @@ bot
 
     if (bot.application) {
       const { id } = bot.application;
+
+      await api.put(Routes.applicationCommands(id), {
+        body: commandsList.flatMap((command) =>
+          command.words.map((word) => {
+            return new SlashCommandBuilder()
+              .setName(word)
+              .setDescription(command.help)
+              .toJSON();
+          }),
+        ),
+      });
+
       console.log("Bot started. If necessary, add it to your test server:");
       console.log(
         `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
@@ -147,6 +167,28 @@ if (process.env.BOT_LOG) {
   logger.add(channelLog(bot, process.env.BOT_LOG)); // #bot-log
 }
 
+const handleInteraction = async (interaction: Interaction) => {
+  if (!interaction.isCommand()) return;
+
+  commandsList.forEach((command) => {
+    const keyword = command.words.find((word) => {
+      return interaction.commandName == word;
+    });
+
+    if (keyword) {
+      if (cooldown.hasCooldown(interaction.user.id, `commands.${keyword}`)) {
+        return;
+      }
+      cooldown.addCooldown(
+        interaction.user.id,
+        `commands.${keyword}`,
+        command.cooldown,
+      );
+      command.handleMessage(interaction);
+    }
+  });
+};
+
 // Amplitude metrics
 setupStats(bot);
 
@@ -180,6 +222,8 @@ bot.on("messageCreate", async (msg) => {
 
   handleMessage(msg);
 });
+
+bot.on("interactionCreate", handleInteraction);
 
 bot.on("error", (err) => {
   try {
