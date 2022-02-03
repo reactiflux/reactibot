@@ -49,7 +49,7 @@ const autoThread: ChannelHandlers = {
     await sleep(30);
     message.delete();
   },
-  handleReaction: async ({ reaction }) => {
+  handleReaction: async ({ reaction, user }) => {
     if (!CHECKS.includes(reaction.emoji.toString())) {
       return;
     }
@@ -59,7 +59,7 @@ const autoThread: ChannelHandlers = {
       ? await thread.fetchStarterMessage()
       : undefined;
 
-    if (!starter || !guild) {
+    if (!starter || !guild || user.id !== starter.author.id) {
       return;
     }
 
