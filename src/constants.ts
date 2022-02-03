@@ -1,4 +1,5 @@
 export const modRoleId = "&102870499406647296";
+export const reactibot = "644375510725689369";
 
 export const enum CHANNELS {
   "helpReact" = "103696749012467712",
