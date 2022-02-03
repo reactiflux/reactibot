@@ -1,11 +1,12 @@
 import { differenceInHours, format } from "date-fns";
-import { Client } from "discord.js";
-import { CHANNELS } from "../constants";
+import { Client, Collection, ThreadChannel, Message } from "discord.js";
+import { CHANNELS, reactibot } from "../constants";
 import {
   constructDiscordLink,
   fetchReactionMembers,
   isHelpful,
   isStaff,
+  fetchMessagesByUser,
 } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
@@ -14,6 +15,20 @@ import { threadStats } from "../features/stats";
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 12;
 const STAFF_ACCEPT_THRESHOLD = 2;
+
+const checkIfBotReplied = (
+  messages: Collection<string, Message<boolean>>,
+): boolean => {
+  let flag = 0;
+
+  messages.forEach((message) => {
+    if (message.content.includes("This question has an answer!")) {
+      flag++;
+    }
+  });
+
+  return flag > 0;
+};
 
 const autoThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -55,6 +70,16 @@ const autoThread: ChannelHandlers = {
     }
 
     const { channel: thread, author, guild } = await reaction.message.fetch();
+
+    const threadMessages = fetchMessagesByUser(
+      thread as ThreadChannel,
+      reactibot,
+    );
+
+    if (checkIfBotReplied(threadMessages)) {
+      return;
+    }
+
     const starter = thread.isThread()
       ? await thread.fetchStarterMessage()
       : undefined;
