@@ -124,27 +124,25 @@ const sendMessage = async (
   messageConfig: MessageConfig,
 ) => {
   const { message, postTo } = messageConfig;
-  postTo.forEach(
-    async ({ guildId = defaultGuildId, channelId, interval }) => {
-      const channel = await bot.channels.fetch(channelId);
+  postTo.forEach(async ({ guildId = defaultGuildId, channelId, interval }) => {
+    const channel = await bot.channels.fetch(channelId);
 
-      if (channel === null) {
-        logger.log(
-          "scheduled",
-          `Failed to send a scheduled message: channel ${channelId} does not exist in guild ${guildId}.`,
-        );
-        return;
-      }
-      if (!channel.isText()) {
-        logger.log(
-          "scheduled",
-          `Failed to send a scheduled message: channel ${channelId} in guild ${guildId} is not a text channel.`,
-        );
-        return;
-      }
-      scheduleTask(interval, () => {
-        channel.send(message);
-      });
-    },
-  );
+    if (channel === null) {
+      logger.log(
+        "scheduled",
+        `Failed to send a scheduled message: channel ${channelId} does not exist in guild ${guildId}.`,
+      );
+      return;
+    }
+    if (!channel.isText()) {
+      logger.log(
+        "scheduled",
+        `Failed to send a scheduled message: channel ${channelId} in guild ${guildId} is not a text channel.`,
+      );
+      return;
+    }
+    scheduleTask(interval, () => {
+      channel.send(message);
+    });
+  });
 };
