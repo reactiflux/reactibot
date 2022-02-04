@@ -1,5 +1,5 @@
 import type * as discord from "discord.js";
-import { CHANNELS } from "../constants";
+import { guildId as defaultGuildId, CHANNELS } from "../constants";
 import { logger } from "./log";
 import { scheduleTask } from "../helpers/schedule";
 
@@ -29,7 +29,7 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
     // Find Discord channel IDs: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
     postTo: [
       {
-        id: "102860784329052160",  // Reactiflux's server ID, optional
+        id: defaultGuildId, // Reactiflux's server ID, optional
         interval: FREQUENCY.weekly, // Frequency the bot should post by
         channelIds: [ CHANNELS.helpReact ]  // Add channel IDs to constants first!
       }
@@ -125,7 +125,7 @@ const sendMessage = async (
 ) => {
   const { message, postTo } = messageConfig;
   postTo.forEach(
-    async ({ guildId = "102860784329052160", channelId, interval }) => {
+    async ({ guildId = defaultGuildId, channelId, interval }) => {
       const channel = await bot.channels.fetch(channelId);
 
       if (channel === null) {
