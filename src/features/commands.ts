@@ -45,6 +45,23 @@ const commandsList: Command[] = [
     },
   },
   {
+    words: [`!conduct`],
+    help: `informs user's of code of conduct`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.reply({
+        embeds: [
+          {
+            title: "Code of Conduct",
+            type: "rich",
+            description: `Reactiflux is the largest chat community of React developers. We make a deliberate effort to have a light touch when it comes to moderating, but we do have some expectations of how our members will behave. Please read the full Code of Conduct at https://www.reactiflux.com/conduct`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
