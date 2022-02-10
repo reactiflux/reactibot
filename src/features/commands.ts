@@ -62,6 +62,25 @@ const commandsList: Command[] = [
     },
   },
   {
+    words: [`!promotion`],
+    help: `informs user's of self-promotion guidelines`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.reply({
+        embeds: [
+          {
+            title: "Self Promotion",
+            type: "rich",
+            description: `Reactiflux's members do lots of cool stuff, and we'd love for you to share what you've done! However Reactiflux is fundamentally a peer group, not an advertising channel or a free audience. Members who join only to promote something have what they share more aggressively moderated than members who participate in the community in other ways.
+            
+            Please review our guidelines around self-promotion at https://www.reactiflux.com/promotion`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
