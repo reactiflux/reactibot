@@ -62,6 +62,23 @@ const commandsList: Command[] = [
     },
   },
   {
+    words: [`!promotion`],
+    help: `informs user's of self-promotion guidelines`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.reply({
+        embeds: [
+          {
+            title: "Self Promotion",
+            type: "rich",
+            description: `Reactiflux is a peer group, not an advertising channel or a free audience. Please review our guidelines around self-promotion at https://www.reactiflux.com/promotion`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
     category: "React/Redux",
