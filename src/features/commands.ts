@@ -501,7 +501,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
-    words: [`!reduxvscontext`, "!context"],
+    words: ["!context"],
     help: `Differences between Redux and Context`,
     category: "React/Redux",
     handleMessage: (msg) => {
@@ -518,10 +518,10 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           See these articles for more details on the differences:
 
-          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
           https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
-          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
           https://blog.isquaredsoftware.com/2020/01/blogged-answers-react-redux-and-context-behavior/
+          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
+          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
           `,
             color: EMBED_COLOR,
           },
@@ -642,6 +642,9 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
 
           The official (stable) React docs still teach classes for the examples, but the concepts are still valid:
           https://reactjs.org/docs/getting-started.html
+
+          The Reactiflux "Learning Resources" page has curated links for learning JS, React, Redux, and TS:
+          https://www.reactiflux.com/learning
           `,
           },
         ],
