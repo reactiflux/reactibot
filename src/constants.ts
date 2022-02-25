@@ -1,4 +1,5 @@
 export const modRoleId = "&102870499406647296";
+export const reactibot = "644375510725689369";
 
 export const guildId = "102860784329052160";
 

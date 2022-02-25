@@ -5,6 +5,7 @@ import {
   Guild,
   MessageReaction,
   PartialMessageReaction,
+  ThreadChannel,
 } from "discord.js";
 
 const staffRoles = ["mvp", "moderator", "admin", "admins"];
@@ -41,3 +42,6 @@ export const fetchReactionMembers = (
     .then((users) =>
       Promise.all(users.map((user) => guild.members.fetch(user.id))),
     );
+
+export const fetchMessagesByUser = (thread: ThreadChannel, userID: string) =>
+  thread.messages.cache.filter((message) => message.author.id === userID);
