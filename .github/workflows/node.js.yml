@@ -68,4 +68,4 @@ jobs:
             sudo docker container stop $(sudo docker container ls -aq)
             sudo docker container rm $(sudo docker container ls -aq)
             sudo docker image prune -f
-            sudo docker run -d -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH -e BOT_LOG=$BOT_LOG reactiflux/reactibot:latest
+            sudo docker run -d -e ENVIRONMENT=production -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH -e BOT_LOG=$BOT_LOG reactiflux/reactibot:latest
