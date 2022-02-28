@@ -20,7 +20,7 @@ import autothread, { cleanupThreads } from "./features/autothread";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
-import { CHANNELS } from "./constants";
+import { CHANNELS } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 
 export const bot = new discord.Client({

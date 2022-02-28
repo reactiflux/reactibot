@@ -1,5 +1,6 @@
 import type * as discord from "discord.js";
-import { guildId as defaultGuildId, CHANNELS } from "../constants";
+import { guildId as defaultGuildId } from "../constants";
+import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
 import { scheduleTask } from "../helpers/schedule";
 

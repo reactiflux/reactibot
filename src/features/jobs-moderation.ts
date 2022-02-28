@@ -1,6 +1,6 @@
 import { compareAsc, differenceInDays, format } from "date-fns";
 import { Client, Message, TextChannel } from "discord.js";
-import { CHANNELS } from "../constants";
+import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
 import cooldown from "./cooldown";

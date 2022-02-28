@@ -1,0 +1,25 @@
+import { isProd } from "../helpers/env";
+
+const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
+  helpReact: "926931785219207301",
+  helpThreadsReact: "926931785219207301",
+  helpJs: "926931785219207301",
+  random: "926931785219207301",
+  thanks: "926931785219207301",
+  jobBoard: "925847361996095509",
+  modLog: "257930126145224704",
+  botLog: "916081991542276096",
+};
+
+const PRODUCTION_CHANNELS = {
+  helpReact: "103696749012467712",
+  helpThreadsReact: "902647189120118794",
+  helpJs: "565213527673929729",
+  random: "103325358643752960",
+  thanks: "798567961468076072",
+  jobBoard: "103882387330457600",
+  modLog: "257930126145224704",
+  botLog: "701462381703856158",
+};
+
+export const CHANNELS = isProd() ? PRODUCTION_CHANNELS : LOCAL_CHANNELS;
