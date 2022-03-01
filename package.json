@@ -20,7 +20,7 @@
     "discord.js": "^13.5.0",
     "dotenv": "^10.0.0",
     "gists": "^2.0.0",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.7",
     "query-string": "^6.2.0"
   },
   "devDependencies": {
