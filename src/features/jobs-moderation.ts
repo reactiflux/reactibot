@@ -64,9 +64,33 @@ const jobModeration = async (bot: Client) => {
   bot.on("messageCreate", async (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
-      isStaff(message.member) ||
       message.author.id === bot.user?.id
     ) {
+      return;
+    }
+    // Allow staff to wipe "recently posted" history for a member
+    if (isStaff(message.member)) {
+      if (
+        message.content.startsWith("!resetJobPost") &&
+        message.mentions.members?.size
+      ) {
+        const memberToClear = message.mentions.members?.at(0);
+        let removed = 0;
+
+        let index = storedMessages.findIndex(
+          (x) => x.author.id === memberToClear?.id,
+        );
+        while (index > 0) {
+          removed += 1;
+          storedMessages.splice(index, 1);
+          index = storedMessages.findIndex(
+            (x) => x.author.id === memberToClear?.id,
+          );
+        }
+        message.reply(
+          `Found and cleared ${removed} posts from cache for this user`,
+        );
+      }
       return;
     }
 
