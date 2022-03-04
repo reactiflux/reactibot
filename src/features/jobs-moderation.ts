@@ -94,6 +94,22 @@ const jobModeration = async (bot: Client) => {
       return;
     }
 
+    if (message.type === "REPLY") {
+      message
+        .reply({
+          content:
+            "This channel is only for job postings, please DM the poster or create a thread",
+          allowedMentions: { repliedUser: false },
+        })
+        .then(async (reply) => {
+          await sleep(45);
+          reply.delete();
+        });
+      moderatedMessageIds.add(message.id);
+      message.delete();
+      return;
+    }
+
     // Handle joining and posting too quickly
     const now = new Date();
     if (
