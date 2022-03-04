@@ -86,7 +86,7 @@ const jobModeration = async (bot: Client) => {
           "You joined too recently to post a job, please try again in a few days. Your post has been DM’d to you.",
         )
         .then(async (reply) => {
-          await sleep(15);
+          await sleep(45);
           reply.delete();
         });
       message.delete();
@@ -110,7 +110,7 @@ const jobModeration = async (bot: Client) => {
           `Please only post every 7 days. Your last post here was only ${lastSent} day(s) ago. Your post has been DM’d to you.`,
         )
         .then(async (reply) => {
-          await sleep(15);
+          await sleep(45);
           reply.delete();
         });
       message.delete();
