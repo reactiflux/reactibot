@@ -20,7 +20,7 @@ import autothread, { cleanupThreads } from "./features/autothread";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
-import { CHANNELS } from "./constants";
+import { CHANNELS } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 
 export const bot = new discord.Client({
@@ -143,9 +143,7 @@ const handleReaction = (
 };
 
 logger.add(stdoutLog);
-if (process.env.BOT_LOG) {
-  logger.add(channelLog(bot, process.env.BOT_LOG)); // #bot-log
-}
+logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics
 setupStats(bot);

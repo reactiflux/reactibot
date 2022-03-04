@@ -4,7 +4,7 @@ WORKDIR /build/reactibot
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
 RUN yarn
 

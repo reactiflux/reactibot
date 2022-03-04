@@ -7,7 +7,8 @@ import {
 } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { CHANNELS, ReportReasons } from "../constants";
+import { ReportReasons } from "../constants";
+import { CHANNELS } from "../constants/channels";
 import { constructLog } from "../helpers/modLog";
 import { simplifyString } from "../helpers/string";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";

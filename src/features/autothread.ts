@@ -1,6 +1,6 @@
 import { differenceInHours, format } from "date-fns";
 import { Client } from "discord.js";
-import { CHANNELS } from "../constants";
+import { CHANNELS } from "../constants/channels";
 import {
   constructDiscordLink,
   fetchReactionMembers,
