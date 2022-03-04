@@ -7,7 +7,7 @@ const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
   random: "926931785219207301",
   thanks: "926931785219207301",
   jobBoard: "925847361996095509",
-  modLog: "257930126145224704",
+  modLog: "925847644318879754",
   botLog: "916081991542276096",
 };
 
