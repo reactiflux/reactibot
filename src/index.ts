@@ -143,9 +143,7 @@ const handleReaction = (
 };
 
 logger.add(stdoutLog);
-if (process.env.BOT_LOG) {
-  logger.add(channelLog(bot, process.env.BOT_LOG)); // #bot-log
-}
+logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics
 setupStats(bot);

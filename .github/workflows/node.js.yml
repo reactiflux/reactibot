@@ -58,14 +58,13 @@ jobs:
           AMPLITUDE_KEY: ${{ secrets.AMPLITUDE_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
-          BOT_LOG: ${{ secrets.BOT_LOG }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
-          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_HEAD_REF,BOT_LOG
+          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_HEAD_REF
           script: |
             sudo docker container stop $(sudo docker container ls -aq)
             sudo docker container rm $(sudo docker container ls -aq)
             sudo docker image prune -f
-            sudo docker run -d -e ENVIRONMENT=production -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH -e BOT_LOG=$BOT_LOG reactiflux/reactibot:latest
+            sudo docker run -d -e ENVIRONMENT=production -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
