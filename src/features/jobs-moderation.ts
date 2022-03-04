@@ -77,6 +77,9 @@ const jobModeration = async (bot: Client) => {
       differenceInDays(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
     ) {
       moderatedMessageIds.add(message.id);
+      message.author.send(
+        "You joined too recently to post a job, please try again in a few days. Your post:",
+      );
       message.author.send(message.content);
       message
         .reply(
@@ -96,14 +99,15 @@ const jobModeration = async (bot: Client) => {
       (m) => m.author.id === message.author.id,
     );
     if (existingMessage) {
+      const lastSent = differenceInDays(now, existingMessage.createdAt);
       moderatedMessageIds.add(message.id);
+      message.author.send(
+        `Please only post every 7 days. Your last post here was only ${lastSent} day(s) ago. Your post:`,
+      );
       message.author.send(message.content);
       message
         .reply(
-          `Please only post every 7 days. Your last post here was only ${differenceInDays(
-            now,
-            existingMessage.createdAt,
-          )} day(s) ago. Your post has been DM’d to you.`,
+          `Please only post every 7 days. Your last post here was only ${lastSent} day(s) ago. Your post has been DM’d to you.`,
         )
         .then(async (reply) => {
           await sleep(15);
@@ -122,7 +126,7 @@ const jobModeration = async (bot: Client) => {
 
       cooldown.addCooldown(message.author.id, "user.jobs");
       message.author
-        .send(`Hello there! You’ve just posted a message to the #jobs-board channel, but you haven’t added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
+        .send(`Your post to #job-board didn’t have any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
 
 [FOR HIRE] - you are looking for a job
 [HIRING] - you are looking to hire someone
