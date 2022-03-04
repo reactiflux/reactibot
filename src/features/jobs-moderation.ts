@@ -143,6 +143,12 @@ Thank you :)
     // Last, update the list of tracked messages.
     updateJobs(message);
   });
+  const modLog = bot.channels.cache.find(
+    (channel) => channel.id === CHANNELS.modLog,
+  );
+  if (!modLog?.isText()) {
+    throw new Error("Couldn't find #mod-log");
+  }
   bot.on("messageDelete", (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
@@ -158,11 +164,11 @@ Thank you :)
     }
 
     // Log deleted job posts publicly
-    message.channel.send(
-      `<@${message.author.id}> deleted their job post from ${format(
+    modLog.send(
+      `<@${message.author.id}>’s job post from ${format(
         new Date(message.createdAt),
-        "PPPP",
-      )}`,
+        "P p",
+      )} was deleted`,
     );
   });
 };
