@@ -64,9 +64,49 @@ const jobModeration = async (bot: Client) => {
   bot.on("messageCreate", async (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
-      isStaff(message.member) ||
       message.author.id === bot.user?.id
     ) {
+      return;
+    }
+    // Allow staff to wipe "recently posted" history for a member
+    if (isStaff(message.member)) {
+      if (
+        message.content.startsWith("!resetJobPost") &&
+        message.mentions.members?.size
+      ) {
+        const memberToClear = message.mentions.members?.at(0);
+        let removed = 0;
+
+        let index = storedMessages.findIndex(
+          (x) => x.author.id === memberToClear?.id,
+        );
+        while (index > 0) {
+          removed += 1;
+          storedMessages.splice(index, 1);
+          index = storedMessages.findIndex(
+            (x) => x.author.id === memberToClear?.id,
+          );
+        }
+        message.reply(
+          `Found and cleared ${removed} posts from cache for this user`,
+        );
+      }
+      return;
+    }
+
+    if (message.type === "REPLY") {
+      message
+        .reply({
+          content:
+            "This channel is only for job postings, please DM the poster or create a thread",
+          allowedMentions: { repliedUser: false },
+        })
+        .then(async (reply) => {
+          await sleep(45);
+          reply.delete();
+        });
+      moderatedMessageIds.add(message.id);
+      message.delete();
       return;
     }
 
@@ -77,13 +117,16 @@ const jobModeration = async (bot: Client) => {
       differenceInDays(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
     ) {
       moderatedMessageIds.add(message.id);
+      message.author.send(
+        "You joined too recently to post a job, please try again in a few days. Your post:",
+      );
       message.author.send(message.content);
       message
         .reply(
           "You joined too recently to post a job, please try again in a few days. Your post has been DM’d to you.",
         )
         .then(async (reply) => {
-          await sleep(15);
+          await sleep(45);
           reply.delete();
         });
       message.delete();
@@ -96,17 +139,18 @@ const jobModeration = async (bot: Client) => {
       (m) => m.author.id === message.author.id,
     );
     if (existingMessage) {
+      const lastSent = differenceInDays(now, existingMessage.createdAt);
       moderatedMessageIds.add(message.id);
+      message.author.send(
+        `Please only post every 7 days. Your last post here was only ${lastSent} day(s) ago. Your post:`,
+      );
       message.author.send(message.content);
       message
         .reply(
-          `Please only post every 7 days. Your last post here was only ${differenceInDays(
-            now,
-            existingMessage.createdAt,
-          )} day(s) ago. Your post has been DM’d to you.`,
+          `Please only post every 7 days. Your last post here was only ${lastSent} day(s) ago. Your post has been DM’d to you.`,
         )
         .then(async (reply) => {
-          await sleep(15);
+          await sleep(45);
           reply.delete();
         });
       message.delete();
@@ -122,7 +166,7 @@ const jobModeration = async (bot: Client) => {
 
       cooldown.addCooldown(message.author.id, "user.jobs");
       message.author
-        .send(`Hello there! You’ve just posted a message to the #jobs-board channel, but you haven’t added any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
+        .send(`Your post to #job-board didn’t have any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
 
 [FOR HIRE] - you are looking for a job
 [HIRING] - you are looking to hire someone
@@ -139,6 +183,12 @@ Thank you :)
     // Last, update the list of tracked messages.
     updateJobs(message);
   });
+  const modLog = bot.channels.cache.find(
+    (channel) => channel.id === CHANNELS.modLog,
+  );
+  if (!modLog?.isText()) {
+    throw new Error("Couldn't find #mod-log");
+  }
   bot.on("messageDelete", (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
@@ -154,11 +204,11 @@ Thank you :)
     }
 
     // Log deleted job posts publicly
-    message.channel.send(
-      `<@${message.author.id}> deleted their job post from ${format(
+    modLog.send(
+      `<@${message.author.id}>’s job post from ${format(
         new Date(message.createdAt),
-        "PPPP",
-      )}`,
+        "P p",
+      )} was deleted`,
     );
   });
 };
