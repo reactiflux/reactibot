@@ -15,6 +15,7 @@ import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
+import promotionThread from "./features/promotion-threads";
 import autothread, { cleanupThreads } from "./features/autothread";
 
 import { ChannelHandlers } from "./types";
@@ -157,9 +158,19 @@ addHandler("*", [
   tsPlaygroundLinkShortener,
 ]);
 
-const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
+addHandler(
+  [
+    CHANNELS.events,
+    CHANNELS.iBuiltThis,
+    CHANNELS.iWroteThis,
+    CHANNELS.techReadsAndNews,
+  ],
+  promotionThread,
+);
 
+const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
+
 bot.on("ready", () => {
   jobsMod(bot);
   scheduleTask(1000 * 60 * 30, () => {
