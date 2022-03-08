@@ -86,7 +86,7 @@ const addHandler = (
   const channels =
     typeof oneOrMoreChannels === "string"
       ? [oneOrMoreChannels]
-      : oneOrMoreChannels;
+      : [...new Set(oneOrMoreChannels)];
   const handlers =
     oneOrMoreHandlers instanceof Array
       ? oneOrMoreHandlers
