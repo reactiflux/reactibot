@@ -3,6 +3,7 @@ import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
 import { format } from "date-fns";
+import fetch from "node-fetch";
 
 const promotionThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -30,17 +31,30 @@ const promotionThread: ChannelHandlers = {
     const title = await (async () => {
       let maybeTitle = msg.author.username;
       if (firstLink) {
-        try {
-          const { result } = await ogs({ url: firstLink });
-          if (result.success) {
-            if (result.ogSiteName === "Twitter") {
-              maybeTitle = `${msg.author.username} tweet`;
-            } else {
-              maybeTitle = `${result.twitterTitle || result.ogTitle}`;
-            }
+        if (firstLink.startsWith("https://twitter.com/")) {
+          try {
+            const res = await fetch(
+              `https://publish.twitter.com/oembed?url=${firstLink}`,
+            );
+            const { author_name } = await res.json();
+            maybeTitle = `${author_name} on Twitter `;
+          } catch (e) {
+            // do nothing
           }
-        } catch (e) {
-          // do nothing
+        } else {
+          try {
+            const { result, error } = await ogs({ url: firstLink });
+            console.log({ result, error });
+            if (result.success) {
+              if (result.ogSiteName === "Twitter") {
+                maybeTitle = `${msg.author.username} tweet`;
+              } else {
+                maybeTitle = `${result.twitterTitle || result.ogTitle}`;
+              }
+            }
+          } catch (e) {
+            // do nothing
+          }
         }
       }
       return `${maybeTitle} – ${format(new Date(), "HH-mm MMM d")}`;
