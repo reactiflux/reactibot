@@ -2,11 +2,16 @@ import { isProd } from "../helpers/env";
 
 const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
   helpReact: "926931785219207301",
-  helpThreadsReact: "926931785219207301",
-  helpJs: "926931785219207301",
+  helpThreadsReact: "950790460857794620",
+  helpJs: "950790460857794620",
   random: "926931785219207301",
   thanks: "926931785219207301",
   jobBoard: "925847361996095509",
+  events: "950790520811184150",
+  iBuiltThis: "950790520811184150",
+  iWroteThis: "950790520811184150",
+  twitterFeed: "950790520811184150",
+  techReadsAndNews: "950790520811184150",
   modLog: "925847644318879754",
   botLog: "916081991542276096",
 };
@@ -18,6 +23,11 @@ const PRODUCTION_CHANNELS = {
   random: "103325358643752960",
   thanks: "798567961468076072",
   jobBoard: "103882387330457600",
+  events: "127442949435817984",
+  iBuiltThis: "312761588778139658",
+  iWroteThis: "918616846100492298",
+  twitterFeed: "951207372125274112",
+  techReadsAndNews: "105816607976095744",
   modLog: "257930126145224704",
   botLog: "701462381703856158",
 };
