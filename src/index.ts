@@ -7,7 +7,7 @@ import discord, {
   PartialUser,
 } from "discord.js";
 
-import { logger, stdoutLog, channelLog } from "./features/log";
+import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
@@ -144,7 +144,6 @@ const handleReaction = (
   });
 };
 
-logger.add(stdoutLog);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics

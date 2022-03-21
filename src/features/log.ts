@@ -2,7 +2,7 @@ import { Client } from "discord.js";
 
 type Logger = (type: string, text: string) => void;
 
-export const stdoutLog: Logger = (type, text) => {
+const stdoutLog: Logger = (type, text) => {
   const d = new Date();
   console.log(
     `[${d.toLocaleDateString()} ${d.toLocaleTimeString()}] [${type}] ${text}`,
@@ -23,7 +23,7 @@ export const channelLog =
     }
   };
 
-const loggers: Logger[] = [];
+const loggers: Logger[] = [stdoutLog];
 
 export const logger = {
   add: (logger: Logger) => loggers.push(logger),
