@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node -r dotenv/config dist/index.js",
     "dev": "ts-node-dev -r dotenv/config src/index.ts",
+    "prod:commands": "node -r dotenv/config dist/scripts/deploy-commands.js",
     "build": "tsc",
     "test": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
