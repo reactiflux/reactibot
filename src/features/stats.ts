@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import queryString from "query-string";
 import { Client } from "discord.js";
+import { amplitudeKey } from "../constants";
 
 type AmplitudeValue = string | number | boolean;
 type EmitEventData = Record<string, AmplitudeValue | AmplitudeValue[]>;
@@ -9,7 +10,7 @@ const emitEvent = (
   eventName: string,
   { data, userId }: { data?: EmitEventData; userId?: string } = {},
 ) => {
-  if (!process.env.AMPLITUDE_KEY) {
+  if (!amplitudeKey) {
     console.log({
       event_type: eventName,
       event_properties: data,
@@ -18,7 +19,7 @@ const emitEvent = (
   }
 
   const fields = {
-    api_key: process.env.AMPLITUDE_KEY,
+    api_key: amplitudeKey,
     event: JSON.stringify({
       user_id: userId,
       event_type: eventName,

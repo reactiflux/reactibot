@@ -23,6 +23,7 @@ import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
+import { discordToken } from "./constants";
 
 export const bot = new discord.Client({
   intents: [
@@ -38,7 +39,7 @@ export const bot = new discord.Client({
 });
 
 bot
-  .login(process.env.DISCORD_HASH)
+  .login(discordToken)
   .then(async () => {
     logger.log("INI", "Bootstrap complete");
 
@@ -66,7 +67,7 @@ bot
   .catch((e) => {
     console.log({ e });
     console.log(
-      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
+      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${discordToken}'`,
     );
     console.log(
       'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
