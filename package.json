@@ -7,7 +7,7 @@
     "start": "node -r dotenv/config dist/index.js",
     "dev": "npm-run-all --parallel 'dev:bot' 'dev:commands'",
     "dev:bot": "ts-node-dev -r dotenv/config src/index.ts",
-    "dev:commands": "nodemon --exec 'ts-node -r dotenv/config' ./scripts/deploy-commands.ts",
+    "dev:commands": "nodemon --watch scripts --exec 'ts-node -r dotenv/config' ./scripts/deploy-commands.ts",
     "start:commands": "node -r dotenv/config dist/scripts/deploy-commands.js",
     "build": "tsc",
     "test": "eslint --ext js,ts . && prettier --check .",
