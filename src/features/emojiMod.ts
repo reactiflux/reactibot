@@ -9,8 +9,7 @@ import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons } from "../constants";
 import { CHANNELS } from "../constants/channels";
-import { constructLog } from "../helpers/modLog";
-import { simplifyString } from "../helpers/string";
+import { constructLog, reportUser } from "../helpers/modLog";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
@@ -24,11 +23,6 @@ const config = {
   deletionThreshold: Infinity,
 };
 
-const warningMessages = new Map<
-  string,
-  { warnings: number; message: Message }
->();
-
 const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾", "👎🏿"];
 
 type ReactionHandlers = {
@@ -41,43 +35,6 @@ type ReactionHandlers = {
     author: GuildMember;
     usersWhoReacted: GuildMember[];
   }) => void;
-};
-
-const handleReport = (
-  reason: ReportReasons,
-  channelInstance: TextChannel,
-  reportedMessage: Message,
-  logBody: string,
-) => {
-  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
-    reportedMessage.content,
-  )}`;
-  const cached = warningMessages.get(simplifiedContent);
-
-  if (cached) {
-    // If we already logged for ~ this message, edit the log
-    const { message, warnings: oldWarnings } = cached;
-    const warnings = oldWarnings + 1;
-
-    let finalLog = logBody;
-    // If this was a mod report, increment the warning count
-    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
-      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
-    }
-
-    message.edit(finalLog);
-    warningMessages.set(simplifiedContent, { warnings, message });
-    return warnings;
-  } else {
-    // If this is new, send a new message
-    channelInstance.send(logBody).then((warningMessage) => {
-      warningMessages.set(simplifiedContent, {
-        warnings: 1,
-        message: warningMessage,
-      });
-    });
-    return 1;
-  }
 };
 
 const reactionHandlers: ReactionHandlers = {

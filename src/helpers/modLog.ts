@@ -1,6 +1,48 @@
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 import { ReportReasons, modRoleId } from "../constants";
 import { constructDiscordLink } from "./discord";
+import { simplifyString } from "../helpers/string";
+
+const warningMessages = new Map<
+  string,
+  { warnings: number; message: Message }
+>();
+export const reportUser = (
+  reason: ReportReasons,
+  channelInstance: TextChannel,
+  reportedMessage: Message,
+  logBody: string,
+) => {
+  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
+    reportedMessage.content,
+  )}`;
+  const cached = warningMessages.get(simplifiedContent);
+
+  if (cached) {
+    // If we already logged for ~ this message, edit the log
+    const { message, warnings: oldWarnings } = cached;
+    const warnings = oldWarnings + 1;
+
+    let finalLog = logBody;
+    // If this was a mod report, increment the warning count
+    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
+      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
+    }
+
+    message.edit(finalLog);
+    warningMessages.set(simplifiedContent, { warnings, message });
+    return warnings;
+  } else {
+    // If this is new, send a new message
+    channelInstance.send(logBody).then((warningMessage) => {
+      warningMessages.set(simplifiedContent, {
+        warnings: 1,
+        message: warningMessage,
+      });
+    });
+    return 1;
+  }
+};
 
 // Discord's limit for message length
 const maxMessageLength = 2000;
