@@ -35,9 +35,14 @@ export const constructDiscordLink = (message: Message | PartialMessage) =>
 export const fetchReactionMembers = (
   guild: Guild,
   reaction: MessageReaction | PartialMessageReaction,
-) =>
-  reaction.users
-    .fetch()
-    .then((users) =>
-      Promise.all(users.map((user) => guild.members.fetch(user.id))),
-    );
+) => {
+  try {
+    return reaction.users
+      .fetch()
+      .then((users) =>
+        Promise.all(users.map((user) => guild.members.fetch(user.id))),
+      );
+  } catch (e) {
+    return Promise.resolve([] as GuildMember[]);
+  }
+};
