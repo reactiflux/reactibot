@@ -5,7 +5,8 @@ type Logger = (type: string, text: string) => void;
 const stdoutLog: Logger = (type, text) => {
   const d = new Date();
   console.log(
-    `[${d.toLocaleDateString()} ${d.toLocaleTimeString()}] [${type}] ${text}`,
+    `[${d.toLocaleDateString()} ${d.toLocaleTimeString()}] [${type}]`,
+    text,
   );
 };
 
