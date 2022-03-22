@@ -21,7 +21,7 @@ import autothread, { cleanupThreads } from "./features/autothread";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
-import { CHANNELS } from "./constants/channels";
+import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./constants";
 
@@ -144,6 +144,7 @@ const handleReaction = (
   });
 };
 
+initCachedChannels(bot);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics

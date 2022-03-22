@@ -1,3 +1,5 @@
+import { Client, TextChannel } from "discord.js";
+import { guildId } from "../constants";
 import { isProd } from "../helpers/env";
 
 const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
@@ -50,3 +52,24 @@ const PRODUCTION_ROLES = {
 };
 
 export const ROLES = isProd() ? PRODUCTION_ROLES : LOCAL_ROLES;
+
+const cachedChannels: Record<string, Record<string, TextChannel>> = {
+  [guildId]: {},
+};
+
+export const initCachedChannels = async (bot: Client) => {
+  const reactiflux = await bot.guilds.fetch(guildId);
+  const channels = await Promise.all(
+    [CHANNELS.botLog, CHANNELS.modLog].map((channelId) =>
+      reactiflux.channels.fetch(channelId),
+    ),
+  );
+
+  channels.forEach((channel) => {
+    if (!channel || !channel.isText()) return;
+    cachedChannels[guildId][channel.id] = channel as TextChannel;
+  });
+};
+
+export const getChannel = (channelId: string) =>
+  cachedChannels[guildId][channelId];
