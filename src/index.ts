@@ -11,7 +11,7 @@ import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
-import commands from "./features/commands";
+import commands, { setupInteractions } from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
@@ -149,6 +149,9 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics
 setupStats(bot);
+
+// Discord commands
+setupInteractions(bot);
 
 // common
 addHandler("*", [
