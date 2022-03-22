@@ -12,6 +12,8 @@ import { applicationId, discordToken, guildId } from "../src/constants";
 import { logger } from "../src/features/log";
 import { difference } from "../src/helpers/sets";
 
+import * as report from "../src/commands/report";
+
 // TODO: make this a global command in production
 const upsertUrl = () => Routes.applicationGuildCommands(applicationId, guildId);
 const deleteUrl = (commandId: string) =>
@@ -22,7 +24,7 @@ interface CommandConfig {
   description: string;
   type: ApplicationCommandType;
 }
-const cmds: CommandConfig[] = [];
+const cmds: CommandConfig[] = [report];
 
 const commands = [
   ...cmds

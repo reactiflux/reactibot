@@ -57,7 +57,7 @@ export const constructLog = (
   members: string[],
   staff: string[],
   message: Message,
-) => {
+): string => {
   const modAlert = `<@${modRoleId}>`;
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
   const postfix = `Link: ${constructDiscordLink(message)}
@@ -90,6 +90,12 @@ ${postfix}`;
 ${postfix}`;
     case ReportReasons.spam:
       return `${preface}, reported for spam:
+
+\`${reportedMessage}\`
+
+${postfix}`;
+    case ReportReasons.anonReport:
+      return `${preface}, reported anonymously:
 
 \`${reportedMessage}\`
 
