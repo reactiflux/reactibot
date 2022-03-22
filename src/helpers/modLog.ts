@@ -1,18 +1,14 @@
-import { Message, TextChannel } from "discord.js";
+import { Message } from "discord.js";
 import { ReportReasons, modRoleId } from "../constants";
 import { constructDiscordLink } from "./discord";
 import { simplifyString } from "../helpers/string";
+import { CHANNELS, getChannel } from "../constants/channels";
 
 const warningMessages = new Map<
   string,
   { warnings: number; message: Message }
 >();
-export const reportUser = (
-  reason: ReportReasons,
-  channelInstance: TextChannel,
-  reportedMessage: Message,
-  logBody: string,
-) => {
+export const reportUser = (reportedMessage: Message, logBody: string) => {
   const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
     reportedMessage.content,
   )}`;
@@ -23,23 +19,24 @@ export const reportUser = (
     const { message, warnings: oldWarnings } = cached;
     const warnings = oldWarnings + 1;
 
-    let finalLog = logBody;
-    // If this was a mod report, increment the warning count
-    if (reason === ReportReasons.mod || reason === ReportReasons.spam) {
-      finalLog = logBody.replace(/warned \d times/, `warned ${warnings} times`);
-    }
+    const finalLog = logBody.replace(
+      /warned \d times/,
+      `warned ${warnings} times`,
+    );
 
     message.edit(finalLog);
     warningMessages.set(simplifiedContent, { warnings, message });
     return warnings;
   } else {
     // If this is new, send a new message
-    channelInstance.send(logBody).then((warningMessage) => {
-      warningMessages.set(simplifiedContent, {
-        warnings: 1,
-        message: warningMessage,
+    getChannel(CHANNELS.modLog)
+      .send(logBody)
+      .then((warningMessage) => {
+        warningMessages.set(simplifiedContent, {
+          warnings: 1,
+          message: warningMessage,
+        });
       });
-    });
     return 1;
   }
 };

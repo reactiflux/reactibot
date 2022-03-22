@@ -1,17 +1,13 @@
-import {
-  MessageReaction,
-  Message,
-  GuildMember,
-  TextChannel,
-  Guild,
-} from "discord.js";
+import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons } from "../constants";
-import { CHANNELS } from "../constants/channels";
+import { CHANNELS, getChannel } from "../constants/channels";
 import { constructLog, reportUser } from "../helpers/modLog";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
+
+const modLog = getChannel(CHANNELS.modLog);
 
 const AUTO_SPAM_THRESHOLD = 5;
 const config = {
@@ -28,7 +24,6 @@ const thumbsDownEmojis = ["👎", "👎🏻", "👎🏼", "👎🏽", "👎🏾"
 type ReactionHandlers = {
   [emoji: string]: (args: {
     guild: Guild;
-    logChannel: TextChannel;
     reaction: MessageReaction;
     message: Message;
     reactor: GuildMember;
@@ -37,15 +32,8 @@ type ReactionHandlers = {
   }) => void;
 };
 
-const reactionHandlers: ReactionHandlers = {
-  "⚠️": async ({
-    author,
-    reactor,
-    message,
-    reaction,
-    usersWhoReacted,
-    logChannel,
-  }) => {
+export const reactionHandlers: ReactionHandlers = {
+  "⚠️": async ({ author, reactor, message, reaction, usersWhoReacted }) => {
     // Skip if the post is from someone from the staff
     if (isStaff(author)) {
       return;
@@ -69,21 +57,9 @@ Thanks!
       return;
     }
 
-    handleReport(
-      ReportReasons.mod,
-      logChannel,
-      message,
-      constructLog(ReportReasons.mod, [], staff, message),
-    );
+    reportUser(message, constructLog(ReportReasons.mod, [], staff, message));
   },
-  "💩": async ({
-    guild,
-    author,
-    reactor,
-    message,
-    usersWhoReacted,
-    logChannel,
-  }) => {
+  "💩": async ({ guild, author, reactor, message, usersWhoReacted }) => {
     // Skip if the post is from someone from the staff or reactor is not staff
     if (isStaff(author) || !isStaff(reactor)) {
       return;
@@ -92,9 +68,7 @@ Thanks!
     const [members, staff] = partition(isStaff, usersWhoReacted);
 
     message.delete();
-    const warnings = handleReport(
-      ReportReasons.spam,
-      logChannel,
+    const warnings = reportUser(
       message,
       constructLog(
         ReportReasons.spam,
@@ -107,13 +81,11 @@ Thanks!
     if (warnings >= AUTO_SPAM_THRESHOLD) {
       guild.members.fetch(message.author.id).then((member) => {
         member.kick("Autokicked for spamming");
-        logChannel.send(
-          `Automatically kicked <@${message.author.id}> for spam`,
-        );
+        modLog.send(`Automatically kicked <@${message.author.id}> for spam`);
       });
     }
   },
-  "👎": async ({ message, reactor, usersWhoReacted, logChannel }) => {
+  "👎": async ({ message, reactor, usersWhoReacted }) => {
     if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
       return;
     }
@@ -138,9 +110,7 @@ Thanks!
       message.delete();
     }
 
-    handleReport(
-      meetsDeletion ? ReportReasons.userDelete : ReportReasons.userWarn,
-      logChannel,
+    reportUser(
       message,
       constructLog(
         trigger,
@@ -194,10 +164,6 @@ const emojiMod: ChannelHandlers = {
       usersWhoReacted: usersWhoReacted.filter((x): x is GuildMember =>
         Boolean(x),
       ),
-      logChannel: guild.channels.cache.find(
-        (channel) =>
-          channel.name === "mod-log" || channel.id === CHANNELS.modLog,
-      ) as TextChannel,
     });
   },
 };
