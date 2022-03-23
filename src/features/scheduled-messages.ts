@@ -41,6 +41,10 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
+    postTo: [{ interval: HOURLY * 24, channelId: CHANNELS.gaming }],
+    message: { content: "Daily <@&954499699870666842> thread" },
+  },
+  {
     postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
     message: {
       content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
