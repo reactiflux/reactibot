@@ -1,7 +1,8 @@
 import Gists from "gists";
+import { gitHubToken } from "../constants";
 
 const gists = new Gists({
-  token: process.env.GITHUB_TOKEN,
+  token: gitHubToken,
 });
 
 const maxLines = 15;

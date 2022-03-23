@@ -7,7 +7,7 @@ import discord, {
   PartialUser,
 } from "discord.js";
 
-import { logger, stdoutLog, channelLog } from "./features/log";
+import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
@@ -21,8 +21,9 @@ import autothread, { cleanupThreads } from "./features/autothread";
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
-import { CHANNELS } from "./constants/channels";
+import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
+import { discordToken } from "./constants";
 
 export const bot = new discord.Client({
   intents: [
@@ -38,7 +39,7 @@ export const bot = new discord.Client({
 });
 
 bot
-  .login(process.env.DISCORD_HASH)
+  .login(discordToken)
   .then(async () => {
     logger.log("INI", "Bootstrap complete");
 
@@ -66,7 +67,7 @@ bot
   .catch((e) => {
     console.log({ e });
     console.log(
-      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${process.env.DISCORD_HASH}'`,
+      `Failed to log into discord bot. Make sure \`.env.local\` has a discord token. Tried to use '${discordToken}'`,
     );
     console.log(
       'You can get a new discord token at https://discord.com/developers/applications, selecting your bot (or making a new one), navigating to "Bot", and clicking "Copy" under "Click to reveal token"',
@@ -143,7 +144,7 @@ const handleReaction = (
   });
 };
 
-logger.add(stdoutLog);
+initCachedChannels(bot);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics
