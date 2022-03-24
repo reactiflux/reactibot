@@ -57,7 +57,9 @@ jobs:
           username: root
           key: ${{ secrets. SSH_KEY }}
           envs: DISCORD_HASH
-          script: npm run prod:commands
+          script: |
+            cd reactibot
+            npm run prod:commands
 
       - name: Start server
         uses: appleboy/ssh-action@master
