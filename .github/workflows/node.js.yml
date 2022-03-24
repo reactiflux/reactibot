@@ -49,7 +49,7 @@ jobs:
             cd reactibot
             sudo docker build -t reactiflux/reactibot:latest .
       - name: Deploy Discord commands
-        uses: applyboy/ssh-action@master
+        uses: appleboy/ssh-action@master
         env:
           DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
         with:

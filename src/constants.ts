@@ -15,6 +15,7 @@ export const gitHubToken = process.env.GITHUB_TOKEN ?? "";
 export const amplitudeKey = process.env.AMPLITUDE_KEY ?? "";
 
 export const enum ReportReasons {
+  anonReport = "anonReport",
   userWarn = "userWarn",
   userDelete = "userDelete",
   mod = "mod",
