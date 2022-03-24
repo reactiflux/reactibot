@@ -50,7 +50,7 @@ jobs:
             sudo docker build -t reactiflux/reactibot:latest .
 
       - name: Deploy Discord commands
-        run: yarn prod:commands
+        run: yarn start:commands
 
       - name: Start server
         uses: appleboy/ssh-action@master
