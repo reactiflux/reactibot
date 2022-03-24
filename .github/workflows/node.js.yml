@@ -48,18 +48,9 @@ jobs:
           script: |
             cd reactibot
             sudo docker build -t reactiflux/reactibot:latest .
+
       - name: Deploy Discord commands
-        uses: appleboy/ssh-action@master
-        env:
-          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets. SSH_KEY }}
-          envs: DISCORD_HASH
-          script: |
-            cd reactibot
-            npm run prod:commands
+        run: yarn prod:commands
 
       - name: Start server
         uses: appleboy/ssh-action@master
