@@ -57,8 +57,7 @@ jobs:
           username: root
           key: ${{ secrets. SSH_KEY }}
           envs: DISCORD_HASH
-          script: |
-            yarn prod:commands
+          script: npm run prod:commands
 
       - name: Start server
         uses: appleboy/ssh-action@master
