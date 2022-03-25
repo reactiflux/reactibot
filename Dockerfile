@@ -2,7 +2,7 @@ FROM node:16-alpine
 WORKDIR /build/reactibot
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+    apk add --no-cache bash
 
 COPY package.json yarn.lock ./
 
