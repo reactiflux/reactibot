@@ -50,7 +50,16 @@ jobs:
             sudo docker build -t reactiflux/reactibot:latest .
 
       - name: Deploy Discord commands
-        run: yarn start:commands
+        uses: appleboy/ssh-action@master
+        env:
+          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          envs: DISCORD_HASH
+          script: |
+            sudo docker run -e ENVIRONMENT=production -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest yarn start:commands
 
       - name: Start server
         uses: appleboy/ssh-action@master
