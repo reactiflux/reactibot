@@ -49,9 +49,6 @@ jobs:
             cd reactibot
             sudo docker build -t reactiflux/reactibot:latest .
 
-      - name: Deploy Discord commands
-        run: yarn prod:commands
-
       - name: Start server
         uses: appleboy/ssh-action@master
         env:
