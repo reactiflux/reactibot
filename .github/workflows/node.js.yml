@@ -62,7 +62,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
-          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH,GITHUB_HEAD_REF
+          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH
           script: |
             sudo docker container stop $(sudo docker container ls -aq)
             sudo docker container rm $(sudo docker container ls -aq)
