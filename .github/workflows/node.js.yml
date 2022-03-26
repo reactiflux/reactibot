@@ -7,14 +7,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install
-        run: yarn --ci
-      - name: Test
-        run: yarn test
-      - name: Build
-        run: yarn build
+
+      - name: Setup tags
+        run: |
+          export COMMIT_HASH=`git log -1 --pretty=%h`
+          echo "TAGS=ghcr.io/$GITHUB_REPOSITORY:$COMMIT_HASH,ghcr.io/$GITHUB_REPOSITORY:latest" >> $GITHUB_ENV
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.10.0
+        with:
+          context: .
+          push: true
+          tags: ${{ env.TAGS }}
 
   deployment:
     needs: build
