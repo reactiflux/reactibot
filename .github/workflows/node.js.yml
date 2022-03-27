@@ -15,20 +15,24 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
-
-      - name: Setup tags
-        run: |
-          export COMMIT_HASH=`git log -1 --pretty=%h`
-          echo "TAGS=ghcr.io/$GITHUB_REPOSITORY:$COMMIT_HASH,ghcr.io/$GITHUB_REPOSITORY:latest" >> $GITHUB_ENV
+      - name: Tag Build
+        uses: docker/metadata-action@v3
+        id: meta
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=pr
+            type=ref,event=branch
 
       - name: Build and push Docker images
-        uses: docker/build-push-action@v2.10.0
+        uses: docker/build-push-action@v2
         with:
-          context: .
+          # push: ${{ github.event_name != 'pull_request' }}
           push: true
-          tags: ${{ env.TAGS }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deployment:
     needs: build
