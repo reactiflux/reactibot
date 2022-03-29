@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+commonLabels:
+  app: reactibot
+resources:
+  - cluster/deployment.yaml
+
+configMapGenerator:
+  - name: k8s-context # this is an internal name
+    envs: [k8s-context] # this is a filename created in the github action
+    behavior: create
+
+configurations:
+  - cluster/variable-config.yaml
+
+vars:
+  - name: IMAGE
+    objref:
+      kind: ConfigMap
+      name: k8s-context
+      apiVersion: v1
+    fieldref:
+      fieldpath: data.IMAGE
