@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout to branch
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.ref }}
       - name: Update server
