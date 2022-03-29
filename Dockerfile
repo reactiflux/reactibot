@@ -6,6 +6,8 @@ RUN apk update && apk upgrade && \
 
 COPY package.json yarn.lock ./
 
+ENV YARN_CACHE_FOLDER=/cache/yarn
+VOLUME /cache/yarn
 RUN yarn
 
 COPY tsconfig.json .eslint* .prettierignore ./
@@ -18,6 +20,8 @@ RUN yarn build
 FROM node:16-alpine
 WORKDIR /build/reactibot
 
+ENV YARN_CACHE_FOLDER=/cache/yarn
+COPY --from=build /cache/yarn /cache/yarn
 
 COPY --from=build /build/reactibot/package.json /build/reactibot/yarn.lock ./
 COPY --from=build /build/reactibot/dist dist
