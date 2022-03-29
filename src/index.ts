@@ -38,6 +38,7 @@ export const bot = new discord.Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
 });
 
+logger.log("INI", "Bootstrap starting…");
 bot
   .login(discordToken)
   .then(async () => {
