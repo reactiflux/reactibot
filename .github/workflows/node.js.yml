@@ -1,6 +1,13 @@
 name: Node.js CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -32,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           # push: ${{ github.event_name != 'pull_request' }}
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -43,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout to branch
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           ref: ${{ github.ref }}
       - name: Update server

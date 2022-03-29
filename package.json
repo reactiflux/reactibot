@@ -21,25 +21,25 @@
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
-    "@types/open-graph-scraper": "^4.8.1",
     "date-fns": "^2.27.0",
     "discord-api-types": "^0.29.0",
     "discord.js": "^13.5.0",
     "dotenv": "^10.0.0",
     "gists": "^2.0.0",
     "node-fetch": "^2.6.7",
-    "npm-run-all": "^4.1.5",
     "open-graph-scraper": "^4.11.0",
     "query-string": "^6.2.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.5",
     "@types/node-fetch": "^2.5.4",
+    "@types/open-graph-scraper": "^4.8.1",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.0",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "nodemon": "^2.0.15",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.3.2",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^4.5.4"
