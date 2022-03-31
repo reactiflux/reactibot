@@ -84,4 +84,4 @@ jobs:
           kubectl apply -k .
 
       - name: Deploy Discord commands
-        run: docker run -e DISCORD_HASH=${{ secrets.DISCORD_HASH }} ${{ join(steps.meta.outputs.tags, '') }} yarn start:commands
+        run: docker run -e ENVIRONMENT=production -e DISCORD_HASH=${{ secrets.DISCORD_HASH }} ${{ join(steps.meta.outputs.tags, '') }} yarn start:commands

@@ -16,6 +16,8 @@ spec:
         - name: reactibot
           image: $(IMAGE)
           env:
+            - name: ENVIRONMENT
+              value: production
             - name: DISCORD_HASH
               valueFrom:
                 secretKeyRef:
