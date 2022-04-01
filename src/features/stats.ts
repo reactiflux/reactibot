@@ -31,8 +31,6 @@ const emitEvent = (
 };
 
 const message = "message sent";
-const newMember = "new member joined";
-const memberLeft = "member left server";
 const threadCreated = "thread created";
 const threadReplyRemoved = "thread reply removed";
 const threadTimeout = "thread timeout";
@@ -56,14 +54,6 @@ export const threadStats = {
 };
 
 const stats = (client: Client) => {
-  client.on("guildMemberAdd", () => {
-    emitEvent(newMember);
-  });
-
-  client.on("guildMemberRemove", () => {
-    emitEvent(memberLeft);
-  });
-
   client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 
