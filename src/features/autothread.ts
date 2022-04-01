@@ -59,7 +59,7 @@ const autoThread: ChannelHandlers = {
       ? await thread.fetchStarterMessage()
       : undefined;
 
-    if (!starter || !guild) {
+    if (!thread.isThread() || !starter || !guild) {
       return;
     }
 
@@ -68,15 +68,13 @@ const autoThread: ChannelHandlers = {
 
     // If the reaction was from the author or there are enough known people
     // responding, mark that answer as the accepted one
+    const authorId = starter.author.id;
     if (
       roledReactors.length >= STAFF_ACCEPT_THRESHOLD ||
-      reaction.users.cache.has(starter.author.id)
+      reaction.users.cache.has(authorId)
     ) {
-      threadStats.threadResolved(
-        starter.channelId,
-        starter.author.id,
-        author.id,
-      );
+      threadStats.threadResolved(starter.channelId, authorId, author.id);
+      thread.setName(`✅ – ${thread.name}`);
       reaction.message.reply({
         allowedMentions: { repliedUser: false },
         content: `This question has an answer! Thank you for helping 😄
