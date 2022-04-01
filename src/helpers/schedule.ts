@@ -1,3 +1,4 @@
+import { schedule as scheduleCron } from "node-cron";
 import { subDays, parseISO, format } from "date-fns";
 
 /**
@@ -20,15 +21,26 @@ const getFirstRun = (interval: number, now = new Date()) => {
   return diff % interval;
 };
 
+export const enum SPECIFIED_TIMES {
+  "midnight" = "0 0 * * *",
+}
+
 /**
  * Schedule messages to run on a consistent interval, assuming a constant
  * first-run time of Sunday at midnight.
  * @param interval An interval in milliseconds
  * @param task A function to run every interval
  */
-export const scheduleTask = (interval: number, task: () => void) => {
-  setTimeout(() => {
-    task();
-    setInterval(task, interval);
-  }, getFirstRun(interval));
+export const scheduleTask = (
+  interval: number | SPECIFIED_TIMES,
+  task: () => void,
+) => {
+  if (typeof interval === "number") {
+    setTimeout(() => {
+      task();
+      setInterval(task, interval);
+    }, getFirstRun(interval));
+  } else {
+    scheduleCron(interval, task);
+  }
 };
