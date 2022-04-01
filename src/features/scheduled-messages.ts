@@ -22,7 +22,9 @@ type MessageConfig = {
     interval: number;
     channelId: discord.Snowflake;
   }[];
-  message: discord.MessageOptions;
+  message:
+    | discord.MessageOptions
+    | ((channel: discord.TextBasedChannel) => void);
 };
 const MESSAGE_SCHEDULE: MessageConfig[] = [
   /*  Example:
@@ -146,7 +148,12 @@ const sendMessage = async (
       );
       return;
     }
+
     scheduleTask(interval, () => {
+      if (typeof message === "function") {
+        message(channel);
+        return;
+      }
       channel.send(message);
     });
   });
