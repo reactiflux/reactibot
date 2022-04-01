@@ -3,7 +3,7 @@ import { differenceInCalendarDays, format, parseISO } from "date-fns/esm";
 import { guildId as defaultGuildId } from "../constants";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
-import { scheduleTask } from "../helpers/schedule";
+import { scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";
 
 const HOURLY = 60 * 60 * 1000;
 // By keeping these off 24 hr, we can make sure they show up at all timezones. If
@@ -20,7 +20,7 @@ const FREQUENCY = {
 type MessageConfig = {
   postTo: {
     guildId?: discord.Snowflake;
-    interval: number;
+    interval: number | SPECIFIED_TIMES;
     channelId: discord.Snowflake;
   }[];
   message:
@@ -44,17 +44,29 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    postTo: [{ interval: HOURLY * 24, channelId: CHANNELS.gaming }],
+    postTo: [
+      { interval: SPECIFIED_TIMES.midnight, channelId: CHANNELS.gaming },
+    ],
     message: async (channel) => {
-      const wordle285 = new Date("2022-03-31");
+      const WORDLE_ON_MAR_31 = 285;
+      const mar31 = new Date("2022-03-31");
       const midnight = parseISO(format(Date.now(), "yyyy-MM-dd"));
+      const wordleCount =
+        WORDLE_ON_MAR_31 + differenceInCalendarDays(midnight, mar31);
 
+      // Send a message
       const message = await channel.send({
-        content: "Daily <@&954499699870666842> thread",
+        content: `Daily wordle thread #${wordleCount}, ${format(
+          midnight,
+          "yyyy-MM-dd",
+        )} https://www.nytimes.com/games/wordle/index.html`,
       });
-      message.startThread({
-        name: `${285 + differenceInCalendarDays(midnight, wordle285)}`,
+      // Start a thread
+      const thread = await message.startThread({
+        name: `World ${format(midnight, "yyyy-MM-dd")}`,
       });
+      // Ping members
+      thread.send("<@&954499699870666842>");
     },
   },
   {
