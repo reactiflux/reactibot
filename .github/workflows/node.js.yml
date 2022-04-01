@@ -75,12 +75,15 @@ jobs:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: k8s-rf
 
+        # --from-literal=DISCORD_HASH=${{ secrets.DISCORD_HASH }} \
+        # --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+        # --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} || echo \n
       - name: Deploy app
         run: |
           kubectl diff -k . || echo \n
           kubectl delete secret reactibot-env || echo \n
           kubectl create secret generic reactibot-env \
-            --from-literal=DISCORD_HASH=${{ secrets.DISCORD_HASH }} \
+            --from-literal=DISCORD_HASH=${{ secrets.TEST_DISCORD_HASH }} \
             --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
             --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} || echo \n
           kubectl apply -k .
