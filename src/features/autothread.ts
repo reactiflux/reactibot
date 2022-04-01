@@ -44,7 +44,7 @@ const autoThread: ChannelHandlers = {
     threadStats.threadCreated(msg.channelId);
     // Send short-lived instructions
     const message = await newThread.send(
-      `React to someone with ✅ to mark their response as the accepted answer and close this thread. If someone has been really helpful, give them a shoutout in <#${CHANNELS.thanks}>!`,
+      `React to someone with ✅ to mark their response as the accepted answer. If someone has been really helpful, give them a shoutout in <#${CHANNELS.thanks}>!`,
     );
     await sleep(30);
     message.delete();
