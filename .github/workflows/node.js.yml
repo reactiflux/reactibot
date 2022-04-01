@@ -47,7 +47,7 @@ jobs:
 
   deployment:
     needs: build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/actions'
+    #if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/actions'
     runs-on: ubuntu-latest
 
     steps:
