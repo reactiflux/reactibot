@@ -21,11 +21,13 @@
   "dependencies": {
     "@discordjs/builders": "^0.12.0",
     "@discordjs/rest": "^0.3.0",
+    "@types/node-cron": "^3.0.1",
     "date-fns": "^2.27.0",
     "discord-api-types": "^0.29.0",
     "discord.js": "^13.5.0",
     "dotenv": "^10.0.0",
     "gists": "^2.0.0",
+    "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
     "open-graph-scraper": "^4.11.0",
     "query-string": "^6.2.0"
