@@ -21,7 +21,7 @@ const emitEvent = (
   const fields = {
     api_key: amplitudeKey,
     event: JSON.stringify({
-      user_id: userId,
+      user_id: userId || "0",
       event_type: eventName,
       event_properties: data,
     }),
@@ -50,6 +50,7 @@ export const threadStats = {
   ) =>
     emitEvent(threadResolved, {
       data: { channel, threadAuthor, answerAuthor },
+      userId: threadAuthor,
     }),
 };
 
