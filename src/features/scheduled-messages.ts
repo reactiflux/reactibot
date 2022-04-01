@@ -1,5 +1,5 @@
 import type * as discord from "discord.js";
-import { differenceInCalendarDays, format, parseISO } from "date-fns/esm";
+import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { guildId as defaultGuildId } from "../constants";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
