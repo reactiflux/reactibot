@@ -1,4 +1,5 @@
 import type * as discord from "discord.js";
+import { differenceInCalendarDays, format, parseISO } from "date-fns/esm";
 import { guildId as defaultGuildId } from "../constants";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
@@ -44,7 +45,17 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   */
   {
     postTo: [{ interval: HOURLY * 24, channelId: CHANNELS.gaming }],
-    message: { content: "Daily <@&954499699870666842> thread" },
+    message: async (channel) => {
+      const wordle285 = new Date("2022-03-31");
+      const midnight = parseISO(format(Date.now(), "yyyy-MM-dd"));
+
+      const message = await channel.send({
+        content: "Daily <@&954499699870666842> thread",
+      });
+      message.startThread({
+        name: `${285 + differenceInCalendarDays(midnight, wordle285)}`,
+      });
+    },
   },
   {
     postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
