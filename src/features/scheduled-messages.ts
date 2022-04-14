@@ -63,7 +63,7 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
       });
       // Start a thread
       const thread = await message.startThread({
-        name: `Wordle ${format(midnight, "yyyy-MM-dd")}`,
+        name: `Wordle ${wordleCount} ${format(midnight, "M-dd")}`,
       });
       // Ping members
       thread.send("<@&954499699870666842>");
