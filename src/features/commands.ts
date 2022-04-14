@@ -304,7 +304,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
 // short code snippets go here
 \\\`\\\`\\\`
 Like Shown Below 👇
-https://im5.ezgif.com/tmp/ezgif-5-26189abd64.gif
+https://media.giphy.com/media/fnkKMYJxnL9DfO8JgY/giphy.gif
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
@@ -370,8 +370,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         if (!msg.mentions.members) return;
 
         targetChannel.send(
-          `${msg.author} has opened a portal from ${
-            msg.channel
+          `${msg.author} has opened a portal from ${msg.channel
           } summoning ${msg.mentions.members.map((i) => i).join(" ")}`,
         );
       } catch (e) {
