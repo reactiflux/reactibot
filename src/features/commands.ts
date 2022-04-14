@@ -303,7 +303,8 @@ How To Ask Questions The Smart Way https://git.io/JKscV
             description: `\\\`\\\`\\\`js
 // short code snippets go here
 \\\`\\\`\\\`
-
+Like Shown Below 👇
+https://im5.ezgif.com/tmp/ezgif-5-26189abd64.gif
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
