@@ -303,14 +303,12 @@ How To Ask Questions The Smart Way https://git.io/JKscV
             description: `\\\`\\\`\\\`js
 // short code snippets go here
 \\\`\\\`\\\`
-Like Shown Below 👇
-https://media.giphy.com/media/fnkKMYJxnL9DfO8JgY/giphy.gif
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
 Link a TypeScript Playground to share types: https://www.typescriptlang.org/play
 Link a Snack to share React Native examples: https://snack.expo.io
-`,
+`,          image:'https://media.giphy.com/media/fnkKMYJxnL9DfO8JgY/giphy.gif',
             color: EMBED_COLOR,
           },
         ],
