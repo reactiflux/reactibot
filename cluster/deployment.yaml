@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reactibot-deployment
+spec:
+  selector:
+    matchLabels:
+      app: reactibot
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reactibot
+    spec:
+      containers:
+        - name: reactibot
+          image: $(IMAGE)
+          env:
+            - name: ENVIRONMENT
+              value: production
+            - name: DISCORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: DISCORD_HASH
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: GITHUB_TOKEN
+            - name: AMPLITUDE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: AMPLITUDE_KEY

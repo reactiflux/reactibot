@@ -51,56 +51,37 @@ jobs:
     steps:
       - name: Checkout to branch
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.ref }}
-      - name: Update server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_KEY }}
-          envs: GITHUB_HEAD_REF
-          script: |
-            cd reactibot
-            sudo git config --global url."https://".insteadOf git://
-            sudo git config --global url."https://github.com/".insteadOf git@github.com
-            sudo git checkout $GITHUB_HEAD_REF
-            sudo git pull
-      - name: Build image server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd reactibot
-            sudo docker build -t reactiflux/reactibot:latest .
 
-      - name: Start server
-        uses: appleboy/ssh-action@master
-        env:
-          AMPLITUDE_KEY: ${{ secrets.AMPLITUDE_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
+      - name: Tag Build
+        uses: docker/metadata-action@v3
+        id: meta
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_KEY }}
-          envs: AMPLITUDE_KEY,GITHUB_TOKEN,DISCORD_HASH
-          script: |
-            sudo docker container stop $(sudo docker container ls -aq)
-            sudo docker container rm $(sudo docker container ls -aq)
-            sudo docker image prune -f
-            sudo docker run -d -e ENVIRONMENT=production -e AMPLITUDE_KEY=$AMPLITUDE_KEY -e GITHUB_TOKEN=$GITHUB_TOKEN -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+
+      - name: Create build context for k8s deployment
+        # There should only be 1 tag, so 'join' will just produce a simple string
+        run: |
+          touch k8s-context
+          echo IMAGE=${{ join(steps.meta.outputs.tags, '') }} > k8s-context
+          cat k8s-context
+
+      - name: Set up kubectl
+        uses: matootie/dokube@v1.4.0
+        with:
+          personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          clusterName: k8s-rf
+
+      - name: Deploy app
+        run: |
+          kubectl diff -k . || echo \n
+          kubectl delete secret reactibot-env || echo \n
+          kubectl create secret generic reactibot-env \
+            --from-literal=DISCORD_HASH=${{ secrets.DISCORD_HASH }} \
+            --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} || echo \n
+          kubectl apply -k .
 
       - name: Deploy Discord commands
-        uses: appleboy/ssh-action@master
-        env:
-          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: root
-          key: ${{ secrets.SSH_KEY }}
-          envs: DISCORD_HASH
-          script: |
-            sudo docker run -e ENVIRONMENT=production -e DISCORD_HASH=$DISCORD_HASH reactiflux/reactibot:latest yarn start:commands
+        run: docker run -e ENVIRONMENT=production -e DISCORD_HASH=${{ secrets.DISCORD_HASH }} ${{ join(steps.meta.outputs.tags, '') }} yarn start:commands
