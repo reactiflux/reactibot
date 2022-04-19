@@ -17,6 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      # TODO: see if we need to do anything special to cache docker images
+      - uses: c-hive/gha-yarn-cache@v2
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -29,6 +32,7 @@ jobs:
         id: meta
         with:
           images: ghcr.io/${{ github.repository }}
+          # Only tag with latest if we're on main
           tags: |
             type=ref,event=pr
             type=ref,event=branch
@@ -38,7 +42,6 @@ jobs:
       - name: Build and push Docker images
         uses: docker/build-push-action@v2
         with:
-          # push: ${{ github.event_name != 'pull_request' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

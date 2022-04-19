@@ -21,7 +21,7 @@ const emitEvent = (
   const fields = {
     api_key: amplitudeKey,
     event: JSON.stringify({
-      user_id: userId,
+      user_id: userId || "0",
       event_type: eventName,
       event_properties: data,
     }),
@@ -31,8 +31,6 @@ const emitEvent = (
 };
 
 const message = "message sent";
-const newMember = "new member joined";
-const memberLeft = "member left server";
 const threadCreated = "thread created";
 const threadReplyRemoved = "thread reply removed";
 const threadTimeout = "thread timeout";
@@ -52,18 +50,11 @@ export const threadStats = {
   ) =>
     emitEvent(threadResolved, {
       data: { channel, threadAuthor, answerAuthor },
+      userId: threadAuthor,
     }),
 };
 
 const stats = (client: Client) => {
-  client.on("guildMemberAdd", () => {
-    emitEvent(newMember);
-  });
-
-  client.on("guildMemberRemove", () => {
-    emitEvent(memberLeft);
-  });
-
   client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 
