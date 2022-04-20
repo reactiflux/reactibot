@@ -165,7 +165,9 @@ const jobModeration = async (bot: Client) => {
       if (cooldown.hasCooldown(message.author.id, "user.jobs")) return;
 
       cooldown.addCooldown(message.author.id, "user.jobs");
-      const thread = await message.startThread({ name: message.author.username });
+      const thread = await message.startThread({
+        name: message.author.username,
+      });
       const content = `Your post to #job-board didn't have any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
   
       [FOR HIRE] - you are looking for a job
