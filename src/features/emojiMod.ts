@@ -1,9 +1,8 @@
 import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { ReportReasons } from "../constants";
 import { CHANNELS, getChannel } from "../constants/channels";
-import { constructLog, reportUser } from "../helpers/modLog";
+import { ReportReasons, reportUser } from "../helpers/modLog";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
@@ -49,15 +48,13 @@ Thanks!
     }
 
     const reactionCount = usersWhoReacted.length;
-    const staff = usersWhoReacted
-      .filter(isStaff)
-      .map((member) => member?.user.username || "X");
+    const staff = usersWhoReacted.filter(isStaff);
 
     if (reactionCount < config.warningThreshold) {
       return;
     }
 
-    reportUser(message, constructLog(ReportReasons.mod, [], staff, message));
+    reportUser({ reason: ReportReasons.mod, message, staff });
   },
   "💩": async ({ guild, author, reactor, message, usersWhoReacted }) => {
     // Skip if the post is from someone from the staff or reactor is not staff
@@ -68,15 +65,12 @@ Thanks!
     const [members, staff] = partition(isStaff, usersWhoReacted);
 
     message.delete();
-    const warnings = reportUser(
+    const warnings = reportUser({
+      reason: ReportReasons.spam,
       message,
-      constructLog(
-        ReportReasons.spam,
-        members.map(({ user }) => user.username),
-        staff.map(({ user }) => user.username),
-        message,
-      ),
-    );
+      staff,
+      members,
+    });
 
     if (warnings >= AUTO_SPAM_THRESHOLD) {
       guild.members.fetch(message.author.id).then((member) => {
@@ -97,9 +91,9 @@ Thanks!
     if (totalReacts < config.thumbsDownThreshold) {
       return;
     }
-    let trigger = ReportReasons.userWarn;
+    let reason = ReportReasons.userWarn;
     if (totalReacts >= config.deletionThreshold) {
-      trigger = ReportReasons.userDelete;
+      reason = ReportReasons.userDelete;
     }
 
     const staffReactionCount = usersWhoReacted.filter(isStaff).length;
@@ -110,15 +104,7 @@ Thanks!
       message.delete();
     }
 
-    reportUser(
-      message,
-      constructLog(
-        trigger,
-        members.map(({ user }) => user.username),
-        staff.map(({ user }) => user.username),
-        message,
-      ),
-    );
+    reportUser({ reason, message, staff, members });
   },
 };
 

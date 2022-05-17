@@ -13,11 +13,3 @@ export const guildId = isProd() ? "102860784329052160" : "614601782152265748";
 export const discordToken = process.env.DISCORD_HASH ?? "";
 export const gitHubToken = process.env.GITHUB_TOKEN ?? "";
 export const amplitudeKey = process.env.AMPLITUDE_KEY ?? "";
-
-export const enum ReportReasons {
-  anonReport = "anonReport",
-  userWarn = "userWarn",
-  userDelete = "userDelete",
-  mod = "mod",
-  spam = "spam",
-}

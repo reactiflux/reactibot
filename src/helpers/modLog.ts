@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { ReportReasons, modRoleId } from "../constants";
+import { GuildMember, Message } from "discord.js";
+import { modRoleId } from "../constants";
 import { constructDiscordLink } from "./discord";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
@@ -8,11 +8,37 @@ const warningMessages = new Map<
   string,
   { warnings: number; message: Message }
 >();
-export const reportUser = (reportedMessage: Message, logBody: string) => {
-  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
-    reportedMessage.content,
+
+export const enum ReportReasons {
+  anonReport = "anonReport",
+  userWarn = "userWarn",
+  userDelete = "userDelete",
+  mod = "mod",
+  spam = "spam",
+  jobAge = "jobAge",
+  jobFrequency = "jobFrequency",
+  jobRemoved = "jobRemoved",
+}
+
+interface Report {
+  reason: ReportReasons;
+  message: Message;
+  extra?: string;
+  staff?: GuildMember[];
+  members?: GuildMember[];
+}
+export const reportUser = ({
+  reason,
+  message,
+  extra,
+  staff = [],
+  members = [],
+}: Report) => {
+  const simplifiedContent = `${message.author.id}${simplifyString(
+    message.content,
   )}`;
   const cached = warningMessages.get(simplifiedContent);
+  const logBody = constructLog({ reason, message, extra, staff, members });
 
   if (cached) {
     // If we already logged for ~ this message, edit the log
@@ -52,24 +78,40 @@ export const truncateMessage = (
   return message;
 };
 
-export const constructLog = (
-  trigger: ReportReasons,
-  members: string[],
-  staff: string[],
-  message: Message,
-): string => {
+const constructLog = ({
+  reason,
+  message,
+  extra = "",
+  staff = [],
+  members = [],
+}: {
+  reason: ReportReasons;
+  message: Message;
+  extra?: string;
+  staff?: GuildMember[];
+  members?: GuildMember[];
+}): string => {
   const modAlert = `<@${modRoleId}>`;
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
   const postfix = `Link: ${constructDiscordLink(message)}
 
-${members.length ? `Reactors: ${members.join(", ")}` : ""}
-${staff.length ? `Staff: ${staff.join(", ")}` : ""}
+${
+  members.length
+    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}`
+    : ""
+}
+${
+  staff.length
+    ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
+    : ""
+}
 `;
   const reportedMessage = truncateMessage(message.content);
 
-  switch (trigger) {
+  switch (reason) {
     case ReportReasons.mod:
       return `${preface}:
+${extra}
 
 \`${reportedMessage}\`
 
@@ -77,6 +119,7 @@ ${postfix}`;
 
     case ReportReasons.userWarn:
       return `${modAlert} – ${preface}, met the warning threshold for the message:
+${extra}
 
 \`${reportedMessage}\`
 
@@ -84,21 +127,47 @@ ${postfix}`;
 
     case ReportReasons.userDelete:
       return `${modAlert} – ${preface}, met the deletion threshold for the message:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
     case ReportReasons.spam:
       return `${preface}, reported for spam:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
     case ReportReasons.anonReport:
       return `${preface}, reported anonymously:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
+    case ReportReasons.jobAge:
+      return `${preface}, account too young:
+${extra}
+
+\`${reportedMessage}\`
+`;
+
+    case ReportReasons.jobFrequency:
+      return `${preface}, posting too frequently:
+${extra}
+
+\`${reportedMessage}\`
+`;
+
+    case ReportReasons.jobRemoved:
+      return `${preface}, post was deleted:
+${extra}
+
+\`${reportedMessage}\`
+`;
   }
 };

@@ -1,7 +1,6 @@
 import { ApplicationCommandType } from "discord-api-types/v9";
 import { Message, MessageContextMenuInteraction } from "discord.js";
-import { ReportReasons } from "../constants";
-import { constructLog, reportUser } from "../helpers/modLog";
+import { ReportReasons, reportUser } from "../helpers/modLog";
 
 export const name = "report-message";
 export const description = "Anonymously report this message";
@@ -12,7 +11,7 @@ export const handler = async (interaction: MessageContextMenuInteraction) => {
     return;
   }
 
-  reportUser(message, constructLog(ReportReasons.anonReport, [], [], message));
+  reportUser({ reason: ReportReasons.anonReport, message });
 
   await interaction.reply({
     ephemeral: true,
