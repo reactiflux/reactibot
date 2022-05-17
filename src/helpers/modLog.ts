@@ -15,17 +15,22 @@ export const enum ReportReasons {
   userDelete = "userDelete",
   mod = "mod",
   spam = "spam",
+  jobAge = "jobAge",
+  jobFrequency = "jobFrequency",
+  jobRemoved = "jobRemoved",
 }
 
 interface Report {
   reason: ReportReasons;
   message: Message;
+  extra?: string;
   staff?: GuildMember[];
   members?: GuildMember[];
 }
 export const reportUser = ({
   reason,
   message,
+  extra,
   staff = [],
   members = [],
 }: Report) => {
@@ -33,7 +38,7 @@ export const reportUser = ({
     message.content,
   )}`;
   const cached = warningMessages.get(simplifiedContent);
-  const logBody = constructLog({ reason, message, staff, members });
+  const logBody = constructLog({ reason, message, extra, staff, members });
 
   if (cached) {
     // If we already logged for ~ this message, edit the log
@@ -76,11 +81,13 @@ export const truncateMessage = (
 const constructLog = ({
   reason,
   message,
+  extra = "",
   staff = [],
   members = [],
 }: {
   reason: ReportReasons;
   message: Message;
+  extra?: string;
   staff?: GuildMember[];
   members?: GuildMember[];
 }): string => {
@@ -104,6 +111,7 @@ ${
   switch (reason) {
     case ReportReasons.mod:
       return `${preface}:
+${extra}
 
 \`${reportedMessage}\`
 
@@ -111,6 +119,7 @@ ${postfix}`;
 
     case ReportReasons.userWarn:
       return `${modAlert} – ${preface}, met the warning threshold for the message:
+${extra}
 
 \`${reportedMessage}\`
 
@@ -118,21 +127,47 @@ ${postfix}`;
 
     case ReportReasons.userDelete:
       return `${modAlert} – ${preface}, met the deletion threshold for the message:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
     case ReportReasons.spam:
       return `${preface}, reported for spam:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
     case ReportReasons.anonReport:
       return `${preface}, reported anonymously:
+${extra}
 
 \`${reportedMessage}\`
 
 ${postfix}`;
+
+    case ReportReasons.jobAge:
+      return `${preface}, account too young:
+${extra}
+
+\`${reportedMessage}\`
+`;
+
+    case ReportReasons.jobFrequency:
+      return `${preface}, posting too frequently:
+${extra}
+
+\`${reportedMessage}\`
+`;
+
+    case ReportReasons.jobRemoved:
+      return `${preface}, post was deleted:
+${extra}
+
+\`${reportedMessage}\`
+`;
   }
 };

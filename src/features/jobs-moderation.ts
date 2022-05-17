@@ -3,6 +3,7 @@ import { Client, Message, TextChannel } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
+import { ReportReasons, reportUser } from "../helpers/modLog";
 import cooldown from "./cooldown";
 
 const storedMessages: Message[] = [];
@@ -117,6 +118,7 @@ const jobModeration = async (bot: Client) => {
       differenceInDays(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
     ) {
       moderatedMessageIds.add(message.id);
+      reportUser({ reason: ReportReasons.jobAge, message });
       message.author.send(
         "You joined too recently to post a job, please try again in a few days. Your post:",
       );
@@ -139,6 +141,7 @@ const jobModeration = async (bot: Client) => {
       (m) => m.author.id === message.author.id,
     );
     if (existingMessage) {
+      reportUser({ reason: ReportReasons.jobAge, message });
       const lastSent = differenceInDays(now, existingMessage.createdAt);
       moderatedMessageIds.add(message.id);
       message.author.send(
@@ -198,10 +201,11 @@ const jobModeration = async (bot: Client) => {
   if (!modLog?.isText()) {
     throw new Error("Couldn't find #mod-log");
   }
-  bot.on("messageDelete", (message) => {
+  bot.on("messageDelete", async (message) => {
     if (
       message.channelId !== CHANNELS.jobBoard ||
       !message.author ||
+      isStaff(message.member) ||
       message.author.id === bot.user?.id
     ) {
       return;
@@ -213,12 +217,11 @@ const jobModeration = async (bot: Client) => {
     }
 
     // Log deleted job posts publicly
-    modLog.send(
-      `<@${message.author.id}>’s job post from ${format(
-        new Date(message.createdAt),
-        "P p",
-      )} was deleted`,
-    );
+    reportUser({
+      reason: ReportReasons.jobRemoved,
+      message: message.partial ? await message.fetch() : message,
+      extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
+    });
   });
 };
 
