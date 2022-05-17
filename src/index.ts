@@ -61,7 +61,7 @@ bot
       const { id } = bot.application;
       console.log("Bot started. If necessary, add it to your test server:");
       console.log(
-        `https://discord.com/oauth2/authorize?client_id=${id}&scope=bot`,
+        `https://discord.com/api/oauth2/authorize?client_id=${id}&permissions=8&scope=applications.commands%20bot`,
       );
     }
   })
