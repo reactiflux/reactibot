@@ -125,7 +125,7 @@ Has someone been really helpful? Shoutout who and what in #thanks! We keep an ey
 Please remember our Code of Conduct: <https://reactiflux.com/conduct>
 and our guidelines for promotion: <https://reactiflux.com/promotion>
 
-If you see anything that violates our rules, help alert the mods by reacting to it with 👎
+If you see anything that violates our rules, help alert the mods by reacting to it with 👎 or reporting it anonymously (right click > Apps > report message).
 `,
     },
   },
@@ -134,7 +134,7 @@ If you see anything that violates our rules, help alert the mods by reacting to 
     message: {
       content: `Have you read our Code of Conduct? <https://reactiflux.com/conduct>
 
-Let us know if anything crosses a line: give it a 👎, or if you'd prefer to remain anonymous, let mods know with the form at <https://reactiflux.com/contact>`,
+Let us know if anything crosses a line: give it a 👎, or if you'd prefer to remain anonymous, let mods know from the message context menu (right click > Apps > report message) or with the form at <https://reactiflux.com/contact>`,
     },
   },
 ];
