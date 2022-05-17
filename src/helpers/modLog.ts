@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { ReportReasons, modRoleId } from "../constants";
+import { GuildMember, Message } from "discord.js";
+import { modRoleId } from "../constants";
 import { constructDiscordLink } from "./discord";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
@@ -8,11 +8,32 @@ const warningMessages = new Map<
   string,
   { warnings: number; message: Message }
 >();
-export const reportUser = (reportedMessage: Message, logBody: string) => {
-  const simplifiedContent = `${reportedMessage.author.id}${simplifyString(
-    reportedMessage.content,
+
+export const enum ReportReasons {
+  anonReport = "anonReport",
+  userWarn = "userWarn",
+  userDelete = "userDelete",
+  mod = "mod",
+  spam = "spam",
+}
+
+interface Report {
+  reason: ReportReasons;
+  message: Message;
+  staff?: GuildMember[];
+  members?: GuildMember[];
+}
+export const reportUser = ({
+  reason,
+  message,
+  staff = [],
+  members = [],
+}: Report) => {
+  const simplifiedContent = `${message.author.id}${simplifyString(
+    message.content,
   )}`;
   const cached = warningMessages.get(simplifiedContent);
+  const logBody = constructLog({ reason, message, staff, members });
 
   if (cached) {
     // If we already logged for ~ this message, edit the log
@@ -52,22 +73,35 @@ export const truncateMessage = (
   return message;
 };
 
-export const constructLog = (
-  trigger: ReportReasons,
-  members: string[],
-  staff: string[],
-  message: Message,
-): string => {
+const constructLog = ({
+  reason,
+  message,
+  staff = [],
+  members = [],
+}: {
+  reason: ReportReasons;
+  message: Message;
+  staff?: GuildMember[];
+  members?: GuildMember[];
+}): string => {
   const modAlert = `<@${modRoleId}>`;
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
   const postfix = `Link: ${constructDiscordLink(message)}
 
-${members.length ? `Reactors: ${members.join(", ")}` : ""}
-${staff.length ? `Staff: ${staff.join(", ")}` : ""}
+${
+  members.length
+    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}`
+    : ""
+}
+${
+  staff.length
+    ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
+    : ""
+}
 `;
   const reportedMessage = truncateMessage(message.content);
 
-  switch (trigger) {
+  switch (reason) {
     case ReportReasons.mod:
       return `${preface}:
 
