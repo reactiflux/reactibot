@@ -1,6 +1,6 @@
 import { GuildMember, Message } from "discord.js";
 import { modRoleId } from "../constants";
-import { constructDiscordLink } from "./discord";
+import { constructDiscordLink, quoteMessageContent } from "./discord";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
 
@@ -81,7 +81,7 @@ export const truncateMessage = (
 const constructLog = ({
   reason,
   message,
-  extra = "",
+  extra: origExtra = "",
   staff = [],
   members = [],
 }: {
@@ -93,6 +93,7 @@ const constructLog = ({
 }): string => {
   const modAlert = `<@${modRoleId}>`;
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
+  const extra = origExtra ? `${origExtra}\n` : "";
   const postfix = `Link: ${constructDiscordLink(message)}
 
 ${
@@ -106,68 +107,60 @@ ${
     : ""
 }
 `;
-  const reportedMessage = truncateMessage(message.content);
+  const reportedMessage = truncateMessage(quoteMessageContent(message));
 
   switch (reason) {
     case ReportReasons.mod:
       return `${preface}:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 
 ${postfix}`;
 
     case ReportReasons.userWarn:
       return `${modAlert} – ${preface}, met the warning threshold for the message:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 
 ${postfix}`;
 
     case ReportReasons.userDelete:
       return `${modAlert} – ${preface}, met the deletion threshold for the message:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 
 ${postfix}`;
 
     case ReportReasons.spam:
       return `${preface}, reported for spam:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 
 ${postfix}`;
 
     case ReportReasons.anonReport:
       return `${preface}, reported anonymously:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 
 ${postfix}`;
 
     case ReportReasons.jobAge:
       return `${preface}, account too young:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 `;
 
     case ReportReasons.jobFrequency:
       return `${preface}, posting too frequently:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 `;
 
     case ReportReasons.jobRemoved:
       return `${preface}, post was deleted:
 ${extra}
-
-\`${reportedMessage}\`
+${reportedMessage}
 `;
   }
 };
