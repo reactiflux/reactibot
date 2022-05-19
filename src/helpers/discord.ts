@@ -51,6 +51,16 @@ export const fetchReactionMembers = (
  * Escape a message and insert markdown quote symbols. Returns a string with
  * backticks escaped to render correctly when sent in a quote.
  */
-export const quoteMessageContent = (message: Message) => {
-  return `> ${message.content.replace("`", "\\`").replace(/[\n]/g, "\n> ")}`;
+export const quoteMessageContent = (content: string) => {
+  return `> ${content.replace("`", "\\`").replace(/[\n]/g, "\n> ")}`;
+};
+
+export const escapeDisruptiveContent = (content: string) => {
+  return (
+    content
+      // Silence pings
+      .replace(/@(.*?)\s/g, "@ $1 ")
+      // Wrap links in <> so they don't make a preview
+      .replace(/(https?:\/\/.*?)\s/g, "<$1> ")
+  );
 };

@@ -1,6 +1,10 @@
 import { GuildMember, Message } from "discord.js";
 import { modRoleId } from "../constants";
-import { constructDiscordLink, quoteMessageContent } from "./discord";
+import {
+  constructDiscordLink,
+  escapeDisruptiveContent,
+  quoteMessageContent,
+} from "./discord";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
 
@@ -98,16 +102,17 @@ const constructLog = ({
 
 ${
   members.length
-    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}`
+    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}\n`
     : ""
-}
-${
-  staff.length
-    ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
-    : ""
-}
+}${
+    staff.length
+      ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
+      : ""
+  }
 `;
-  const reportedMessage = truncateMessage(quoteMessageContent(message));
+  const reportedMessage = truncateMessage(
+    escapeDisruptiveContent(quoteMessageContent(message.content)),
+  );
 
   switch (reason) {
     case ReportReasons.mod:
