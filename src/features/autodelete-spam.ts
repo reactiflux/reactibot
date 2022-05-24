@@ -1,11 +1,12 @@
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { simplifyString } from "../helpers/string";
 import { sleep } from "../helpers/misc";
 
 const spamKeywords = ["nitro", "steam", "free", "gift", "airdrop"];
 
 const safeKeywords = ["forhire", "hiring", "remote", "onsite"];
+
+const spamPings = ["@everyone", "@here"];
 
 const safeDomains = [
   "https://discord.com",
@@ -20,6 +21,37 @@ const safeDomains = [
 const checkWords = (message: string, wordList: string[]) =>
   message.split(/\b/).some((word) => wordList.includes(word.toLowerCase()));
 
+const getPingCount = (content: string) => {
+  return spamPings.reduce(
+    (sum, pingKeyword) => (content.includes(pingKeyword) ? sum + 1 : sum),
+    0,
+  );
+};
+
+const getSpamScore = (content: string) => {
+  const pingCount = getPingCount(content);
+
+  const words = content.split(" ");
+  const includedSpamKeywords = words
+    .map((word) => spamKeywords.includes(word))
+    .filter(Boolean);
+
+  const hasSafeKeywords = checkWords(content, safeKeywords);
+
+  const hasLink =
+    content.includes("http") &&
+    !safeDomains.some((domain) => content.includes(domain));
+
+  return (
+    Number(hasLink) +
+    includedSpamKeywords.length +
+    // Pinging everyone is always treated as spam
+    Number(pingCount) * 5 -
+    // If it's a job post, then it's probably  not spam
+    Number(hasSafeKeywords) * 10
+  );
+};
+
 const autodelete: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (isStaff(maybeMessage.member)) return;
@@ -29,11 +61,7 @@ const autodelete: ChannelHandlers = {
       : maybeMessage;
     if (!msg.guild) return;
 
-    const msgHasPingKeywords = ["@everyone", "@here"].some((pingKeyword) =>
-      msg.content.includes(pingKeyword),
-    );
-
-    if (msgHasPingKeywords) {
+    if (getPingCount(msg.content) > 0) {
       msg
         .reply({
           embeds: [
@@ -49,28 +77,9 @@ const autodelete: ChannelHandlers = {
           tsk.delete();
         });
     }
+    const spamScore = getSpamScore(msg.content);
 
-    const content = simplifyString(msg.content);
-    const words = content.split(" ");
-    const msgSpamKeywords = words
-      .map((word) => spamKeywords.includes(word))
-      .filter(Boolean);
-
-    const msgHasSafeKeywords = checkWords(msg.content, safeKeywords);
-
-    const msgHasLink =
-      msg.content.includes("http") &&
-      !safeDomains.some((domain) => msg.content.includes(domain));
-
-    const spamScore =
-      Number(msgHasLink) +
-      msgSpamKeywords.length +
-      // Pinging everyone is always treated as spam
-      Number(msgHasPingKeywords) * 5 -
-      // If it's a job post, then it's probably  not spam
-      Number(msgHasSafeKeywords) * 10;
-
-    if (spamScore > 3) {
+    if (spamScore >= 3) {
       await msg.react("💩");
     }
   },
