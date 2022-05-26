@@ -141,7 +141,7 @@ const jobModeration = async (bot: Client) => {
       (m) => m.author.id === message.author.id,
     );
     if (existingMessage) {
-      reportUser({ reason: ReportReasons.jobAge, message });
+      reportUser({ reason: ReportReasons.jobFrequency, message });
       const lastSent = differenceInDays(now, existingMessage.createdAt);
       moderatedMessageIds.add(message.id);
       message.author.send(
@@ -172,16 +172,16 @@ const jobModeration = async (bot: Client) => {
         name: message.author.username,
       });
       const content = `Your post to #job-board didn't have any tags - please consider adding some of the following tags to the start of your message to make your offer easier to find (and to index correctly on https://reactiflux.com/jobs):
-  
+
       [FOR HIRE] - you are looking for a job
       [HIRING] - you are looking to hire someone
       [INTERN] - this is an intern position, no experience required
       [REMOTE] - only remote work is possible
       [LOCAL] - only local work is possible (please remember to provide the country / city!)
       [VISA] - Your company will help with the visa process in case of successful hire
-      
+
       Thank you :)
-      
+
       :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`;
       if (thread) {
         // Warning is sent in a newly created thread
