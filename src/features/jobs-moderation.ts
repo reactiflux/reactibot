@@ -125,12 +125,12 @@ const jobModeration = async (bot: Client) => {
       moderatedMessageIds.add(message.id);
       reportUser({ reason: ReportReasons.jobAge, message });
       message.author.send(
-        "You joined too recently to post a job, please try again in a few days. Your post:",
+        "You joined too recently to post a job, please try again in a little while. Your post:",
       );
       message.author.send(message.content);
       message
         .reply(
-          "You joined too recently to post a job, please try again in a few days. Your post has been DM’d to you.",
+          "You joined too recently to post a job, please try again in a little while. Your post has been DM’d to you.",
         )
         .then(async (reply) => {
           await sleep(45);
