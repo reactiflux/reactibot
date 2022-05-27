@@ -1,4 +1,9 @@
-import { compareAsc, differenceInDays, format } from "date-fns";
+import {
+  compareAsc,
+  differenceInDays,
+  differenceInHours,
+  format,
+} from "date-fns";
 import { Client, Message, TextChannel } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
@@ -10,7 +15,7 @@ const storedMessages: Message[] = [];
 const moderatedMessageIds: Set<string> = new Set();
 
 const DAYS_OF_POSTS = 7; // days
-const MINIMUM_JOIN_AGE = 3; // days
+const MINIMUM_JOIN_AGE = 1; // hours
 
 const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
@@ -115,7 +120,7 @@ const jobModeration = async (bot: Client) => {
     const now = new Date();
     if (
       message.member?.joinedAt &&
-      differenceInDays(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
+      differenceInHours(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
     ) {
       moderatedMessageIds.add(message.id);
       reportUser({ reason: ReportReasons.jobAge, message });
