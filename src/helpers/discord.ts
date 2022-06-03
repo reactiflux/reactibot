@@ -68,7 +68,7 @@ export const escapeDisruptiveContent = (content: string) => {
   return (
     content
       // Silence pings
-      .replace(/@(.*?)\s?/g, "@ $1 ")
+      .replace(/@(\S*)(\s)?/g, "@ $1 ")
       // Wrap links in <> so they don't make a preview
       .replace(/(https?:\/\/.*?)\s?/g, "<$1> ")
   );
