@@ -55,12 +55,21 @@ export const quoteMessageContent = (content: string) => {
   return `> ${content.replace("`", "\\`").replace(/[\n]/g, "\n> ")}`;
 };
 
+/*
+some test cases once this can get into a test runner
+'@everyone'
+'@everyone '
+' @everyone'
+' @everyonebutts'
+'butts@everyone'
+'butts@everyonebutts'
+*/
 export const escapeDisruptiveContent = (content: string) => {
   return (
     content
       // Silence pings
-      .replace(/@(.*?)\s/g, "@ $1 ")
+      .replace(/@(.*?)\s?/g, "@ $1 ")
       // Wrap links in <> so they don't make a preview
-      .replace(/(https?:\/\/.*?)\s/g, "<$1> ")
+      .replace(/(https?:\/\/.*?)\s?/g, "<$1> ")
   );
 };
