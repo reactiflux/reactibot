@@ -78,6 +78,7 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
 * Posts should be reasonably descriptive.
 * Jobs are paid — unpaid, equity-only, or similar are not allowed.
 * We don't allow "small gigs".
+* Third-party recruitment must be discussed with moderators, DM <@103525876892708864>.
 
 Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently.
 `,
