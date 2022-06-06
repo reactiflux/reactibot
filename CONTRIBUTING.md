@@ -13,5 +13,5 @@
    1. Grant "Server members intent" permission
    1. Grant "Message content intent" permission
 1. Go to the OAuth2 Tab and choose the "bot" scope.
-1. `yarn`
-1. `yarn start`
+1. `npm install`
+1. `npm run start`

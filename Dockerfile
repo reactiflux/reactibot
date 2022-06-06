@@ -1,32 +1,25 @@
 FROM node:16-alpine as build
 WORKDIR /build/reactibot
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash
-
-COPY package.json yarn.lock ./
-
-ENV YARN_CACHE_FOLDER=/cache/yarn
-VOLUME /cache/yarn
-RUN yarn
+COPY package.json package-lock.json ./
+RUN npm install --production=false
 
 COPY tsconfig.json .eslint* .prettierignore ./
 COPY src ./src
 COPY scripts ./scripts
 
-RUN yarn test
-RUN yarn build
+RUN npm run test
+RUN npm run build
 
 FROM node:16-alpine
 WORKDIR /build/reactibot
 
-ENV YARN_CACHE_FOLDER=/cache/yarn
-COPY --from=build /cache/yarn /cache/yarn
+ENV NODE_ENV=production
 
-COPY --from=build /build/reactibot/package.json /build/reactibot/yarn.lock ./
+COPY --from=build /build/reactibot/node_modules /build/reactibot/node_modules
+ADD package.json package-lock.json ./
+RUN npm prune --production
+
 COPY --from=build /build/reactibot/dist dist
 
-ENV NODE_ENV=production
-RUN yarn
-
-CMD ["yarn", "start"]
+CMD ["npm", "run", "start"]
