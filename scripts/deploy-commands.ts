@@ -7,7 +7,7 @@ import {
   APIApplicationCommand,
   ApplicationCommandType,
   Routes,
-} from "discord-api-types/v9";
+} from "discord-api-types/v10";
 import { applicationId, discordToken, guildId } from "../src/constants";
 import { logger } from "../src/features/log";
 import { difference } from "../src/helpers/sets";
@@ -39,8 +39,6 @@ const commands = [
     .filter((x) => x.type === ApplicationCommandType.Message)
     .map((c) =>
       new ContextMenuCommandBuilder()
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error Discord.js doesn't export the union we need
         .setType(ApplicationCommandType.Message)
         .setName(c.name)
         .toJSON(),
@@ -49,8 +47,6 @@ const commands = [
     .filter((x) => x.type === ApplicationCommandType.User)
     .map((c) =>
       new ContextMenuCommandBuilder()
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error Discord.js doesn't export the union we need
         .setType(ApplicationCommandType.User)
         .setName(c.name)
         .toJSON(),
@@ -58,7 +54,7 @@ const commands = [
 ];
 const names = new Set(commands.map((c) => c.name));
 
-const rest = new REST({ version: "9" }).setToken(discordToken);
+const rest = new REST({ version: "10" }).setToken(discordToken);
 const deploy = async () => {
   const remoteCommands = (await rest.get(
     upsertUrl(),
