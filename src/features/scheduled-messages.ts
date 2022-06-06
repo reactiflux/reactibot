@@ -178,7 +178,10 @@ const sendMessage = async (
         message(channel);
         return;
       }
-      channel.send(message);
+      channel.send({
+        ...message,
+        allowedMentions: { users: [], roles: [] },
+      });
     });
   });
 };
