@@ -48,6 +48,9 @@ const promotionThread: ChannelHandlers = {
             if (result.success) {
               if (result.ogSiteName === "Twitter") {
                 maybeTitle = `${msg.author.username} tweet`;
+              } else if (result.ogSiteName === "GitHub") {
+                maybeTitle =
+                  result.ogDescription || result.title || result.ogSiteName;
               } else {
                 maybeTitle = `${result.twitterTitle || result.ogTitle}`;
               }
