@@ -48,6 +48,9 @@ const promotionThread: ChannelHandlers = {
             if (result.success) {
               if (result.ogSiteName === "Twitter") {
                 maybeTitle = `${msg.author.username} tweet`;
+              } else if (result.ogSiteName === "GitHub") {
+                maybeTitle =
+                  result.ogDescription || result.title || result.ogSiteName;
               } else {
                 maybeTitle = `${result.twitterTitle || result.ogTitle}`;
               }
@@ -59,10 +62,9 @@ const promotionThread: ChannelHandlers = {
       }
       return `${maybeTitle} – ${format(new Date(), "HH-mm MMM d")}`;
     })();
-
     // Create threads
     await msg.startThread({
-      name: title,
+      name: `${title.slice(0, 99)}…`,
     });
     threadStats.threadCreated(msg.channelId);
   },
