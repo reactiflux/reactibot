@@ -59,10 +59,9 @@ const promotionThread: ChannelHandlers = {
       }
       return `${maybeTitle} – ${format(new Date(), "HH-mm MMM d")}`;
     })();
-
     // Create threads
     await msg.startThread({
-      name: title,
+      name: `${title.slice(0, 99)}…`,
     });
     threadStats.threadCreated(msg.channelId);
   },
