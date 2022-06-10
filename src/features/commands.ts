@@ -4,6 +4,7 @@ import { Client, Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
+import { CHANNELS } from "../constants/channels";
 
 import * as report from "../commands/report";
 
@@ -20,7 +21,12 @@ export const setupInteractions = (bot: Client) => {
 
 export const EMBED_COLOR = 7506394;
 
-type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
+type Categories =
+  | "Reactiflux"
+  | "Communication"
+  | "Web"
+  | "React/Redux"
+  | "Moderation";
 
 type Command = {
   words: string[];
@@ -35,6 +41,7 @@ const sortedCategories: Categories[] = [
   "Communication",
   "Web",
   "React/Redux",
+  "Moderation",
 ];
 
 const commandsList: Command[] = [
@@ -731,6 +738,56 @@ Instead:
         );
       }
     },
+  },,
+  {
+    words: ["!ban"],
+    help: "Ban a member that can't be found from the Discord UI\n\t(usage: `!ban reason userIds1 userId2...`)",
+    category: "Moderation",
+    handleMessage: (msg) => {
+      if (!msg.guild || !isStaff(msg.member)) return;
+
+      let reason!: string;
+      const userIds: Array<string> = [];
+
+      msg.content
+        .replace(/[\D\W]*!ban |!ban /, "")
+        .split(" ")
+        .map((contents: string, index: Number) => {
+          if (index === 0) reason = contents;
+          else userIds.push(contents);
+        });
+
+      if (!reason) return msg.channel.send("Plaese provide a reason");
+      if (!userIds) return msg.channel.send("Unable to find userIds");
+
+      try {
+        userIds.map((userId) => {
+          msg.guild?.members.ban(userId, { reason: reason });
+        });
+      } catch (e) {
+        return msg.channel.send(`unexpected error occured \`\`\`js
+        ${e}
+        \`\`\``);
+      }
+
+      msg.reply(`banned \`${[...userIds]}\` for ${reason} successfully`);
+
+      const targetChannel = msg.guild?.channels.cache.get(
+        CHANNELS.modLog,
+      ) as TextChannel;
+      targetChannel.send({
+        embeds: [
+          {
+            title: "banned !!",
+            type: "rich",
+            description: `${msg.author.toString()}  has bannned \` ${[
+              ...userIds,
+            ]} \` for ${reason} at ${new Date()} `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
   },
 ];
 
@@ -739,6 +796,7 @@ const createCommandsMessage = () => {
     Reactiflux: [],
     Communication: [],
     Web: [],
+    Moderation: [],
     "React/Redux": [],
   };
 
