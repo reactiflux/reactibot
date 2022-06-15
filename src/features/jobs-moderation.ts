@@ -2,6 +2,7 @@ import {
   compareAsc,
   differenceInDays,
   differenceInHours,
+  differenceInMinutes,
   format,
 } from "date-fns";
 import { Client, Message, TextChannel } from "discord.js";
@@ -16,6 +17,7 @@ const moderatedMessageIds: Set<string> = new Set();
 
 const DAYS_OF_POSTS = 7; // days
 const MINIMUM_JOIN_AGE = 1; // hours
+const REPOST_THRESHOLD = 10; // minutes
 
 const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
@@ -59,6 +61,9 @@ const updateJobs = (message: Message) => {
   ) {
     storedMessages.shift();
   }
+};
+const removeSpecificJob = (message: Message) => {
+  storedMessages.splice(storedMessages.findIndex((m) => m === message));
 };
 
 const jobModeration = async (bot: Client) => {
@@ -127,16 +132,19 @@ const jobModeration = async (bot: Client) => {
       message.author.send(
         "You joined too recently to post a job, please try again in a little while. Your post:",
       );
-      message.author.send(message.content);
-      message
-        .reply(
+      const [, reply] = await Promise.all([
+        message.author.send(message.content),
+        message.reply(
           "You joined too recently to post a job, please try again in a little while. Your post has been DM’d to you.",
-        )
-        .then(async (reply) => {
+        ),
+      ]);
+      await Promise.all([
+        message.delete(),
+        (async () => {
           await sleep(45);
-          reply.delete();
-        });
-      message.delete();
+          return reply.delete();
+        })(),
+      ]);
 
       return;
     }
@@ -173,6 +181,7 @@ const jobModeration = async (bot: Client) => {
       if (cooldown.hasCooldown(message.author.id, "user.jobs")) return;
 
       cooldown.addCooldown(message.author.id, "user.jobs");
+      // TODO: private threads, probably a discord helper for creating
       const thread = await message.startThread({
         name: message.author.username,
       });
@@ -190,10 +199,10 @@ const jobModeration = async (bot: Client) => {
       :robot: This message was sent by a bot, please do not respond to it - in case of additional questions / issues, please contact one of our mods!`;
       if (thread) {
         // Warning is sent in a newly created thread
-        thread.send(content);
+        await thread.send(content);
       } else {
         // If thread creation fails, the warning is sent as a normal message
-        message.reply(content);
+        await message.reply(content);
       }
     }
 
@@ -207,6 +216,7 @@ const jobModeration = async (bot: Client) => {
     throw new Error("Couldn't find #mod-log");
   }
   bot.on("messageDelete", async (message) => {
+    // TODO: look up audit log, early return if member was banned
     if (
       message.channelId !== CHANNELS.jobBoard ||
       !message.author ||
@@ -221,10 +231,16 @@ const jobModeration = async (bot: Client) => {
       return;
     }
 
+    message = message.partial ? await message.fetch() : message;
+    const deletedCreation = differenceInMinutes(new Date(), message.createdAt);
+    if (deletedCreation < REPOST_THRESHOLD) {
+      removeSpecificJob(message);
+    }
+
     // Log deleted job posts publicly
     reportUser({
       reason: ReportReasons.jobRemoved,
-      message: message.partial ? await message.fetch() : message,
+      message,
       extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
     });
   });
