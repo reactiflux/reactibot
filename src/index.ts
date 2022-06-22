@@ -206,7 +206,7 @@ bot.on("error", (err) => {
 
 const errorHandler = (error: unknown) => {
   if (error instanceof Error) {
-    logger.log("ERROR", error.message);
+    logger.log("ERROR", `${error.message} ${error.stack}`);
   } else if (typeof error === "string") {
     logger.log("ERROR", error);
   }
