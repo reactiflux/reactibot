@@ -129,13 +129,13 @@ const jobModeration = async (bot: Client) => {
     ) {
       moderatedMessageIds.add(message.id);
       reportUser({ reason: ReportReasons.jobAge, message });
-      message.author.send(
-        "You joined too recently to post a job, please try again in a little while. Your post:",
-      );
-      const [, reply] = await Promise.all([
-        message.author.send(message.content),
+      const [reply] = await Promise.all([
         message.reply(
           "You joined too recently to post a job, please try again in a little while. Your post has been DM’d to you.",
+        ),
+        message.author.send(message.content),
+        message.author.send(
+          "You joined too recently to post a job, please try again in a little while. Your post:",
         ),
       ]);
       await Promise.all([
