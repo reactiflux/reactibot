@@ -59,7 +59,11 @@ export const reportUser = ({
     return warnings;
   } else {
     // If this is new, send a new message
-    getChannel(CHANNELS.modLog)
+    getChannel(
+      message.channelId === CHANNELS.jobBoard
+        ? CHANNELS.jobsLog
+        : CHANNELS.modLog,
+    )
       .send(logBody)
       .then((warningMessage) => {
         warningMessages.set(simplifiedContent, {
