@@ -10,6 +10,7 @@ const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
   gaming: "926931785219207301",
   thanks: "926931785219207301",
   jobBoard: "925847361996095509",
+  jobsLog: "925847644318879754",
   events: "950790520811184150",
   iBuiltThis: "950790520811184150",
   iWroteThis: "950790520811184150",
@@ -27,6 +28,7 @@ const PRODUCTION_CHANNELS = {
   gaming: "509219336175747082",
   thanks: "798567961468076072",
   jobBoard: "103882387330457600",
+  jobsLog: "989201828572954694",
   events: "127442949435817984",
   iBuiltThis: "312761588778139658",
   iWroteThis: "918616846100492298",
@@ -62,7 +64,7 @@ const cachedChannels: Record<string, Record<string, TextChannel>> = {
 export const initCachedChannels = async (bot: Client) => {
   const reactiflux = await bot.guilds.fetch(guildId);
   const channels = await Promise.all(
-    [CHANNELS.botLog, CHANNELS.modLog].map((channelId) =>
+    [CHANNELS.botLog, CHANNELS.modLog, CHANNELS.jobsLog].map((channelId) =>
       reactiflux.channels.fetch(channelId),
     ),
   );
