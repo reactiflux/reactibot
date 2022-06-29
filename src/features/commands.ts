@@ -732,6 +732,24 @@ Instead:
       }
     },
   },
+  {
+    words: [`!const`],
+    help: `explains that const variables are not immutable`,
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Using const variables",
+            type: "rich",
+            description: `
+                TBD
+          `,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
