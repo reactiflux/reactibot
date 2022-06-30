@@ -734,7 +734,7 @@ Instead:
   },
   {
     words: [`!const`],
-    help: `explains that const variables are not immutable`,
+    help: `explains that const values are not immutable`,
     category: "Web",
     handleMessage: (msg) => {
       msg.channel.send({
@@ -742,8 +742,28 @@ Instead:
           {
             title: "Using const variables",
             type: "rich",
-            description: `
-                TBD
+            description: `As its name suggests, you cannot reassign a const variable.
+> \`\`\`js
+const a = 'hello';
+a = 'world'; // ❌ Uncaught TypeError: Assignment to constant variable.
+> \`\`\`
+However, that does not mean the value of a const variable is immutable.
+For example, you could mutate an object's property
+> \`\`\`js
+const obj = {
+hello: 'world'
+};
+obj.hello = 'reactiflux'; // ✅
+> \`\`\`
+or you could mutate an array's elements
+> \`\`\`js
+const arr = ['hello'];
+arr.push('world'); // ✅
+arr[1] = 'reactiflux'; // ✅
+console.log(arr); // ['hello', 'reactiflux']
+> \`\`\`
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const#:~:text=The%20const%20declaration%20creates%20a%20read%2Donly%20reference%20to%20a%20value.%20It%20does%20not%20mean%20the%20value%20it%20holds%20is%20immutable%E2%80%94just%20that%20the%20variable%20identifier%20cannot%20be%20reassigned.%20For%20instance%2C%20in%20the%20case%20where%20the%20content%20is%20an%20object%2C%20this%20means%20the%20object%27s%20contents%20(e.g.%2C%20its%20properties)%20can%20be%20altered.
           `,
           },
         ],
