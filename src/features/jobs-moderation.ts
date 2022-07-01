@@ -209,12 +209,6 @@ const jobModeration = async (bot: Client) => {
     // Last, update the list of tracked messages.
     updateJobs(message);
   });
-  const modLog = bot.channels.cache.find(
-    (channel) => channel.id === CHANNELS.modLog,
-  );
-  if (!modLog?.isText()) {
-    throw new Error("Couldn't find #mod-log");
-  }
   bot.on("messageDelete", async (message) => {
     // TODO: look up audit log, early return if member was banned
     if (
