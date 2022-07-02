@@ -480,6 +480,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
           https://daveceddia.com/react-redux-immutability-guide/
+          https://beta.reactjs.org/learn/updating-objects-in-state
+          https://beta.reactjs.org/learn/updating-arrays-in-state
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
           `,
             color: EMBED_COLOR,
