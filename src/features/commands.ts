@@ -734,6 +734,45 @@ Instead:
       }
     },
   },
+  {
+    words: [`!const`],
+    help: `explains that const values are not immutable`,
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Using const variables",
+            type: "rich",
+            description: `As its name suggests, you cannot reassign a const variable.
+\`\`\`js
+const a = 'hello';
+a = 'world'; // ❌ Uncaught TypeError: Assignment to constant variable.
+\`\`\`
+However, that does not mean the value of a const variable is immutable.
+For example, you could mutate an object's property
+\`\`\`js
+const obj = {
+  hello: 'world'
+};
+obj.hello = 'reactiflux'; // ✅
+\`\`\`
+or you could mutate an array's elements
+\`\`\`js
+const arr = ['hello'];
+arr.push('world'); // ✅
+arr[1] = 'reactiflux'; // ✅
+console.log(arr); // ['hello', 'reactiflux']
+\`\`\`
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const#description
+https://exploringjs.com/es6/ch_variables.html#_pitfall-const-does-not-make-the-value-immutable
+          `,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
