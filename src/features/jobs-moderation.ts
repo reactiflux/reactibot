@@ -5,11 +5,19 @@ import {
   differenceInMinutes,
   format,
 } from "date-fns";
-import { Client, Message, TextChannel } from "discord.js";
+import {
+  Client,
+  Message,
+  MessageActionRow,
+  MessageButton,
+  MessageMentions,
+  TextChannel,
+} from "discord.js";
+import { simplifyString } from "../helpers/string";
 import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
 import { sleep } from "../helpers/misc";
-import { ReportReasons, reportUser } from "../helpers/modLog";
+import { ReportReasons, reportUser, modLog } from "../helpers/modLog";
 import cooldown from "./cooldown";
 
 const storedMessages: Message[] = [];
@@ -66,11 +74,72 @@ const removeSpecificJob = (message: Message) => {
   storedMessages.splice(storedMessages.findIndex((m) => m === message));
 };
 
+const freeflowHiring = "https://discord.gg/gTWTwZPDYT";
+const freeflowForHire = "https://vjlup8tch3g.typeform.com/to/T8w8qWzl";
+
+const hiringTest = /hiring/i;
+const isHiring = (content: string) => hiringTest.test(content);
+
+const forHireTest = /for ?hire/i;
+const isForHire = (content: string) => forHireTest.test(content);
+
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (!jobBoard?.isText() || !(jobBoard instanceof TextChannel)) return;
 
   await loadJobs(bot, jobBoard);
+
+  bot.on("interactionCreate", (interaction) => {
+    if (
+      interaction.isMessageComponent() &&
+      interaction.customId === "freeflow-hiring"
+    ) {
+      if (
+        !(interaction.message.mentions as MessageMentions).users.has(
+          interaction.user.id,
+        )
+      ) {
+        modLog(`<@${interaction.user.id}> invited to Freeflow by hiring link`);
+      } else {
+        modLog(`<@${interaction.user.id}> directed to hire from Freeflow`);
+      }
+      interaction.reply({
+        content: "Join the Freeflow community and start hiring developers",
+        ephemeral: true,
+        components: [
+          new MessageActionRow().addComponents(
+            new MessageButton()
+              .setURL(freeflowHiring)
+              .setLabel("Apply")
+              .setStyle("LINK"),
+          ),
+        ],
+      });
+    }
+    if (
+      interaction.isMessageComponent() &&
+      interaction.customId === "freeflow-for-hire"
+    ) {
+      if (
+        !(interaction.message.mentions as MessageMentions).users.has(
+          interaction.user.id,
+        )
+      ) {
+        modLog(
+          `<@${interaction.user.id}> invited to Freeflow by for hire link`,
+        );
+        return interaction.reply({
+          ephemeral: true,
+          content: `For more information about Freeflow, visit their website: <https://freeflow.dev/> or apply to join: ${freeflowForHire}`,
+        });
+      }
+      modLog(`<@${interaction.user.id}> directed to apply to Freeflow`);
+      interaction.reply({
+        content: `Apply to join Freeflow to get started: ${freeflowForHire}`,
+        ephemeral: true,
+      });
+    }
+  });
 
   bot.on("messageCreate", async (message) => {
     if (
@@ -118,6 +187,41 @@ const jobModeration = async (bot: Client) => {
         });
       moderatedMessageIds.add(message.id);
       message.delete();
+      return;
+    }
+
+    const DELETE_DELAY = 90;
+    const bannedWords = /(nft|blockchain|crypto)/;
+    if (bannedWords.test(simplifyString(message.content))) {
+      moderatedMessageIds.add(message.id);
+      const [reply] = await Promise.all([
+        message.reply({
+          content: `Sorry! We don't allow blockchain or related cryptocurrency roles to be advertised in our community. We encourage you to contact our Freeflow, a talent network for the cryptocurrency industry. This message will be deleted in ${DELETE_DELAY} seconds.`,
+          components: (() => {
+            const hiring = isHiring(message.content);
+            const forHire = isForHire(message.content);
+            const hiringLink = new MessageActionRow().addComponents(
+              new MessageButton()
+                .setCustomId("freeflow-hiring")
+                .setLabel("Start hiring")
+                .setStyle("PRIMARY"),
+            );
+            const forHireLink = new MessageActionRow().addComponents(
+              new MessageButton()
+                .setCustomId("freeflow-for-hire")
+                .setLabel("Request a Freeflow application")
+                .setStyle("PRIMARY"),
+            );
+            if (!hiring && !forHire) {
+              return [hiringLink, forHireLink];
+            }
+            return hiring ? [hiringLink] : [forHireLink];
+          })(),
+        }),
+        reportUser({ reason: ReportReasons.jobCrypto, message }),
+      ]);
+      await Promise.all([message.delete(), sleep(DELETE_DELAY)]);
+      await reply.delete();
       return;
     }
 
