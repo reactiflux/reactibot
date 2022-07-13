@@ -191,7 +191,7 @@ const jobModeration = async (bot: Client) => {
     }
 
     const DELETE_DELAY = 90;
-    const bannedWords = /(nft|blockchain|crypto)/;
+    const bannedWords = /(blockchain|nft|cryptocurrency|token|web3)/;
     if (bannedWords.test(simplifyString(message.content))) {
       moderatedMessageIds.add(message.id);
       const [reply] = await Promise.all([
