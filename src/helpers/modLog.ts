@@ -1,4 +1,9 @@
-import { GuildMember, Message } from "discord.js";
+import {
+  GuildMember,
+  Message,
+  MessageOptions,
+  MessagePayload,
+} from "discord.js";
 import { modRoleId } from "../constants";
 import {
   constructDiscordLink,
@@ -7,6 +12,13 @@ import {
 } from "./discord";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
+
+export const modLog = async (
+  message: string | MessagePayload | MessageOptions,
+) => {
+  const logChannel = await getChannel(CHANNELS.jobsLog);
+  return await logChannel.send(message);
+};
 
 const warningMessages = new Map<
   string,
@@ -22,6 +34,7 @@ export const enum ReportReasons {
   jobAge = "jobAge",
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
+  jobCrypto = "jobCrypto",
 }
 
 interface Report {
@@ -169,6 +182,10 @@ ${reportedMessage}
     case ReportReasons.jobRemoved:
       return `${preface}, post was deleted:
 ${extra}
+${reportedMessage}
+`;
+    case ReportReasons.jobCrypto:
+      return `<@${message.author.id}> posted a crypto job:
 ${reportedMessage}
 `;
   }
