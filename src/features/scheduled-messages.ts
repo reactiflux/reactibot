@@ -81,6 +81,9 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
 * Third-party recruitment must be discussed with moderators, DM <@103525876892708864>.
 
 Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently.
+
+We no longer allow blockchain or web3 jobs to be advertised here. We encourage you to reach out to Freeflow, a web3 talent network, instead. If you're hiring: <https://discord.gg/gTWTwZPDYT>
+If you're seeking work: <https://vjlup8tch3g.typeform.com/to/T8w8qWzl>
 `,
     },
   },
