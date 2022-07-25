@@ -16,8 +16,12 @@ const prepareOptionalPingForward = ({ users, roles, repliedUser }: MessageMentio
     pingedReceivers.unshift(formatReceiverID(repliedUser.id));
   }
 
+  if (!pingedReceivers.length) {
+    return {};
+  }
+
   return {
-    content: `Hey ${pingedReceivers.join(', ')}! :wave: Please check the hint below. :point_down:`
+    content: `Hey ${pingedReceivers.join(', ')}! :wave: Please check the hint below. :point_down: \n\u200B`
   };
 }
 
