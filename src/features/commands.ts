@@ -1,11 +1,25 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import { Client, Message, TextChannel } from "discord.js";
+import { Client, Message, TextChannel, MessageMentions } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 
 import * as report from "../commands/report";
+
+const prepareOptionalPingForward = ({ users, roles, repliedUser }: MessageMentions) => {
+  const formatReceiverID = (receiverID: string) => `<@${receiverID}>`;
+  const pingedReceiversIDs = [...users.keys(), ...roles.keys()];
+  const pingedReceivers = pingedReceiversIDs.map(formatReceiverID);
+  
+  if (repliedUser?.id) {
+    pingedReceivers.unshift(formatReceiverID(repliedUser.id));
+  }
+
+  return {
+    content: `Hey ${pingedReceivers.join(', ')}! :wave: Please check the hint below. :point_down:`
+  };
+}
 
 export const setupInteractions = (bot: Client) => {
   bot.on("interactionCreate", (interaction) => {
@@ -264,6 +278,7 @@ https://beta.reactjs.org/learn/sharing-state-between-components`,
     category: "Reactiflux",
     handleMessage: (msg) => {
       msg.channel.send({
+        ...prepareOptionalPingForward(msg.mentions),
         embeds: [
           {
             title: "Asking to ask",
@@ -296,6 +311,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
     category: "Reactiflux",
     handleMessage: (msg) => {
       msg.channel.send({
+        ...prepareOptionalPingForward(msg.mentions),
         embeds: [
           {
             title: "Attaching Code",
@@ -322,6 +338,7 @@ Link a Snack to share React Native examples: https://snack.expo.io
     category: "Reactiflux",
     handleMessage: (msg) => {
       msg.channel.send({
+        ...prepareOptionalPingForward(msg.mentions),
         embeds: [
           {
             title: "Don’t ping or DM other devs you aren’t actively talking to",
