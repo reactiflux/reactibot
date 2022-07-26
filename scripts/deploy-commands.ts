@@ -11,8 +11,10 @@ import {
 import { applicationId, discordToken, guildId } from "../src/constants";
 import { logger } from "../src/features/log";
 import { difference } from "../src/helpers/sets";
+import { partition } from "../src/helpers/array";
 
 import * as report from "../src/commands/report";
+import { storedMessages } from "../src/features/commands";
 
 // TODO: make this a global command in production
 const upsertUrl = () => Routes.applicationGuildCommands(applicationId, guildId);
@@ -24,10 +26,16 @@ interface CommandConfig {
   description: string;
   type: ApplicationCommandType;
 }
-const cmds: CommandConfig[] = [report];
+const cmds: (CommandConfig | SlashCommandBuilder)[] = [report, storedMessages];
+
+const [unbuilt, prebuilt] = partition(
+  (x): x is SlashCommandBuilder => x instanceof SlashCommandBuilder,
+  cmds,
+) as [CommandConfig[], SlashCommandBuilder[]];
 
 const commands = [
-  ...cmds
+  ...prebuilt.map((c) => c.toJSON()),
+  ...unbuilt
     .filter((x) => x.type === ApplicationCommandType.ChatInput)
     .map((c) =>
       new SlashCommandBuilder()
@@ -35,7 +43,7 @@ const commands = [
         .setDescription(c.description)
         .toJSON(),
     ),
-  ...cmds
+  ...unbuilt
     .filter((x) => x.type === ApplicationCommandType.Message)
     .map((c) =>
       new ContextMenuCommandBuilder()
@@ -43,7 +51,7 @@ const commands = [
         .setName(c.name)
         .toJSON(),
     ),
-  ...cmds
+  ...unbuilt
     .filter((x) => x.type === ApplicationCommandType.User)
     .map((c) =>
       new ContextMenuCommandBuilder()
