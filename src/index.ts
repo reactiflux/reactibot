@@ -11,7 +11,7 @@ import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
-import commands, { setupInteractions } from "./features/commands";
+import { savedResponsesCommand, setupInteractions } from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import autodelete from "./features/autodelete-spam";
@@ -153,15 +153,10 @@ setupStats(bot);
 
 // Discord commands
 setupInteractions(bot);
+savedResponsesCommand(bot);
 
 // common
-addHandler("*", [
-  commands,
-  autoban,
-  emojiMod,
-  autodelete,
-  tsPlaygroundLinkShortener,
-]);
+addHandler("*", [autoban, emojiMod, autodelete, tsPlaygroundLinkShortener]);
 
 addHandler(
   [
