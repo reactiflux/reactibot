@@ -1,4 +1,5 @@
 import {
+  add,
   compareAsc,
   differenceInDays,
   differenceInHours,
@@ -54,8 +55,9 @@ const loadJobs = async (bot: Client, channel: TextChannel) => {
 const updateJobs = (message: Message) => {
   storedMessages.push(message);
 
+  // Allow posts every 6.75 days by pretending "now" is 6 hours in the future
+  const now = add(new Date(), { hours: 6 });
   // Remove all posts that are older than the limit
-  const now = new Date();
   while (
     storedMessages[0] &&
     differenceInDays(now, storedMessages[0].createdAt) >= DAYS_OF_POSTS
