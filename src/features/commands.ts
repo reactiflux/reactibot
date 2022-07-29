@@ -388,7 +388,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const [fetchMsg, res] = await Promise.all([
         msg.channel.send(`Fetching "${query}"...`),
         fetch(
-          `https://developer.mozilla.org/api/v1/search/en-US?highlight=false&q=${query}`,
+          `https://developer.mozilla.org/api/v1/search?highlight=false&locale=en-us&q=${query}`,
         ),
       ]);
 
