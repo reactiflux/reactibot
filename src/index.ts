@@ -23,7 +23,7 @@ import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
-import { discordToken } from "./constants";
+import { discordToken } from "./helpers/env";
 
 export const bot = new discord.Client({
   intents: [

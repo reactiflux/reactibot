@@ -8,7 +8,7 @@ import {
   ApplicationCommandType,
   Routes,
 } from "discord-api-types/v10";
-import { applicationId, discordToken, guildId } from "../src/constants";
+import { applicationId, discordToken, guildId } from "../src/helpers/env";
 import { logger } from "../src/features/log";
 import { difference } from "../src/helpers/sets";
 

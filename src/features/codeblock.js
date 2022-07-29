@@ -1,5 +1,5 @@
 import Gists from "gists";
-import { gitHubToken } from "../constants";
+import { gitHubToken } from "../helpers/env";
 
 const gists = new Gists({
   token: gitHubToken,
