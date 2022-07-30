@@ -15,3 +15,12 @@
 1. Go to the OAuth2 Tab and choose the "bot" scope.
 1. `npm install`
 1. `npm run start`
+
+## Environment variables
+
+Adding a new environment variable needs to be done in several places to work corectly and be predictable for new developers
+
+- Your own `.env` (and restart your dev server)
+- Add a suitable example to `.env.example`
+- The action in `.github/workflows/node.js.yml`
+- The Kubernetes config under `cluster/deployment.yml
