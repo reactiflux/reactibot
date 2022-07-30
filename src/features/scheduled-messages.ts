@@ -1,6 +1,6 @@
 import type * as discord from "discord.js";
 import { differenceInCalendarDays, format, parseISO } from "date-fns";
-import { guildId as defaultGuildId } from "../constants";
+import { guildId as defaultGuildId } from "../helpers/env";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
 import { scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";

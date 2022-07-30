@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import queryString from "query-string";
 import { Client } from "discord.js";
-import { amplitudeKey } from "../constants";
+import { amplitudeKey } from "../helpers/env";
 
 type AmplitudeValue = string | number | boolean;
 type EmitEventData = Record<string, AmplitudeValue | AmplitudeValue[]>;
