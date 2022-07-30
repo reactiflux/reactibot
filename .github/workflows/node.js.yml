@@ -87,4 +87,11 @@ jobs:
           kubectl apply -k .
 
       - name: Deploy Discord commands
-        run: docker run -e ENVIRONMENT=production -e DISCORD_HASH=${{ secrets.DISCORD_HASH }} ${{ join(steps.meta.outputs.tags, '') }} npm run start:commands
+        run: docker run \
+          -e ENVIRONMENT=production \
+          -e DISCORD_HASH=${{ secrets.DISCORD_HASH }} \
+          -e DISCORD_PUBLIC_KEY=${{secrets.DISCORD_PUBLIC_KEY}} \
+          -e DISCORD_APP_ID=${{secrets.DISCORD_APP_ID}} \
+          -e GUILD_ID=${{secrets.GUILD_ID}} \
+          ${{ join(steps.meta.outputs.tags, '') }} \
+          npm run start:commands
