@@ -33,3 +33,18 @@ spec:
                 secretKeyRef:
                   name: reactibot-env
                   key: AMPLITUDE_KEY
+            - name: DISCORD_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: DISCORD_PUBLIC_KEY
+            - name: DISCORD_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: DISCORD_APP_ID
+            - name: GUILD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: GUILD_ID
