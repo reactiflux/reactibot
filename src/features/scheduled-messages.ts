@@ -1,5 +1,4 @@
 import type * as discord from "discord.js";
-import { differenceInCalendarDays, format, parseISO } from "date-fns";
 import { guildId as defaultGuildId } from "../helpers/env";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
@@ -43,32 +42,6 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
     }
   }
   */
-  {
-    postTo: [
-      { interval: SPECIFIED_TIMES.midnight, channelId: CHANNELS.gaming },
-    ],
-    message: async (channel) => {
-      const WORDLE_ON_MAR_31 = 285;
-      const mar31 = new Date("2022-03-31");
-      const midnight = parseISO(format(Date.now(), "yyyy-MM-dd"));
-      const wordleCount =
-        WORDLE_ON_MAR_31 + differenceInCalendarDays(midnight, mar31);
-
-      // Send a message
-      const message = await channel.send({
-        content: `Daily wordle thread #${wordleCount}, ${format(
-          midnight,
-          "yyyy-MM-dd",
-        )} https://www.nytimes.com/games/wordle/index.html`,
-      });
-      // Start a thread
-      const thread = await message.startThread({
-        name: `Wordle ${wordleCount} ${format(midnight, "M-dd")}`,
-      });
-      // Ping members
-      thread.send("<@&954499699870666842>");
-    },
-  },
   {
     postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
     message: {
