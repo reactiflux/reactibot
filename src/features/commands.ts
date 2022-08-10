@@ -5,15 +5,11 @@ import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 
-import * as report from "../commands/report";
-
 export const setupInteractions = (bot: Client) => {
   bot.on("interactionCreate", (interaction) => {
     if (interaction.isMessageContextMenu()) {
-      switch (interaction.commandName) {
-        case report.name:
-          return report.handler(interaction);
-      }
+      // switch (interaction.commandName) {
+      // }
     }
   });
 };

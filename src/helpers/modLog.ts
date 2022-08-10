@@ -26,7 +26,6 @@ const warningMessages = new Map<
 >();
 
 export const enum ReportReasons {
-  anonReport = "anonReport",
   userWarn = "userWarn",
   userDelete = "userDelete",
   jobAge = "jobAge",
@@ -139,13 +138,6 @@ ${postfix}`;
 
     case ReportReasons.userDelete:
       return `${modAlert} – ${preface}, met the deletion threshold for the message:
-${extra}
-${reportedMessage}
-
-${postfix}`;
-
-    case ReportReasons.anonReport:
-      return `${preface}, reported anonymously:
 ${extra}
 ${reportedMessage}
 
