@@ -14,7 +14,6 @@ import autoban from "./features/autoban";
 import commands, { setupInteractions } from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
-import autodelete from "./features/autodelete-spam";
 import promotionThread from "./features/promotion-threads";
 import autothread, { cleanupThreads } from "./features/autothread";
 
@@ -155,13 +154,7 @@ setupStats(bot);
 setupInteractions(bot);
 
 // common
-addHandler("*", [
-  commands,
-  autoban,
-  emojiMod,
-  autodelete,
-  tsPlaygroundLinkShortener,
-]);
+addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
 
 addHandler(
   [

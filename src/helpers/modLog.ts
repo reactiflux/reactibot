@@ -30,7 +30,6 @@ export const enum ReportReasons {
   userWarn = "userWarn",
   userDelete = "userDelete",
   mod = "mod",
-  spam = "spam",
   jobAge = "jobAge",
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
@@ -148,13 +147,6 @@ ${postfix}`;
 
     case ReportReasons.userDelete:
       return `${modAlert} – ${preface}, met the deletion threshold for the message:
-${extra}
-${reportedMessage}
-
-${postfix}`;
-
-    case ReportReasons.spam:
-      return `${preface}, reported for spam:
 ${extra}
 ${reportedMessage}
 

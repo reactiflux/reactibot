@@ -1,14 +1,10 @@
 import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { CHANNELS, getChannel } from "../constants/channels";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 
-const modLog = getChannel(CHANNELS.modLog);
-
-const AUTO_SPAM_THRESHOLD = 5;
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
@@ -55,29 +51,6 @@ Thanks!
     }
 
     reportUser({ reason: ReportReasons.mod, message, staff });
-  },
-  "💩": async ({ guild, author, reactor, message, usersWhoReacted }) => {
-    // Skip if the post is from someone from the staff or reactor is not staff
-    if (isStaff(author) || !isStaff(reactor)) {
-      return;
-    }
-
-    const [members, staff] = partition(isStaff, usersWhoReacted);
-
-    message.delete();
-    const warnings = reportUser({
-      reason: ReportReasons.spam,
-      message,
-      staff,
-      members,
-    });
-
-    if (warnings >= AUTO_SPAM_THRESHOLD) {
-      guild.members.fetch(message.author.id).then((member) => {
-        member.kick("Autokicked for spamming");
-        modLog.send(`Automatically kicked <@${message.author.id}> for spam`);
-      });
-    }
   },
   "👎": async ({ message, reactor, usersWhoReacted }) => {
     if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
