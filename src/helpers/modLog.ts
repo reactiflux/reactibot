@@ -29,7 +29,6 @@ export const enum ReportReasons {
   anonReport = "anonReport",
   userWarn = "userWarn",
   userDelete = "userDelete",
-  mod = "mod",
   jobAge = "jobAge",
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
@@ -131,13 +130,6 @@ ${
   );
 
   switch (reason) {
-    case ReportReasons.mod:
-      return `${preface}:
-${extra}
-${reportedMessage}
-
-${postfix}`;
-
     case ReportReasons.userWarn:
       return `${modAlert} – ${preface}, met the warning threshold for the message:
 ${extra}

@@ -4,6 +4,7 @@ import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import { fetchReactionMembers, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
+import { sleep } from "../helpers/misc";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -28,29 +29,18 @@ type ReactionHandlers = {
 };
 
 export const reactionHandlers: ReactionHandlers = {
-  "⚠️": async ({ author, reactor, message, reaction, usersWhoReacted }) => {
-    // Skip if the post is from someone from the staff
-    if (isStaff(author)) {
-      return;
-    }
-    // If the user that reacted isn't in the staff, remove the reaction, send a
-    if (!isStaff(reactor)) {
-      reaction.users.remove(reactor.id);
-      reactor.send(`Hey there! 👋
-The ⚠️ reaction is reserved for staff usage as part of our moderation system.  If you would like to mark a message as needing moderator attention, you can use react with 👎 instead.
-Thanks!
-`);
+  "⚠️": async ({ author, reactor, message }) => {
+    // Skip if the post is from someone from the staff, or if the reaction isn't
+    // from staff
+    if (isStaff(author) || !isStaff(reactor)) {
       return;
     }
 
-    const reactionCount = usersWhoReacted.length;
-    const staff = usersWhoReacted.filter(isStaff);
-
-    if (reactionCount < config.warningThreshold) {
-      return;
-    }
-
-    reportUser({ reason: ReportReasons.mod, message, staff });
+    const reply = await message.reply(
+      'This has been replaced by a "Track" command in the message command options! Right click the message instead.',
+    );
+    await sleep(10);
+    await reply.delete();
   },
   "👎": async ({ message, reactor, usersWhoReacted }) => {
     if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
