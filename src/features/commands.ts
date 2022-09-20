@@ -770,7 +770,7 @@ https://exploringjs.com/es6/ch_variables.html#_pitfall-const-does-not-make-the-v
     },
   },
   {
-    words: [!remote, !remotework],
+    words: ["!remote", "!remotework"],
     help: "provides resources for the remote work job search",
     category: "Web",
     handleMessage: (msg) => {
