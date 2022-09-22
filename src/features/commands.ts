@@ -769,6 +769,39 @@ https://exploringjs.com/es6/ch_variables.html#_pitfall-const-does-not-make-the-v
       });
     },
   },
+  {
+    words: ["!remote", "!remotework"],
+    help: "provides resources for the remote work job search",
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Acquiring a remote position",
+            type: "rich",
+            description: `
+Below is a list of resources we commonly point to as an aid in a search for remote jobs. 
+
+NOTE: If you are looking for your first job in the field or are earlier in your career, then getting
+a remote job at this stage is incredibly rare. We recommend prioritizing getting a job local to
+the area you are in or possibly moving to an area for work if options are limited where you are.
+
+If you are feeling confident or are further along in career, feel free to make use of the following resources
+to start your search:
+
+https://hnhiring.com/
+https://whoishiring.io/
+https://weworkremotely.com/
+https://remoteok.io/
+https://remote.com/
+https://remotive.io/remote-jobs/software-dev
+            `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
