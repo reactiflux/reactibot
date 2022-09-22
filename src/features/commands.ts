@@ -568,6 +568,53 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
+    words: [`!jwt`],
+    help: `Describes reasoning for and against the use of JWT tokens againt using standard sessions`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title:
+              "Is JWT the right approach for my applications authentication?",
+            type: "rich",
+            description: `
+            **TL;DR: JWT is widely overused as the go to authentication choice over sessions. Use this bot to form your opinon on wether it is a good fit for you.**
+            
+            A lot of developers starting their journey into programming will, at some point, hit the question of how to work with backend authentication.
+            They will undoubtably come across the multitude of JWT tutorials on the subject. But is this the correct approach?. Most of the time the answer will be no. 
+            So what is the alternaive? Sessions. Sessions have been tried and tested for decades, with a lot of back end frameworks supporting them out of the box.
+            They take up miminal setup times, are completely managed by the server and cannot, if correctly set up , be accessed by the client
+
+            Some reasons why you may need to use a JWT approach:
+            - The JWT token is not supplied by yourself (i.e firestore, Auth0, third party apis out of your control)
+            - You are working with a distributed system of services where the JWT token is the source of identity ( i.e microservices)
+
+            When you dont need to use JWT:
+            - You are managing and hosting your own UI and api
+            - Your api is only feeding your UI and not exposed to exterior service to service consumers
+
+            Some of the negatives of JWT in the above instance:
+            - JWT tokens get stored client side, usually in local storage , making them vulnerable to attack
+            - JWT tokens cannot be revoked so if a users role ,for example, is revoked in the DB the user will still have that permission until the token expires
+            - The amount of code needed to manage, store, refresh and append the token in the UI and backend far outscales using sessions
+            - Authentication is not stateless, and JWT tokens cannot be revoked. This clashes when a user for example logs out, and because the token will still be valid until it expires, the backend needs to blacklist tokens to prevent malicious usage.
+  
+            See below for some helpful links to help you decide which is the best solution for you:
+  
+            https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+            https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+            https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
+            https://gist.github.com/samsch/a5c99b9faaac9f131967e8a6d61682b0
+
+            `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!formatting`, `!prettier`],
     help: `describes Prettier and explains how to use it to format code`,
     category: "Reactiflux",
