@@ -790,7 +790,6 @@ https://hnhiring.com/
 https://whoishiring.io/
 https://weworkremotely.com/
 https://remoteok.io/
-https://remote.com/
 https://remotive.io/remote-jobs/software-dev
             `,
             color: EMBED_COLOR,
