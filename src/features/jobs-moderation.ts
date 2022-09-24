@@ -101,17 +101,21 @@ const jobModeration = async (bot: Client) => {
         message.content.startsWith("!resetJobPost") &&
         message.mentions.members?.size
       ) {
-        const memberToClear = message.mentions.members?.at(0);
+        const memberToClear = message.mentions.members?.at(0)?.id || "";
         let removed = 0;
+        if (cryptoPosters.has(memberToClear)) {
+          removed += 1;
+          cryptoPosters.delete(memberToClear);
+        }
 
         let index = storedMessages.findIndex(
-          (x) => x.author.id === memberToClear?.id,
+          (x) => x.author.id === memberToClear,
         );
         while (index > 0) {
           removed += 1;
           storedMessages.splice(index, 1);
           index = storedMessages.findIndex(
-            (x) => x.author.id === memberToClear?.id,
+            (x) => x.author.id === memberToClear,
           );
         }
         message.reply(
