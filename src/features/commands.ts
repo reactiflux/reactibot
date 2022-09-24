@@ -579,14 +579,15 @@ Here's an article explaining the difference between the two: https://goshakkk.na
               "Is JWT the right approach for my applications authentication?",
             type: "rich",
             description: `
-            **TL;DR: JWT is widely overused as the go to authentication choice over sessions in most situations. Use this bot to form your opinion on wether it is a good fit for you.**
+            Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
             
-            A lot of developers starting their journey into programming will, at some point, hit the question of how to work with backend authentication.
-            They will undoubtably come across the multitude of JWT tutorials on the subject. But is this the correct approach?. Most of the time the answer will be no. 
-            So what is the alternative? Sessions. Sessions have been tried and tested for decades, with a lot of back end frameworks supporting them out of the box.
-            They take up miminal setup times, are completely managed by the server and cannot, if correctly set up , be accessed by the client
-            See below for some helpful links to help you decide which is the best solution for you:
+            That said there are also scenarios when using a JWT token is the best approach:
+            - When using a third party auth service ( OpenID, Auth0, Firestore)
+            - Service to service calls
+            - Distributed architectures ( i.e Microservices)
   
+            See below to help you decide which works best for you:
+
             https://evertpot.com/jwt-is-a-bad-default
             https://redis.com/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions
             https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
