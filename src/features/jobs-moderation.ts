@@ -15,11 +15,15 @@ import { ReportReasons, reportUser } from "../helpers/modLog";
 import cooldown from "./cooldown";
 
 const storedMessages: Message[] = [];
+// Moderated message IDs are used to avoid creating deletion logs for removed
 const moderatedMessageIds: Set<string> = new Set();
+
+const cryptoPosters: Map<string, { count: number; last: Date }> = new Map();
 
 const DAYS_OF_POSTS = 7; // days
 const MINIMUM_JOIN_AGE = 1; // hours
 const REPOST_THRESHOLD = 10; // minutes
+const CRYPTO_COOLDOWN = 6; // hours
 
 const tags = ["forhire", "for hire", "hiring", "remote", "local"];
 
@@ -133,10 +137,57 @@ const jobModeration = async (bot: Client) => {
       return;
     }
 
+    const now = new Date();
     const DELETE_DELAY = 90;
-    const bannedWords = /(blockchain|nft|cryptocurrency|token|web3)/;
+    const lastCryptoPost = cryptoPosters.get(message.author.id);
+    if (
+      lastCryptoPost &&
+      // extend duration for each repeated post
+      differenceInHours(now, lastCryptoPost.last) <
+        CRYPTO_COOLDOWN * lastCryptoPost.count
+    ) {
+      moderatedMessageIds.add(message.id);
+      const newCount = lastCryptoPost.count + 1;
+      cryptoPosters.set(message.author.id, {
+        ...lastCryptoPost,
+        count: newCount,
+      });
+
+      // If they post 3 times, time them out overnight
+      if (newCount >= 3) {
+        await message.member?.timeout(20 * 60 * 60 * 1000);
+      }
+
+      const hiring = isHiring(message.content);
+      const forHire = isForHire(message.content);
+
+      const referralLink =
+        !hiring && !forHire
+          ? `If you're hiring: ${freeflowHiring}
+If you're seeking work: ${freeflowForHire}`
+          : hiring
+          ? `Join their server to start hiring: ${freeflowHiring}`
+          : `Apply to join their talent pool: ${freeflowForHire}`;
+
+      const [reply] = await Promise.all([
+        message.reply({
+          content: `Sorry! We don't allow posts from people who came here to advertise blockchain or related cryptocurrency services.
+
+We encourage you to contact our Freeflow, a talent network for the cryptocurrency industry. This message will be deleted in ${DELETE_DELAY} seconds. If you continue posting, you’ll be timed out overnight.
+
+${referralLink}`,
+        }),
+        reportUser({ reason: ReportReasons.jobCrypto, message }),
+      ]);
+      await Promise.all([message.delete(), sleep(DELETE_DELAY)]);
+      await reply.delete();
+      return;
+    }
+
+    const bannedWords = /(blockchain|nft|cryptocurrency|token|web3|web 3)/;
     if (bannedWords.test(simplifyString(message.content))) {
       moderatedMessageIds.add(message.id);
+      cryptoPosters.set(message.author.id, { count: 1, last: new Date() });
 
       const hiring = isHiring(message.content);
       const forHire = isForHire(message.content);
@@ -163,7 +214,6 @@ ${referralLink}`,
     }
 
     // Handle joining and posting too quickly
-    const now = new Date();
     if (
       message.member?.joinedAt &&
       differenceInHours(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
