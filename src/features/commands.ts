@@ -296,7 +296,10 @@ How To Ask Questions The Smart Way https://git.io/JKscV
           {
             title: "Attaching Code",
             type: "rich",
-            description: `\\\`\\\`\\\`js
+            description: `
+Please don't post code in screenshots. Instead, use one of these:
+
+\\\`\\\`\\\`js
 // short code snippets go here
 \\\`\\\`\\\`
 
