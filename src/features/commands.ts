@@ -836,6 +836,30 @@ https://remotive.io/remote-jobs/software-dev
       });
     },
   },
+  {
+    words: [`!keys`],
+    help: `Explains the importance of keys when rendering lists in React`,
+    category: "React/Redux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "The importance of keys when rendering lists in React",
+            type: "rich",
+            description: `
+React depends on the use of stable and unique keys to identify items in a list so that it can perform correct and performant DOM updates. Keys are particularly important if the list can change over time.
+
+Please see these resources for more information:
+
+https://beta.reactjs.org/learn/rendering-lists#keeping-list-items-in-order-with-key
+https://kentcdodds.com/blog/understanding-reacts-key-prop
+          `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
