@@ -297,7 +297,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
             title: "Attaching Code",
             type: "rich",
             description: `
-Please don't post code in screenshots. Instead, use one of these:
+Please don't post code in screenshots or post unformatted code. Instead, use one of these preferred methods to share code:
 
 \\\`\\\`\\\`js
 // short code snippets go here
