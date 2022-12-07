@@ -21,7 +21,6 @@ const moderatedMessageIds: Set<string> = new Set();
 const cryptoPosters: Map<string, { count: number; last: Date }> = new Map();
 
 const DAYS_OF_POSTS = 7; // days
-const MINIMUM_JOIN_AGE = 1; // hours
 const REPOST_THRESHOLD = 10; // minutes
 const CRYPTO_COOLDOWN = 6; // hours
 
@@ -214,33 +213,6 @@ ${referralLink}`,
       ]);
       await Promise.all([message.delete(), sleep(DELETE_DELAY)]);
       await reply.delete();
-      return;
-    }
-
-    // Handle joining and posting too quickly
-    if (
-      message.member?.joinedAt &&
-      differenceInHours(now, message.member.joinedAt) < MINIMUM_JOIN_AGE
-    ) {
-      moderatedMessageIds.add(message.id);
-      reportUser({ reason: ReportReasons.jobAge, message });
-      const [reply] = await Promise.all([
-        message.reply(
-          "You joined too recently to post a job, please try again in a little while. Your post has been DM’d to you.",
-        ),
-        message.author.send(message.content),
-        message.author.send(
-          "You joined too recently to post a job, please try again in a little while. Your post:",
-        ),
-      ]);
-      await Promise.all([
-        message.delete(),
-        (async () => {
-          await sleep(45);
-          return reply.delete();
-        })(),
-      ]);
-
       return;
     }
 
