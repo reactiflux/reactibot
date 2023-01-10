@@ -2,7 +2,7 @@ import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { fetchReactionMembers, isStaff } from "../helpers/discord";
+import { fetchReactionMembers, isHelpful, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 import { sleep } from "../helpers/misc";
 
@@ -68,6 +68,24 @@ export const reactionHandlers: ReactionHandlers = {
     }
 
     reportUser({ reason, message, staff, members });
+  },
+  "🔍": async ({ message, usersWhoReacted }) => {
+    const NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION = 2;
+
+    const hasRequiredNumberOfReactions =
+      usersWhoReacted.length >= NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION;
+
+    const hasAuthoritativeUserReacted = usersWhoReacted.some(
+      (userWhoReacted) => isStaff(userWhoReacted) || isHelpful(userWhoReacted),
+    );
+
+    if (!hasRequiredNumberOfReactions || !hasAuthoritativeUserReacted) {
+      return;
+    }
+
+    await message.delete();
+
+    await message.author.send("...");
   },
 };
 
