@@ -723,6 +723,35 @@ Instead:
     },
   },
   {
+    words: [`!laptop`],
+    help: `gives some advice about what laptop to use for web development`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "",
+            type: "rich",
+            description: `Web development is generally not a highly taxing process, so the laptop you get may matter less than you think. Any operating system is fine for general web development.
+
+A few things to consider when getting a laptop:
+- Memory may be important if you plan on running containers (common as part of typical development flows) or emulators for mobile devices. Look for a laptop with at least 16GB of memory.
+- Consumer-targeted laptops tend to be less repairable and receive less support over long periods of time than business laptops.
+
+Here are a few recommendations for laptops:
+- Dell Latitude or XPS
+- Lenovo Thinkpad
+- Apple Macbook (avoid models with butterfly keyboards)
+
+These lines are popular so there's generally a lot of resources for working on them; their makers have refurbished stores and they are also widely available used if you're on a budget.
+`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: ["!lock"],
     help: "",
     category: "Communication",
