@@ -6,7 +6,6 @@ import { fetchReactionMembers, isHelpful, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 import { sleep } from "../helpers/misc";
 import { EMBED_COLOR } from "./commands";
-import { createNewThreadName } from "../helpers/threads";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -72,21 +71,37 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
+    const NUMBER_OF_AUTHORITATIVE_REACTIONS_REQUIRED_FOR_DELETION = 1;
     const NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION = 2;
+
+    const [unauthoritativeUsersWhoReacted, authoritativeUsersWhoReacted] =
+      partition(
+        (userWhoReacted) =>
+          isStaff(userWhoReacted) || isHelpful(userWhoReacted),
+        usersWhoReacted,
+      );
+
+    const hasRequiredNumberOfAuthoritativeReactions =
+      authoritativeUsersWhoReacted.length >=
+      NUMBER_OF_AUTHORITATIVE_REACTIONS_REQUIRED_FOR_DELETION;
 
     const hasRequiredNumberOfReactions =
       usersWhoReacted.length >= NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION;
 
-    const hasAuthoritativeUserReacted = usersWhoReacted.some(
-      (userWhoReacted) => isStaff(userWhoReacted) || isHelpful(userWhoReacted),
-    );
+    const isMessageWithinThread = message.channel.isThread();
 
-    if (!hasRequiredNumberOfReactions || !hasAuthoritativeUserReacted) {
+    if (
+      !hasRequiredNumberOfAuthoritativeReactions ||
+      !hasRequiredNumberOfReactions ||
+      isMessageWithinThread
+    ) {
       return;
     }
 
+    const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
+
     const newThread = await message.startThread({
-      name: createNewThreadName({ username: message.author.username }),
+      name: newThreadName,
     });
 
     await newThread.send({
@@ -107,6 +122,13 @@ export const reactionHandlers: ReactionHandlers = {
     });
 
     await message.delete();
+
+    reportUser({
+      reason: ReportReasons.lowEffortQuestionRemoved,
+      message,
+      staff: authoritativeUsersWhoReacted,
+      members: unauthoritativeUsersWhoReacted,
+    });
   },
 };
 
