@@ -32,6 +32,7 @@ export const enum ReportReasons {
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
   jobCrypto = "jobCrypto",
+  lowEffortQuestionRemoved = "lowEffortQuestionRemoved",
 }
 
 interface Report {
@@ -112,18 +113,24 @@ const constructLog = ({
   const modAlert = `<@${modRoleId}>`;
   const preface = `<@${message.author.id}> in <#${message.channel.id}> warned 1 times`;
   const extra = origExtra ? `${origExtra}\n` : "";
+
+  const formattedUsersWhoReacted = members.length
+    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}\n`
+    : "";
+
+  const formattedStaffWhoReacted = staff.length
+    ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
+    : "";
+
+  const usersWhoReacted = `${formattedUsersWhoReacted}
+${formattedStaffWhoReacted}
+`;
+
   const postfix = `Link: ${constructDiscordLink(message)}
 
-${
-  members.length
-    ? `Reactors: ${members.map(({ user }) => user.username).join(", ")}\n`
-    : ""
-}${
-    staff.length
-      ? `Staff: ${staff.map(({ user }) => user.username).join(", ")}`
-      : ""
-  }
+${usersWhoReacted}
 `;
+
   const reportedMessage = truncateMessage(
     escapeDisruptiveContent(quoteMessageContent(message.content)),
   );
@@ -163,6 +170,13 @@ ${reportedMessage}
     case ReportReasons.jobCrypto:
       return `<@${message.author.id}> posted a crypto job:
 ${reportedMessage}
+`;
+    case ReportReasons.lowEffortQuestionRemoved:
+      return `
+<@${message.author.id}> posted a low effort question in <#${message.channel.id}> that was removed: 
+
+${reportedMessage}
+${usersWhoReacted}
 `;
   }
 };
