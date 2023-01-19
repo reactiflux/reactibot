@@ -71,29 +71,20 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
-    const NUMBER_OF_AUTHORITATIVE_REACTIONS_REQUIRED_FOR_DELETION = 1;
-    const NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION = 2;
+    const KNOWN_REACTOR_THRESHOLD = 1;
+    const UNKNOWN_REACTOR_THRESHOLD = 2;
 
-    const [unauthoritativeUsersWhoReacted, authoritativeUsersWhoReacted] =
-      partition(
-        (userWhoReacted) =>
-          isStaff(userWhoReacted) || isHelpful(userWhoReacted),
-        usersWhoReacted,
-      );
-
-    const hasRequiredNumberOfAuthoritativeReactions =
-      authoritativeUsersWhoReacted.length >=
-      NUMBER_OF_AUTHORITATIVE_REACTIONS_REQUIRED_FOR_DELETION;
-
-    const hasRequiredNumberOfReactions =
-      usersWhoReacted.length >= NUMBER_OF_REACTIONS_REQUIRED_FOR_DELETION;
-
-    const isMessageWithinThread = message.channel.isThread();
+    const [unknownReactors, knownReactors] = partition(
+      (user) => isStaff(user) || isHelpful(user),
+      usersWhoReacted,
+    );
 
     if (
-      !hasRequiredNumberOfAuthoritativeReactions ||
-      !hasRequiredNumberOfReactions ||
-      isMessageWithinThread
+      !(
+        knownReactors.length >= KNOWN_REACTOR_THRESHOLD ||
+        unknownReactors.length >= UNKNOWN_REACTOR_THRESHOLD
+      ) ||
+      message.channel.isThread()
     ) {
       return;
     }
@@ -110,11 +101,13 @@ export const reactionHandlers: ReactionHandlers = {
           title: "Please improve your question",
           type: "rich",
           description: `
-            Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
+Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
 
-            This is a good resource about asking good programming questions: 
+This is a good resource about asking good programming questions: 
 
-            https://zellwk.com/blog/asking-questions/
+https://zellwk.com/blog/asking-questions/
+
+(this was triggered by crossing a threshold of "🔍" reactions on the original message)
           `,
           color: EMBED_COLOR,
         },
@@ -126,8 +119,8 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({
       reason: ReportReasons.lowEffortQuestionRemoved,
       message,
-      staff: authoritativeUsersWhoReacted,
-      members: unauthoritativeUsersWhoReacted,
+      staff: unknownReactors,
+      members: knownReactors,
     });
   },
 };
