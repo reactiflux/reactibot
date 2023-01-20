@@ -71,8 +71,6 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
-    return; // Temporarily disable feature.
-
     const KNOWN_REACTOR_THRESHOLD = 1;
     const UNKNOWN_REACTOR_THRESHOLD = 2;
 
