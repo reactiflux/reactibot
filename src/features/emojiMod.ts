@@ -2,9 +2,10 @@ import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { fetchReactionMembers, isStaff } from "../helpers/discord";
+import { fetchReactionMembers, isHelpful, isStaff } from "../helpers/discord";
 import { partition } from "../helpers/array";
 import { sleep } from "../helpers/misc";
+import { EMBED_COLOR } from "./commands";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -68,6 +69,59 @@ export const reactionHandlers: ReactionHandlers = {
     }
 
     reportUser({ reason, message, staff, members });
+  },
+  "🔍": async ({ message, usersWhoReacted }) => {
+    const KNOWN_REACTOR_THRESHOLD = 1;
+    const UNKNOWN_REACTOR_THRESHOLD = 2;
+
+    const [unknownReactors, knownReactors] = partition(
+      (user) => isStaff(user) || isHelpful(user),
+      usersWhoReacted,
+    );
+
+    if (
+      !(
+        knownReactors.length >= KNOWN_REACTOR_THRESHOLD ||
+        unknownReactors.length >= UNKNOWN_REACTOR_THRESHOLD
+      ) ||
+      message.channel.isThread()
+    ) {
+      return;
+    }
+
+    const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
+
+    const newThread = await message.startThread({
+      name: newThreadName,
+    });
+
+    await newThread.send({
+      embeds: [
+        {
+          title: "Please improve your question",
+          type: "rich",
+          description: `
+Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
+
+This is a good resource about asking good programming questions: 
+
+https://zellwk.com/blog/asking-questions/
+
+(this was triggered by crossing a threshold of "🔍" reactions on the original message)
+          `,
+          color: EMBED_COLOR,
+        },
+      ],
+    });
+
+    await message.delete();
+
+    reportUser({
+      reason: ReportReasons.lowEffortQuestionRemoved,
+      message,
+      staff: knownReactors,
+      members: unknownReactors,
+    });
   },
 };
 

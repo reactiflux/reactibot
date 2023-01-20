@@ -10,6 +10,7 @@ import {
 import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
+import { createNewThreadName } from "../helpers/threads";
 
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 12;
@@ -39,7 +40,7 @@ const autoThread: ChannelHandlers = {
     }
     // Create threads
     const newThread = await msg.startThread({
-      name: `${msg.author.username} – ${format(new Date(), "HH-mm MMM d")}`,
+      name: createNewThreadName({ username: msg.author.username }),
     });
     threadStats.threadCreated(msg.channelId);
     // Send short-lived instructions
