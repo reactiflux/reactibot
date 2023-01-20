@@ -119,8 +119,8 @@ https://zellwk.com/blog/asking-questions/
     reportUser({
       reason: ReportReasons.lowEffortQuestionRemoved,
       message,
-      staff: unknownReactors,
-      members: knownReactors,
+      staff: knownReactors,
+      members: unknownReactors,
     });
   },
 };
