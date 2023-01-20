@@ -2,7 +2,11 @@ import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { fetchReactionMembers, isHelpful, isStaff } from "../helpers/discord";
+import {
+  fetchReactionMembers,
+  isStaff,
+  isStaffOrHelpful,
+} from "../helpers/discord";
 import { partition } from "../helpers/array";
 import { sleep } from "../helpers/misc";
 import { EMBED_COLOR } from "./commands";
@@ -71,21 +75,12 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
-    return; // Temporarily disable feature.
+    const STAFF_OR_HELPFUL_REACTOR_THRESHOLD = 2;
 
-    const KNOWN_REACTOR_THRESHOLD = 1;
-    const UNKNOWN_REACTOR_THRESHOLD = 2;
-
-    const [unknownReactors, knownReactors] = partition(
-      (user) => isStaff(user) || isHelpful(user),
-      usersWhoReacted,
-    );
+    const staffOrHelpfulReactors = usersWhoReacted.filter(isStaffOrHelpful);
 
     if (
-      !(
-        knownReactors.length >= KNOWN_REACTOR_THRESHOLD ||
-        unknownReactors.length >= UNKNOWN_REACTOR_THRESHOLD
-      ) ||
+      staffOrHelpfulReactors.length < STAFF_OR_HELPFUL_REACTOR_THRESHOLD ||
       message.channel.isThread()
     ) {
       return;
@@ -121,8 +116,7 @@ https://zellwk.com/blog/asking-questions/
     reportUser({
       reason: ReportReasons.lowEffortQuestionRemoved,
       message,
-      staff: knownReactors,
-      members: unknownReactors,
+      staff: staffOrHelpfulReactors,
     });
   },
 };
