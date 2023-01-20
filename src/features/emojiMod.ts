@@ -2,7 +2,11 @@ import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { fetchReactionMembers, isHelpful, isStaff } from "../helpers/discord";
+import {
+  fetchReactionMembers,
+  isStaff,
+  isStaffOrHelpful,
+} from "../helpers/discord";
 import { partition } from "../helpers/array";
 import { sleep } from "../helpers/misc";
 import { EMBED_COLOR } from "./commands";
@@ -71,21 +75,9 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
-    const KNOWN_REACTOR_THRESHOLD = 1;
-    const UNKNOWN_REACTOR_THRESHOLD = 2;
+    const staffOrHelpfulReactor = usersWhoReacted.find(isStaffOrHelpful);
 
-    const [unknownReactors, knownReactors] = partition(
-      (user) => isStaff(user) || isHelpful(user),
-      usersWhoReacted,
-    );
-
-    if (
-      !(
-        knownReactors.length >= KNOWN_REACTOR_THRESHOLD ||
-        unknownReactors.length >= UNKNOWN_REACTOR_THRESHOLD
-      ) ||
-      message.channel.isThread()
-    ) {
+    if (!staffOrHelpfulReactor || message.channel.isThread()) {
       return;
     }
 
@@ -107,7 +99,7 @@ This is a good resource about asking good programming questions:
 
 https://zellwk.com/blog/asking-questions/
 
-(this was triggered by crossing a threshold of "🔍" reactions on the original message)
+(this was triggered by a helpful member of the community reacting to the original message)
           `,
           color: EMBED_COLOR,
         },
@@ -119,8 +111,7 @@ https://zellwk.com/blog/asking-questions/
     reportUser({
       reason: ReportReasons.lowEffortQuestionRemoved,
       message,
-      staff: knownReactors,
-      members: unknownReactors,
+      staff: [staffOrHelpfulReactor],
     });
   },
 };
