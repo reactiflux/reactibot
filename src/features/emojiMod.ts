@@ -75,9 +75,14 @@ export const reactionHandlers: ReactionHandlers = {
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
-    const staffOrHelpfulReactor = usersWhoReacted.find(isStaffOrHelpful);
+    const STAFF_OR_HELPFUL_REACTOR_THRESHOLD = 2;
 
-    if (!staffOrHelpfulReactor || message.channel.isThread()) {
+    const staffOrHelpfulReactors = usersWhoReacted.filter(isStaffOrHelpful);
+
+    if (
+      staffOrHelpfulReactors.length < STAFF_OR_HELPFUL_REACTOR_THRESHOLD ||
+      message.channel.isThread()
+    ) {
       return;
     }
 
@@ -99,7 +104,7 @@ This is a good resource about asking good programming questions:
 
 https://zellwk.com/blog/asking-questions/
 
-(this was triggered by a helpful member of the community reacting to the original message)
+(this was triggered by crossing a threshold of "🔍" reactions on the original message)
           `,
           color: EMBED_COLOR,
         },
@@ -111,7 +116,7 @@ https://zellwk.com/blog/asking-questions/
     reportUser({
       reason: ReportReasons.lowEffortQuestionRemoved,
       message,
-      staff: [staffOrHelpfulReactor],
+      staff: staffOrHelpfulReactors,
     });
   },
 };
