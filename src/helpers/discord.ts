@@ -28,6 +28,9 @@ export const isHelpful = (member: GuildMember | null | undefined) => {
 
   return hasRole(member, helpfulRoles);
 };
+export const isStaffOrHelpful = (member: GuildMember) => {
+  return isStaff(member) || isHelpful(member);
+};
 
 export const constructDiscordLink = (message: Message | PartialMessage) =>
   `https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`;
