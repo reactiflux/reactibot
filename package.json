@@ -29,7 +29,7 @@
     "gists": "^2.0.0",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
-    "open-graph-scraper": "^4.11.0",
+    "open-graph-scraper": "^5.0.5",
     "query-string": "^6.2.0",
     "uuid": "^8.3.2"
   },
