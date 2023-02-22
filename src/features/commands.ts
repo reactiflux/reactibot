@@ -295,6 +295,9 @@ How To Ask Questions The Smart Way https://git.io/JKscV
         embeds: [
           {
             title: "Attaching Code",
+            image: {
+              url: 'https://giphy.com/gifs/fnkKMYJxnL9DfO8JgY',
+            },
             type: "rich",
             description: `
 Please don't post code in screenshots or post unformatted code. Instead, use one of these preferred methods to share code:
