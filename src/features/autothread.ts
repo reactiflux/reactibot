@@ -1,4 +1,4 @@
-import { differenceInHours, format } from "date-fns";
+import { differenceInHours } from "date-fns";
 import { Client } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import {

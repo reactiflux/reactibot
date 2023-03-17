@@ -295,6 +295,9 @@ How To Ask Questions The Smart Way https://git.io/JKscV
         embeds: [
           {
             title: "Attaching Code",
+            image: {
+              url: "https://media1.tenor.com/images/a23c33a91cb8d026b83488f1673495fd/tenor.gif?itemid=27632534",
+            },
             type: "rich",
             description: `
 Please don't post code in screenshots or post unformatted code. Instead, use one of these preferred methods to share code:
@@ -303,6 +306,7 @@ Please don't post code in screenshots or post unformatted code. Instead, use one
 // short code snippets go here
 \\\`\\\`\\\`
 
+Please look at the gif attached below
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
 Link a Code Sandbox to an existing GitHub repo: https://codesandbox.io/s/github/<username>/<reponame>
