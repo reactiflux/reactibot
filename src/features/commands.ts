@@ -296,7 +296,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
           {
             title: "Attaching Code",
             image: {
-              url: 'https://media1.tenor.com/images/a23c33a91cb8d026b83488f1673495fd/tenor.gif?itemid=27632534',
+              url: "https://media1.tenor.com/images/a23c33a91cb8d026b83488f1673495fd/tenor.gif?itemid=27632534",
             },
             type: "rich",
             description: `
