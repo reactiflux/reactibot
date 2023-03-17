@@ -137,7 +137,9 @@ ${usersWhoReacted}
 
   switch (reason) {
     case ReportReasons.userWarn:
-      return `${modAlert} – ${preface}, met the warning threshold for the message:
+      return `${
+        message.channelId === CHANNELS.jobBoard ? "" : `${modAlert} – `
+      }${preface}, met the warning threshold for the message:
 ${extra}
 ${reportedMessage}
 
