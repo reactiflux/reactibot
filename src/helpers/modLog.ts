@@ -137,7 +137,9 @@ ${usersWhoReacted}
 
   switch (reason) {
     case ReportReasons.userWarn:
-      return `${modAlert} – ${preface}, met the warning threshold for the message:
+      return `${
+        message.channelId === CHANNELS.jobBoard ? "" : `${modAlert} – `
+      }${preface}, met the warning threshold for the message:
 ${extra}
 ${reportedMessage}
 
@@ -168,9 +170,7 @@ ${extra}
 ${reportedMessage}
 `;
     case ReportReasons.jobCrypto:
-      return `<@${message.author.id}> posted a crypto job:
-${reportedMessage}
-`;
+      return `<@${message.author.id}> posted a crypto job.`;
     case ReportReasons.lowEffortQuestionRemoved:
       return `
 <@${message.author.id}> posted a low effort question in <#${message.channel.id}> that was removed: 
