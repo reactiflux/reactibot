@@ -686,8 +686,8 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
             title: "Learning React",
             type: "rich",
             description: `
-          The official (beta) React docs are the best resource for learning React:
-          https://beta.reactjs.org
+          The official React docs are the best resource for learning React:
+          https://react.dev
 
           The official (stable) React docs still teach classes for the examples, but the concepts are still valid:
           https://reactjs.org/docs/getting-started.html
