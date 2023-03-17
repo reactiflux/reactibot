@@ -305,6 +305,7 @@ Please don't post code in screenshots or post unformatted code. Instead, use one
 \\\`\\\`\\\`js
 // short code snippets go here
 \\\`\\\`\\\`
+
 Please look at the gif attached below
 Link a Gist to upload entire files: https://gist.github.com
 Link a Code Sandbox to share runnable examples: https://codesandbox.io/s
