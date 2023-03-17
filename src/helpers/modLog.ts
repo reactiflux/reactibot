@@ -170,9 +170,7 @@ ${extra}
 ${reportedMessage}
 `;
     case ReportReasons.jobCrypto:
-      return `<@${message.author.id}> posted a crypto job:
-${reportedMessage}
-`;
+      return `<@${message.author.id}> posted a crypto job.`;
     case ReportReasons.lowEffortQuestionRemoved:
       return `
 <@${message.author.id}> posted a low effort question in <#${message.channel.id}> that was removed: 
