@@ -153,7 +153,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
             type: "rich",
             description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
-https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
+https://legacy.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
             color: EMBED_COLOR,
           },
         ],
@@ -180,8 +180,8 @@ console.log(state);
 where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
 
 Check out these resources for more information:
-https://beta.reactjs.org/learn/queueing-a-series-of-state-updates
-https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
+https://react.dev/learn/queueing-a-series-of-state-updates
+https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
 https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
             color: EMBED_COLOR,
           },
@@ -246,7 +246,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
             type: "rich",
             description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
 
-https://beta.reactjs.org/learn/sharing-state-between-components`,
+https://react.dev/learn/sharing-state-between-components`,
             color: EMBED_COLOR,
           },
         ],
@@ -483,8 +483,8 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
           https://daveceddia.com/react-redux-immutability-guide/
-          https://beta.reactjs.org/learn/updating-objects-in-state
-          https://beta.reactjs.org/learn/updating-arrays-in-state
+          https://react.dev/learn/updating-objects-in-state
+          https://react.dev/learn/updating-arrays-in-state
           https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
           `,
             color: EMBED_COLOR,
@@ -883,7 +883,7 @@ Keys are particularly important if the list can change over time. React will use
 
 Please see these resources for more information:
 
-https://beta.reactjs.org/learn/rendering-lists#keeping-list-items-in-order-with-key
+https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key
 https://kentcdodds.com/blog/understanding-reacts-key-prop
           `,
             color: EMBED_COLOR,
