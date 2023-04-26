@@ -12,6 +12,7 @@ const emitEvent = (
 ) => {
   if (!amplitudeKey) {
     console.log({
+      user_id: userId,
       event_type: eventName,
       event_properties: data,
     });
@@ -35,6 +36,7 @@ const threadCreated = "thread created";
 const threadReplyRemoved = "thread reply removed";
 const threadTimeout = "thread timeout";
 const threadResolved = "thread resolved";
+const reacted = "reaction added";
 
 export const threadStats = {
   threadCreated: (channel: string) =>
@@ -55,6 +57,25 @@ export const threadStats = {
 };
 
 const stats = (client: Client) => {
+  client.on("messageReactionAdd", async (reaction, user) => {
+    const { message, emoji } = reaction;
+    const { channel } = message;
+
+    if (!channel || !emoji || !user || user.bot) return;
+
+    const channelId =
+      channel.isThread() && channel.parent
+        ? (await channel.parent.fetch()).id
+        : channel.id;
+
+    emitEvent(reacted, {
+      data: {
+        channel: channelId,
+        emoji: emoji.toString() ?? "n/a",
+      },
+      userId: user.id,
+    });
+  });
   client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 

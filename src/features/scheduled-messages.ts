@@ -57,7 +57,7 @@ Moderators may remove posts at any time, with or without warning. Repeat violato
 `,
         embeds: [
           {
-            description: `📋 Quick poll ⤵️ React if you've…
+            description: `📋 Quick poll ⤵ React if you've…
 
 💼 gotten work by applying to a [hiring] post
 👨‍💻 gotten work by posting [forhire]
@@ -132,40 +132,8 @@ Let us know if anything crosses a line: give it a 👎, or if you'd prefer to re
 
 export const messages: MessageConfig[] = [];
 
-const test = async (channel: discord.TextChannel) => {
-  const msg = await channel.send({
-    content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
-
-* Posts should be reasonably descriptive.
-* Jobs are paid — unpaid, equity-only, or similar are not allowed.
-* We don't allow "small gigs," like pay-for-help, or one-off work of only a few hours.
-
-Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently, with or without warning. If you believe you have been removed in error, you can dispute at \`hello@reactiflux.com\`.
-
-`,
-    embeds: [
-      {
-        description: `📋 Quick poll ⤵ React if you've…
-
-💼 gotten work by applying to a [hiring] post
-👨‍💻 gotten work by posting [forhire]
-🤷‍♀️ never gotten work from this channel, but post [forhire]
-😔 never gotten work after applying to [hiring] posts`,
-      },
-    ],
-  });
-  await Promise.all([
-    msg.react("💼"),
-    msg.react("👨‍💻"),
-    msg.react("🤷‍♀️"),
-    msg.react("😔"),
-  ]);
-};
-
 export const scheduleMessages = (bot: discord.Client) => {
   bot.on("ready", () => {
-    test(bot.channels.cache.get(CHANNELS.jobBoard) as discord.TextChannel);
-
     MESSAGE_SCHEDULE.forEach((messageConfig) =>
       sendMessage(bot, messageConfig),
     );
