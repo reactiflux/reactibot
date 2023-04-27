@@ -79,7 +79,7 @@ const stats = (client: Client) => {
   client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 
-    if (!channel || !author || author.id === client.user?.id) return;
+    if (!channel || !author || author.bot || msg.system) return;
 
     const channelId =
       channel.isThread() && channel.parent
