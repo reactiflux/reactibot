@@ -43,21 +43,37 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
-    message: {
-      content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
+    postTo: [
+      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.jobBoard },
+    ],
+    message: async (channel) => {
+      const msg = await channel.send({
+        content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
 
-* Job postings may only be posted every 7 days.
 * Posts should be reasonably descriptive.
 * Jobs are paid — unpaid, equity-only, or similar are not allowed.
-* We don't allow "small gigs".
-* Third-party recruitment must be discussed with moderators, DM <@103525876892708864>.
+* We don't allow "small gigs," like pay-for-help, one-off work of only a few hours, .
 
-Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently.
+Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently, with or without warning. If you believe you have been removed in error, you can dispute at \`hello@reactiflux.com\`.
 
-We no longer allow blockchain or web3 jobs to be advertised here. We encourage you to reach out to Freeflow, a web3 talent network, instead. If you're hiring: <https://discord.gg/gTWTwZPDYT>
-If you're seeking work: <https://vjlup8tch3g.typeform.com/to/T8w8qWzl>
 `,
+        embeds: [
+          {
+            description: `📋 Quick poll ⤵ React if you've…
+
+💼 gotten work by applying to a [hiring] post
+👨‍💻 gotten work by posting [forhire]
+🤷‍♀️ never gotten work from this channel, but post [forhire]
+😔 never gotten work after applying to [hiring] posts`,
+          },
+        ],
+      });
+      await Promise.all([
+        msg.react("💼"),
+        msg.react("👨‍💻"),
+        msg.react("🤷‍♀️"),
+        msg.react("😔"),
+      ]);
     },
   },
   {
