@@ -43,7 +43,9 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
+    postTo: [
+      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.jobBoard },
+    ],
     message: async (channel) => {
       const msg = await channel.send({
         content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
