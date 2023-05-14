@@ -6,7 +6,17 @@ import {
   differenceInMinutes,
   format,
 } from "date-fns";
-import { Client, Message, TextChannel } from "discord.js";
+
+import {
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+  CommandInteraction,
+  Client,
+  Message,
+  TextChannel,
+  ChannelType,
+  MessageType,
+} from "discord.js";
 import { simplifyString } from "../helpers/string";
 import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
@@ -81,6 +91,48 @@ const isHiring = (content: string) => hiringTest.test(content);
 const forHireTest = /for ?hire/i;
 const isForHire = (content: string) => forHireTest.test(content);
 
+export const resetJobCacheCommand = {
+  command: new SlashCommandBuilder()
+    .setName("reset-job-cache")
+    .setDescription("Reset cached posts for the time-based job moderation")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("User to clear post history for")
+        .setRequired(true),
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+
+  handler: async (interaction: CommandInteraction) => {
+    const { options } = interaction;
+
+    const { user } = options.get("user") || {};
+    if (!user) {
+      interaction.reply("Must mention a user to clear their post history");
+      return;
+    }
+
+    const memberToClear = user?.id;
+    let removed = 0;
+    if (cryptoPosters.has(memberToClear)) {
+      removed += 1;
+      cryptoPosters.delete(memberToClear);
+    }
+
+    let index = storedMessages.findIndex((x) => x.author.id === memberToClear);
+    while (index > 0) {
+      removed += 1;
+      storedMessages.splice(index, 1);
+      index = storedMessages.findIndex((x) => x.author.id === memberToClear);
+    }
+    interaction.reply({
+      ephemeral: true,
+      content: `Cleared ${removed} posts from ${user?.username} out of cache`,
+    });
+    return;
+  },
+};
+
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
@@ -94,36 +146,6 @@ const jobModeration = async (bot: Client) => {
     ) {
       return;
     }
-    // Allow staff to wipe "recently posted" history for a member
-    if (isStaff(message.member)) {
-      if (
-        message.content.startsWith("!resetJobPost") &&
-        message.mentions.members?.size
-      ) {
-        const memberToClear = message.mentions.members?.at(0)?.id || "";
-        let removed = 0;
-        if (cryptoPosters.has(memberToClear)) {
-          removed += 1;
-          cryptoPosters.delete(memberToClear);
-        }
-
-        let index = storedMessages.findIndex(
-          (x) => x.author.id === memberToClear,
-        );
-        while (index > 0) {
-          removed += 1;
-          storedMessages.splice(index, 1);
-          index = storedMessages.findIndex(
-            (x) => x.author.id === memberToClear,
-          );
-        }
-        message.reply(
-          `Found and cleared ${removed} posts from cache for this user`,
-        );
-      }
-      return;
-    }
-
     if (message.type === MessageType.Reply || message.mentions.members?.size) {
       message
         .reply({

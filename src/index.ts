@@ -11,7 +11,7 @@ import discord, {
 
 import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import jobsMod from "./features/jobs-moderation";
+import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -40,6 +40,8 @@ export const bot = new discord.Client({
   ],
   partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
+
+registerCommand(resetJobCacheCommand);
 
 logger.log("INI", "Bootstrap starting…");
 bot
