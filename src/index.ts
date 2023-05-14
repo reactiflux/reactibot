@@ -13,7 +13,7 @@ import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod from "./features/jobs-moderation";
 import autoban from "./features/autoban";
-import commands, { setupInteractions } from "./features/commands";
+import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import promotionThread from "./features/promotion-threads";
@@ -25,6 +25,7 @@ import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
+import { registerCommand, deployCommands } from "./helpers/deploy-commands";
 
 export const bot = new discord.Client({
   intents: [
@@ -153,9 +154,6 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 // Amplitude metrics
 setupStats(bot);
 
-// Discord commands
-setupInteractions(bot);
-
 // common
 addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
 
@@ -174,6 +172,7 @@ const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
 bot.on("ready", () => {
+  deployCommands(bot);
   jobsMod(bot);
   scheduleTask(1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);

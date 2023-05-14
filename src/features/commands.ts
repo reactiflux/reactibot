@@ -1,25 +1,9 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import {
-  ChannelType,
-  Client,
-  EmbedType,
-  InteractionType,
-  Message,
-  TextChannel,
-} from "discord.js";
+import { ChannelType, EmbedType, Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-
-export const setupInteractions = (bot: Client) => {
-  bot.on("interactionCreate", (interaction) => {
-    if (interaction.type === InteractionType.ApplicationCommand) {
-      // switch (interaction.commandName) {
-      // }
-    }
-  });
-};
 
 export const EMBED_COLOR = 7506394;
 
