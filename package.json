@@ -19,12 +19,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@discordjs/builders": "^0.15.0",
-    "@discordjs/rest": "^0.5.0",
     "@types/node-cron": "^3.0.1",
     "date-fns": "^2.27.0",
     "discord-api-types": "^0.33.4",
-    "discord.js": "^13.8.0",
+    "discord.js": "^14.11.0",
     "dotenv": "^10.0.0",
     "gists": "^2.0.0",
     "node-cron": "^3.0.0",

@@ -83,7 +83,7 @@ const isForHire = (content: string) => forHireTest.test(content);
 
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
-  if (!jobBoard?.isText() || !(jobBoard instanceof TextChannel)) return;
+  if (jobBoard?.type !== ChannelType.GuildText) return;
 
   await loadJobs(bot, jobBoard);
 
@@ -124,7 +124,7 @@ const jobModeration = async (bot: Client) => {
       return;
     }
 
-    if (message.type === "REPLY") {
+    if (message.type === MessageType.Reply || message.mentions.members?.size) {
       message
         .reply({
           content:

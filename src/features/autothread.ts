@@ -1,5 +1,5 @@
 import { differenceInHours } from "date-fns";
-import { Client } from "discord.js";
+import { ChannelType, Client, MessageType } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import {
   constructDiscordLink,
@@ -23,7 +23,7 @@ const autoThread: ChannelHandlers = {
       : maybeMessage;
 
     // Delete top-level replies
-    if (msg.type === "REPLY") {
+    if (msg.type === MessageType.Reply) {
       const repliedTo = await msg.fetchReference();
       // Allow members to reply to their own messages, as "followup" threads
       // If they replied to someone else, delete it and let them know why
@@ -92,7 +92,7 @@ export default autoThread;
 export const cleanupThreads = async (channelIds: string[], bot: Client) => {
   channelIds.forEach(async (id) => {
     const channel = await bot.channels.fetch(id);
-    if (!channel?.isText()) return;
+    if (channel?.type !== ChannelType.GuildText) return;
 
     const now = new Date();
 
@@ -109,6 +109,9 @@ export const cleanupThreads = async (channelIds: string[], bot: Client) => {
         thread.messages.fetch({ limit: 1 }),
         thread.fetchStarterMessage(),
       ]);
+      if (!starter) {
+        return;
+      }
       const mostRecent = tempCollection.at(0);
 
       // If the thread has no messages, check time for initial message

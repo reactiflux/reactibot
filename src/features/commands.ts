@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import { Client, Message, TextChannel } from "discord.js";
+import {
+  ChannelType,
+  Client,
+  EmbedType,
+  InteractionType,
+  Message,
+  TextChannel,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 
 export const setupInteractions = (bot: Client) => {
   bot.on("interactionCreate", (interaction) => {
-    if (interaction.isMessageContextMenu()) {
+    if (interaction.type === InteractionType.ApplicationCommand) {
       // switch (interaction.commandName) {
       // }
     }
@@ -45,7 +52,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "Available Help Commands",
-            type: "rich",
+            type: EmbedType.Rich,
             description: commandsMessage,
             color: EMBED_COLOR,
           },
@@ -62,7 +69,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "Code of Conduct",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Reactiflux is the largest chat community of React developers. We make a deliberate effort to have a light touch when it comes to moderating, but we do have some expectations of how our members will behave. Please read the full Code of Conduct at https://www.reactiflux.com/conduct`,
             color: EMBED_COLOR,
           },
@@ -79,7 +86,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "Self Promotion",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Reactiflux is a peer group, not an advertising channel or a free audience. Please review our guidelines around self-promotion at https://www.reactiflux.com/promotion`,
             color: EMBED_COLOR,
           },
@@ -96,7 +103,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "Helpful links",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
             color: EMBED_COLOR,
           },
@@ -113,7 +120,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "The XY Issue",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
             color: EMBED_COLOR,
           },
@@ -130,7 +137,7 @@ const commandsList: Command[] = [
         embeds: [
           {
             title: "You Might Not Need Redux",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
 
 https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
@@ -150,7 +157,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
           {
             title:
               "You might not need getDerivedStateFrom props or state at all!",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
 
 https://legacy.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
@@ -169,7 +176,7 @@ https://legacy.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.
         embeds: [
           {
             title: "State Updates May Be Asynchronous",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Often times you run into an issue like this
 \`\`\`js
 const handleEvent = e => {
@@ -198,7 +205,7 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
         embeds: [
           {
             title: "Binding functions",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `In JavaScript, a class function will not be bound to the instance of the class, this is why you often see messages saying that you can't access something of undefined.
 
 In order to fix this, you need to bind your function, either in constructor:
@@ -243,7 +250,7 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
         embeds: [
           {
             title: "Lifting State Up",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
 
 https://react.dev/learn/sharing-state-between-components`,
@@ -263,7 +270,7 @@ https://react.dev/learn/sharing-state-between-components`,
         embeds: [
           {
             title: "Asking to ask",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Instead of asking to ask, ask your question instead. People can help you better if they know your question.
 
 Bad: "hey can anyone help me?"
@@ -298,7 +305,7 @@ How To Ask Questions The Smart Way https://git.io/JKscV
             image: {
               url: "https://media1.tenor.com/images/a23c33a91cb8d026b83488f1673495fd/tenor.gif?itemid=27632534",
             },
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
 Please don't post code in screenshots or post unformatted code. Instead, use one of these preferred methods to share code:
 
@@ -328,7 +335,7 @@ Link a Snack to share React Native examples: https://snack.expo.io
         embeds: [
           {
             title: "Don’t ping or DM other devs you aren’t actively talking to",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `It’s very tempting to try to get more attention to your question by @-mentioning one of the high profile(or recently active) members of Reactiflux, but please don’t. They may not actually be online, they may not be able to help, and they may be in a completely different timezone–nobody likes push notifications at 3am from an impatient stranger.
 
 Similarly, don’t DM other members without asking first. All of the same problems as @-mentioning apply, and private conversations can’t help anyone else. Your questions are likely not unique, and other people can learn from them when they’re kept public.`,
@@ -347,7 +354,7 @@ Similarly, don’t DM other members without asking first. All of the same proble
         embeds: [
           {
             title: "Uncontrolled vs Controlled components",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `In React, inputs can either be uncontrolled (traditional input) or be controlled via state.
 Here's an article explaining the difference between the two: https://goshakkk.name/controlled-vs-uncontrolled-inputs-react/
           `,
@@ -434,7 +441,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "Florinpop17s Curated App Ideas!",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Sometimes it's tough finding inspiration, luckily this guy listed a bunch of stuff for you to pick from for your next project!  Well sorted progression to confidence in web dev.
 
           https://github.com/florinpop17/app-ideas
@@ -454,7 +461,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "Understanding CORS",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
           Cross-Origin Resource Sharing (CORS) is a mechanism that lets remote servers restrict which origin (i.e your website) can access it.
 
@@ -478,7 +485,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "Immutable updates",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Immutable updates involve modifying data by creating new, updated objects instead of modifying the original object directly.
           You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
@@ -502,7 +509,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "When should you use Redux?",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Redux is still the most widely used state management tool for React, but it's important to always ask "what problems am I trying to solve?", and choose tools that solve those problems.  Redux, Context, React Query, and Apollo all solve different problems, with some overlap.
 
           See these articles for advice on what Redux does and when it makes sense to use it:
@@ -527,7 +534,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "What are the differences between Redux and Context?",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Redux and Context are different tools that solve different problems, with some overlap.
 
           Context is a Dependency Injection tool for a single value.
@@ -556,7 +563,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "How does React rendering behavior work?",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `There are several common misunderstandings about how React renders components. It's important to know that:
 
           - React re-renders components recursively by default
@@ -584,7 +591,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           {
             title:
               "Is JWT the right approach for my applications authentication?",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
             Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
             
@@ -618,7 +625,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title: "Formatting code with Prettier",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Inconsistent indentation and syntax can make it more difficult to understand code, create churn from style debates, and cause logic and syntax errors.
 
 Prettier is a modern and well-supported formatter that completely reformats your code to be more readable and follow best practices.
@@ -641,7 +648,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embeds: [
           {
             title: "Please use gender neutral language by default",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Unless someone has made their pronouns known, please use gender neutral language.
 
 - Instead of "hey guys," try "hey folks", "hey all", or similar
@@ -662,7 +669,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embeds: [
           {
             title: "Resources for React + TypeScript",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `The best resource for how to use TypeScript and React together is the React TypeScript CheatSheet. It has advice on how to type function components, hooks, event handlers, and much more:
 
           https://react-typescript-cheatsheet.netlify.app/
@@ -688,7 +695,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embeds: [
           {
             title: "Learning React",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
           The official React docs are the best resource for learning React:
           https://react.dev
@@ -710,7 +717,7 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
         embeds: [
           {
             title: "State your problem",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `To improve your chances at getting help, it's important to describe the behavior you're seeing and how it differs from your expectations. Simply saying something "doesn't work" requires too many assumptions on the helper's part, and could lead both of you astray.
 
 Instead:
@@ -732,7 +739,7 @@ Instead:
         embeds: [
           {
             title: "",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `Web development is generally not a highly taxing process, so the laptop you get may matter less than you think. Any operating system is fine for general web development.
 
 A few things to consider when getting a laptop:
@@ -762,15 +769,15 @@ These lines are popular so there's generally a lot of resources for working on t
       }
 
       // permission overwrites can only be applied on Guild Text Channels
-      if (msg.channel.type === "GUILD_TEXT") {
+      if (msg.channel.type === ChannelType.GuildText) {
         const { channel: guildTextChannel } = msg;
         await guildTextChannel.permissionOverwrites.create(
           guildTextChannel.guild.roles.everyone,
           {
-            SEND_MESSAGES: false,
-            CREATE_PUBLIC_THREADS: false,
-            CREATE_PRIVATE_THREADS: false,
-            SEND_MESSAGES_IN_THREADS: false,
+            SendMessages: false,
+            CreatePublicThreads: false,
+            CreatePrivateThreads: false,
+            SendMessagesInThreads: false,
           },
         );
         guildTextChannel.send("This channel has been locked by a moderator");
@@ -787,12 +794,12 @@ These lines are popular so there's generally a lot of resources for working on t
       }
 
       // permission overwrites can only be applied on Guild Text Channels
-      if (msg.channel.type === "GUILD_TEXT") {
+      if (msg.channel.type === ChannelType.GuildText) {
         const { channel: guildTextChannel } = msg;
         guildTextChannel.permissionOverwrites.create(
           guildTextChannel.guild.roles.everyone,
           {
-            SEND_MESSAGES: null, // null will inherit the permission from the parent channel category
+            SendMessages: null, // null will inherit the permission from the parent channel category
           },
         );
       }
@@ -807,7 +814,7 @@ These lines are popular so there's generally a lot of resources for working on t
         embeds: [
           {
             title: "Using const variables",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `As its name suggests, you cannot reassign a const variable.
 \`\`\`js
 const a = 'hello';
@@ -846,7 +853,7 @@ https://exploringjs.com/es6/ch_variables.html#_pitfall-const-does-not-make-the-v
         embeds: [
           {
             title: "Acquiring a remote position",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
 Below is a list of resources we commonly point to as an aid in a search for remote jobs. 
 
@@ -875,7 +882,7 @@ https://remotive.io/remote-jobs/software-dev
         embeds: [
           {
             title: "The importance of keys when rendering lists in React",
-            type: "rich",
+            type: EmbedType.Rich,
             description: `
 React depends on the use of stable and unique keys to identify items in a list so that it can perform correct and performant DOM updates. 
 
@@ -934,7 +941,7 @@ const createCommandsMessage = () => {
 
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
-    if (!maybeMessage.guild && maybeMessage.channel.type !== "DM") {
+    if (!maybeMessage.guild && maybeMessage.channel.type !== ChannelType.DM) {
       return;
     }
     const msg = maybeMessage.partial

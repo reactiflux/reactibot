@@ -1,13 +1,11 @@
 import {
+  REST,
   ContextMenuCommandBuilder,
   SlashCommandBuilder,
-} from "@discordjs/builders";
-import { REST } from "@discordjs/rest";
-import {
   APIApplicationCommand,
   ApplicationCommandType,
   Routes,
-} from "discord-api-types/v10";
+} from "discord.js";
 import { applicationId, discordToken, guildId } from "../src/helpers/env";
 import { logger } from "../src/features/log";
 import { difference } from "../src/helpers/sets";

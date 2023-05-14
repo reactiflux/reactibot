@@ -3,6 +3,7 @@ import { guildId as defaultGuildId } from "../helpers/env";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
 import { scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";
+import { ChannelType } from "discord.js";
 
 const HOURLY = 60 * 60 * 1000;
 // By keeping these off 24 hr, we can make sure they show up at all timezones. If
@@ -23,7 +24,7 @@ type MessageConfig = {
     channelId: discord.Snowflake;
   }[];
   message:
-    | discord.MessageOptions
+    | discord.MessageCreateOptions
     | ((channel: discord.TextBasedChannel) => void);
 };
 const MESSAGE_SCHEDULE: MessageConfig[] = [
@@ -157,7 +158,7 @@ const sendMessage = async (
       );
       return;
     }
-    if (!channel.isText()) {
+    if (channel.type !== ChannelType.GuildText) {
       logger.log(
         "scheduled",
         `Failed to send a scheduled message: channel ${channelId} in guild ${guildId} is not a text channel.`,

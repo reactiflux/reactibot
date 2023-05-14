@@ -1,7 +1,7 @@
 import {
   GuildMember,
   Message,
-  MessageOptions,
+  MessageCreateOptions,
   MessagePayload,
 } from "discord.js";
 import { modRoleId } from "../constants";
@@ -14,7 +14,7 @@ import { simplifyString } from "../helpers/string";
 import { CHANNELS, getChannel } from "../constants/channels";
 
 export const modLog = async (
-  message: string | MessagePayload | MessageOptions,
+  message: string | MessagePayload | MessageCreateOptions,
 ) => {
   const logChannel = await getChannel(CHANNELS.jobsLog);
   return await logChannel.send(message);
