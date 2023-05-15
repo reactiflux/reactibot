@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "start": "node dist/src/index.js",
-    "start:commands": "node dist/scripts/deploy-commands.js",
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
     "build": "tsc",
