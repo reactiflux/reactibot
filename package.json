@@ -4,7 +4,7 @@
   "description": "Source code of Reactibot, utilized at Reactiflux server",
   "private": true,
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "node dist/index.js",
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
     "build": "tsc",
