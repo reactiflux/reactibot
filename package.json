@@ -5,10 +5,8 @@
   "private": true,
   "scripts": {
     "start": "node dist/src/index.js",
-    "start:commands": "node dist/scripts/deploy-commands.js",
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
-    "dev:commands": "nodemon -r dotenv/config ./scripts/deploy-commands.ts",
     "build": "tsc",
     "test": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
@@ -19,17 +17,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@discordjs/builders": "^0.15.0",
-    "@discordjs/rest": "^0.5.0",
     "@types/node-cron": "^3.0.1",
     "date-fns": "^2.27.0",
     "discord-api-types": "^0.33.4",
-    "discord.js": "^13.8.0",
+    "discord.js": "^14.11.0",
     "dotenv": "^10.0.0",
     "gists": "^2.0.0",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
     "open-graph-scraper": "^4.11.0",
+    "pretty-bytes": "^5.6.0",
     "query-string": "^6.2.0",
     "uuid": "^8.3.2"
   },

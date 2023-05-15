@@ -2,16 +2,18 @@ import discord, {
   Message,
   MessageReaction,
   User,
-  Intents,
   PartialMessageReaction,
   PartialUser,
+  Partials,
+  ActivityType,
+  IntentsBitField,
 } from "discord.js";
 
 import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
-import jobsMod from "./features/jobs-moderation";
+import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
 import autoban from "./features/autoban";
-import commands, { setupInteractions } from "./features/commands";
+import commands from "./features/commands";
 import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import promotionThread from "./features/promotion-threads";
@@ -23,19 +25,23 @@ import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
+import { registerCommand, deployCommands } from "./helpers/deploy-commands";
 
 export const bot = new discord.Client({
   intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-    Intents.FLAGS.DIRECT_MESSAGES,
-    Intents.FLAGS.DIRECT_MESSAGE_REACTIONS,
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildEmojisAndStickers,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.GuildMessageReactions,
+    IntentsBitField.Flags.DirectMessages,
+    IntentsBitField.Flags.DirectMessageReactions,
+    IntentsBitField.Flags.MessageContent,
   ],
-  partials: ["MESSAGE", "CHANNEL", "REACTION"],
+  partials: [Partials.Channel, Partials.Message, Partials.Reaction],
 });
+
+registerCommand(resetJobCacheCommand);
 
 logger.log("INI", "Bootstrap starting…");
 bot
@@ -43,7 +49,7 @@ bot
   .then(async () => {
     logger.log("INI", "Bootstrap complete");
 
-    bot.user?.setActivity("DMs for !commands", { type: "WATCHING" });
+    bot.user?.setActivity("DMs for !commands", { type: ActivityType.Watching });
 
     scheduleMessages(bot);
 
@@ -150,9 +156,6 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 // Amplitude metrics
 setupStats(bot);
 
-// Discord commands
-setupInteractions(bot);
-
 // common
 addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
 
@@ -171,6 +174,7 @@ const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
 bot.on("ready", () => {
+  deployCommands(bot);
   jobsMod(bot);
   scheduleTask(1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);

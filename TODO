@@ -1,0 +1,8 @@
+- [x] parse posts
+  - [x] tags
+  - [x] description
+  - [x] application instructions
+- [ ] validate posts have required tags
+- [ ] validate hiring posts have contact and description
+- [ ] Enforce stylistic rules (emoji max, linecount max, wordcount max)
+- [ ]

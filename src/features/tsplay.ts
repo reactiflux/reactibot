@@ -29,7 +29,7 @@ const tsPlaygroundLinkShortener: ChannelHandlers = {
           color: EMBED_COLOR,
           author: {
             name: msg.author.tag,
-            iconURL: msg.author.displayAvatarURL(),
+            icon_url: msg.author.displayAvatarURL(),
           },
         },
       ],
