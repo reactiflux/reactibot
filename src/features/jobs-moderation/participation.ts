@@ -1,5 +1,5 @@
 import { differenceInDays } from "date-fns";
-import { Message } from "discord.js";
+import { Message, MessageType } from "discord.js";
 import { sleep } from "../../helpers/misc";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
 import { RuleViolation } from "./job-mod-helpers";
@@ -7,7 +7,7 @@ import { storedMessages, trackModeratedMessage } from "./job-mod-helpers";
 
 const participationRules = async (message: Message) => {
   // Block replies and mentions
-  if (message.type === "REPLY") {
+  if (message.type === MessageType.Reply || message.mentions.members?.size) {
     // if (message.type === "REPLY" || (message.mentions.members?.size || 0) > 0) {
     trackModeratedMessage(message);
     const reply = await message.reply({
