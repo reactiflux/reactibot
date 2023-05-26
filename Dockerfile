@@ -6,7 +6,6 @@ RUN npm install --production=false
 
 COPY tsconfig.json .eslint* .prettierignore ./
 COPY src ./src
-COPY scripts ./scripts
 
 RUN npm run test
 RUN npm run build

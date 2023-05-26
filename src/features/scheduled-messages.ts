@@ -3,6 +3,7 @@ import { guildId as defaultGuildId } from "../helpers/env";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
 import { scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";
+import { ChannelType } from "discord.js";
 
 const HOURLY = 60 * 60 * 1000;
 // By keeping these off 24 hr, we can make sure they show up at all timezones. If
@@ -23,7 +24,7 @@ type MessageConfig = {
     channelId: discord.Snowflake;
   }[];
   message:
-    | discord.MessageOptions
+    | discord.MessageCreateOptions
     | ((channel: discord.TextBasedChannel) => void);
 };
 const MESSAGE_SCHEDULE: MessageConfig[] = [
@@ -43,17 +44,37 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    postTo: [{ interval: FREQUENCY.daily, channelId: CHANNELS.jobBoard }],
-    message: {
-      content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
+    postTo: [
+      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.jobBoard },
+    ],
+    message: async (channel) => {
+      const msg = await channel.send({
+        content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
 
-* Job postings may only be posted every 7 days.
 * Posts should be reasonably descriptive.
 * Jobs are paid — unpaid, equity-only, or similar are not allowed.
-* We don't allow "small gigs".
+* We don't allow "small gigs," like pay-for-help or one-off work of only a few hours.
 
-Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently. We have more information on our Promotion Guidelines: https://www.reactiflux.com/promotion#job-board
+Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently, with or without warning. We have more information on our Promotion Guidelines: https://www.reactiflux.com/promotion#job-board. If you believe you have been removed in error, you can dispute at \`hello@reactiflux.com\`.
+
 `,
+        embeds: [
+          {
+            description: `📋 Quick poll ⤵ React if you've…
+
+💼 gotten work by applying to a [hiring] post
+👨‍💻 gotten work by posting [forhire]
+🤷‍♀️ never gotten work from this channel, but post [forhire]
+😔 never gotten work after applying to [hiring] posts`,
+          },
+        ],
+      });
+      await Promise.all([
+        msg.react("💼"),
+        msg.react("👨‍💻"),
+        msg.react("🤷‍♀️"),
+        msg.react("😔"),
+      ]);
     },
   },
   {
@@ -137,7 +158,7 @@ const sendMessage = async (
       );
       return;
     }
-    if (!channel.isText()) {
+    if (channel.type !== ChannelType.GuildText) {
       logger.log(
         "scheduled",
         `Failed to send a scheduled message: channel ${channelId} in guild ${guildId} is not a text channel.`,

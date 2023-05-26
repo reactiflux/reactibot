@@ -1,4 +1,4 @@
-import { Client, TextChannel } from "discord.js";
+import { ChannelType, Client, TextChannel } from "discord.js";
 import { guildId, isProd } from "../helpers/env";
 
 const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
@@ -67,7 +67,7 @@ export const initCachedChannels = async (bot: Client) => {
   );
 
   channels.forEach((channel) => {
-    if (!channel || !channel.isText()) return;
+    if (!channel || channel.type !== ChannelType.GuildText) return;
     cachedChannels[guildId][channel.id] = channel as TextChannel;
   });
 };

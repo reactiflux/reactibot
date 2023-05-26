@@ -4,6 +4,7 @@ import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
 import { format } from "date-fns";
 import fetch from "node-fetch";
+import { MessageType } from "discord.js";
 
 const promotionThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
@@ -12,7 +13,7 @@ const promotionThread: ChannelHandlers = {
       : maybeMessage;
 
     // Delete top-level replies
-    if (msg.type === "REPLY") {
+    if (msg.type === MessageType.Reply) {
       msg.author.send(msg.content);
       const reply = await msg.reply(
         "This is a thread-only channel! Please reply in that message’s thread. Your message has been DM’d to you.",

@@ -1,4 +1,10 @@
-import { MessageReaction, Message, GuildMember, Guild } from "discord.js";
+import {
+  MessageReaction,
+  Message,
+  GuildMember,
+  Guild,
+  EmbedType,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { ReportReasons, reportUser } from "../helpers/modLog";
@@ -96,7 +102,7 @@ export const reactionHandlers: ReactionHandlers = {
       embeds: [
         {
           title: "Please improve your question",
-          type: "rich",
+          type: EmbedType.Rich,
           description: `
 Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
 

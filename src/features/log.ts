@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { ChannelType, Client } from "discord.js";
 
 type Logger = (type: string, text: string) => void;
 
@@ -16,7 +16,7 @@ export const channelLog =
     try {
       const channel = await client.channels.fetch(channelId);
 
-      if (channel?.isText()) {
+      if (channel?.type == ChannelType.GuildText) {
         channel.send(`[${type}] ${text}`);
       }
     } catch (error) {

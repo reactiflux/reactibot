@@ -1,5 +1,11 @@
 import { differenceInMinutes, format } from "date-fns";
-import { Client, TextChannel } from "discord.js";
+import {
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+  CommandInteraction,
+  Client,
+  ChannelType,
+} from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import { isStaff } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
@@ -20,9 +26,41 @@ import {
 
 const REPOST_THRESHOLD = 10; // minutes
 
+export const resetJobCacheCommand = {
+  command: new SlashCommandBuilder()
+    .setName("reset-job-cache")
+    .setDescription("Reset cached posts for the time-based job moderation")
+    .addUserOption((option) =>
+      option
+        .setName("user")
+        .setDescription("User to clear post history for")
+        .setRequired(true),
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+
+  handler: async (interaction: CommandInteraction) => {
+    const { options } = interaction;
+
+    const { user } = options.get("user") || {};
+    if (!user) {
+      interaction.reply("Must mention a user to clear their post history");
+      return;
+    }
+
+    const memberToClear = user.id;
+    const removed =
+      removeFromWeb3Cache(memberToClear) + purgeMember(memberToClear);
+    await interaction.reply({
+      ephemeral: true,
+      content: `Cleared ${removed} posts from ${user?.username} out of cache`,
+    });
+    return;
+  },
+};
+
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
-  if (!jobBoard?.isText() || !(jobBoard instanceof TextChannel)) return;
+  if (jobBoard?.type !== ChannelType.GuildText) return;
 
   await loadJobs(bot, jobBoard);
 
@@ -31,21 +69,6 @@ const jobModeration = async (bot: Client) => {
       message.channelId !== CHANNELS.jobBoard ||
       message.author.id === bot.user?.id
     ) {
-      return;
-    }
-    // Allow staff to wipe "recently posted" history for a member
-    if (isStaff(message.member)) {
-      if (
-        message.content.toLowerCase().startsWith("!resetjobpost") &&
-        message.mentions.members?.size
-      ) {
-        const memberToClear = message.mentions.members?.at(0)?.id || "";
-        const removed =
-          removeFromWeb3Cache(memberToClear) + purgeMember(memberToClear);
-        await message.reply(
-          `Found and cleared ${removed} posts from cache for this user`,
-        );
-      }
       return;
     }
     try {
