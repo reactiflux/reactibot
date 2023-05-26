@@ -7,9 +7,10 @@
     "start": "node dist/index.js",
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
+    "dev:test": "vitest",
     "build": "tsc",
     "test": "npm-run-all -c --parallel 'test:*'",
-    "test:vitest": "vitest",
+    "test:vitest": "vitest --run",
     "test:lint": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
   },
