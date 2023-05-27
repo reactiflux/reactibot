@@ -3,7 +3,7 @@ import { Message } from "discord.js";
 import { simplifyString } from "../../helpers/string";
 import { sleep } from "../../helpers/misc";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
-import { RuleViolation, trackModeratedMessage } from "./job-mod-helpers";
+import { JOB_POST_FAILURE, trackModeratedMessage } from "./job-mod-helpers";
 
 const cryptoPosters: Map<string, { count: number; last: Date }> = new Map();
 const bannedWords = /(blockchain|nft|cryptocurrency|token|web3|web 3)/;
@@ -72,7 +72,7 @@ ${referralLink}`,
     ]);
     await Promise.all([message.delete(), sleep(DELETE_DELAY)]);
     await reply.delete();
-    throw new RuleViolation("recent web3 poster");
+    return JOB_POST_FAILURE.web3Poster;
   }
 
   if (bannedWords.test(simplifyString(message.content))) {
@@ -100,6 +100,7 @@ ${referralLink}`,
     ]);
     await Promise.all([message.delete(), sleep(DELETE_DELAY)]);
     await reply.delete();
-    throw new RuleViolation("web3 keyword");
+    return JOB_POST_FAILURE.web3Content;
   }
+  return [];
 };

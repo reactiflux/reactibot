@@ -11,6 +11,7 @@ import { isStaff } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import { formatting } from "./jobs-moderation/formatting";
 import {
+  JOB_POST_FAILURE,
   loadJobs,
   purgeMember,
   removeSpecificJob,
@@ -72,9 +73,10 @@ const jobModeration = async (bot: Client) => {
       return;
     }
     try {
-      await participationRules(message);
-      await web3Jobs(message);
-      await formatting(message);
+      const errors: JOB_POST_FAILURE[] = [];
+      errors.concat(await participationRules(message));
+      errors.concat(await web3Jobs(message));
+      errors.concat(await formatting(message));
 
       // Last, update the list of tracked messages.
       updateJobs(message);

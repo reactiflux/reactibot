@@ -9,6 +9,19 @@ import {
 
 export class RuleViolation extends Error {}
 
+export const enum JOB_POST_FAILURE {
+  missingType = "missingType",
+  tooManyLines = "tooManyLines",
+  tooFrequent = "tooFrequent",
+  replyOrMention = "replyOrMention",
+  web3Content = "web3Content",
+  web3Poster = "web3Poster",
+  // invalidContact = 'invalidContact',
+  tooManyEmojis = "tooManyEmojis",
+  // unknownLocation = 'unknownLocation',
+  // invalidPostType = 'invalidPostType',
+}
+
 interface StoredMessage {
   id: Snowflake;
   authorId: Snowflake;
