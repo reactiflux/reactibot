@@ -10,3 +10,5 @@ export const simplifyString = (s: string) =>
     .replace(NORMALIZED_CODEPOINTS, "")
     .replace(EMOJI_RANGE, "")
     .replace(SPECIAL_CHARACTERS, "");
+
+export const extractEmoji = (s: string) => s.match(EMOJI_RANGE) || [];
