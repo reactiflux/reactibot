@@ -7,17 +7,25 @@ import {
   ChannelType,
 } from "discord.js";
 import { CHANNELS } from "../constants/channels";
-import { isStaff } from "../helpers/discord";
+import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import { formatting } from "./jobs-moderation/formatting";
 import {
-  JOB_POST_FAILURE,
   loadJobs,
   purgeMember,
   removeSpecificJob,
-  RuleViolation,
   untrackModeratedMessage,
   updateJobs,
+  PostFailures,
+  POST_FAILURE_REASONS,
+  trackModeratedMessage,
+  failedReplyOrMention,
+  failedTooFrequent,
+  failedMissingType,
+  failedTooManyLines,
+  failedTooManyEmojis,
+  failedWeb3Content,
+  failedWeb3Poster,
 } from "./jobs-moderation/job-mod-helpers";
 import participationRules from "./jobs-moderation/participation";
 import {
@@ -59,6 +67,23 @@ export const resetJobCacheCommand = {
   },
 };
 
+const ValidationMessages = {
+  [POST_FAILURE_REASONS.missingType]:
+    "Your post does not include our required `HIRING` or `FOR HIRE` tag. Make sure the first line of your post includes `HIRING` if you’re looking to pay someone for their work, and `FOR HIRE` if you’re offering your services.",
+  [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
+  [POST_FAILURE_REASONS.tooManyLines]: "Your post has too many lines.",
+  [POST_FAILURE_REASONS.tooFrequent]: "You’re posting too frequently. ",
+  [POST_FAILURE_REASONS.replyOrMention]:
+    "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",
+  [POST_FAILURE_REASONS.web3Content]:
+    "We do not allow web3 positions to be advertised here. If you continue posting, you’ll be timed out overnight.",
+  [POST_FAILURE_REASONS.web3Poster]:
+    "We do not allow posers who arrived to post web3 positions to create posts. If you continue posting, you’ll be timed out overnight.",
+};
+
+const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
+const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
+
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
@@ -66,26 +91,106 @@ const jobModeration = async (bot: Client) => {
   await loadJobs(bot, jobBoard);
 
   bot.on("messageCreate", async (message) => {
+    const { channel } = message;
     if (
       message.channelId !== CHANNELS.jobBoard ||
-      message.author.id === bot.user?.id
+      message.author.id === bot.user?.id ||
+      channel.type !== ChannelType.GuildText
     ) {
       return;
     }
-    try {
-      const errors: JOB_POST_FAILURE[] = [];
-      errors.concat(await participationRules(message));
-      errors.concat(await web3Jobs(message));
-      errors.concat(await formatting(message));
+    const errors: PostFailures[] = [];
+    errors.push(...participationRules(message));
+    errors.push(...web3Jobs(message));
+    errors.push(...formatting(message));
 
-      // Last, update the list of tracked messages.
+    if (errors.length === 0) {
       updateJobs(message);
-    } catch (e) {
-      if (!(e instanceof RuleViolation)) {
-        throw e;
-      }
+      return;
     }
+
+    trackModeratedMessage(message);
+    await message.delete();
+
+    const thread = await channel.threads.create({
+      name: "Your job was not posted",
+      type: ChannelType.PrivateThread,
+    });
+    await thread.send(
+      `Hey <@${
+        message.author.id
+      }>, your message does not meet our requirements to be posted to the board. It was removed for these reasons:
+
+${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+    );
+
+    // Handle missing post type
+    let error: PostFailures | undefined = errors.find(failedMissingType);
+    if (error) {
+      return;
+    }
+
+    // Handle posting too frequently
+    error = errors.find(failedTooFrequent);
+    if (error) {
+      reportUser({ reason: ReportReasons.jobFrequency, message });
+    }
+
+    // Handle replies or posts with mentions
+    error = errors.find(failedReplyOrMention);
+    if (error) {
+      //
+    }
+
+    // Handle posts that have too many newlines
+    error = errors.find(failedTooManyLines);
+    if (error) {
+      //
+    }
+
+    // Handle posts with too many emonis
+    error = errors.find(failedTooManyEmojis);
+    if (error) {
+      //
+    }
+
+    // Handle posts that contain web3 content and posters who have been blocked
+    // for posting web3 roles
+    error = errors.find(failedWeb3Poster) || errors.find(failedWeb3Content);
+    console.log(error);
+    if (error) {
+      reportUser({ reason: ReportReasons.jobCrypto, message });
+      if (error.count >= 3) {
+        await message.member?.timeout(20 * 60 * 60 * 1000);
+      }
+      const { hiring, forHire } = error;
+      await thread.send(
+        !hiring && !forHire
+          ? `If you're hiring: ${freeflowHiring}
+If you're seeking work: ${freeflowForHire}`
+          : hiring
+          ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
+          : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
+      );
+    }
+    await thread.send("Your post:");
+    await thread.send(quoteMessageContent(message.content));
   });
+
+  /*
+   * Handle message deletion. There are 3 major cases where messages are removed:
+   * - by a moderator
+   * - by the poster immediately because of an error
+   * - by the poster to try and circumvent our limits
+   * - automatically by this bot
+   *
+   * We don't currently handle messages removed by moderators, we'd need to check * the audit log and there are race conditions there.
+   * There's a 10 minute grace period where people are allowed to re-post if they
+   * delete their own message.
+   * After 10 minutes, they must wait 6.75 days before reposting
+   * If it's been removed by this bot for being a web3 related post, they are
+   * warned twice and timed out after a third post.
+   */
   bot.on("messageDelete", async (message) => {
     // TODO: look up audit log, early return if member was banned
     if (
