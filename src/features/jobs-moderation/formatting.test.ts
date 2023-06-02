@@ -9,11 +9,41 @@ describe("parseContent", () => {
       );
       expectTypeOf(parsed).toBeArray();
       expect(parsed[0]).toMatchObject({
-        tags: ["Company", "Job Title", "Location", "Compensation", "Job Type"],
+        tags: ["company", "jobtitle", "location", "compensation", "jobtype"],
       });
-      parsed = parseContent("[for hire]");
-      expectTypeOf(parsed).toBeArray();
-      expect(parsed[0]).toMatchObject({ tags: ["for hire"] });
+
+      // "for hire" standardization. All forms should end as "for hire".
+      const validForHireTags = [
+        "[for hire]",
+        "[FOR HIRE]",
+        "[FORHIRE]",
+        "[forhire]",
+        "for hire|",
+        "|for hire|",
+        "[f o r h i r e]",
+        "|FoRhIrE|",
+      ];
+      validForHireTags.forEach((tag) => {
+        const [parsed] = parseContent(tag);
+        expect(parsed).toMatchObject({ tags: ["forhire"] });
+      });
+      parsed = parseContent("for hire");
+      expect(parsed[0]).toMatchObject({ tags: [] });
+
+      // "hiring" standardization. All forms should end as "for hire".
+      const validHiringTags = [
+        "[hiring]",
+        "[HIRING]",
+        "[hire]",
+        "[HIRE]",
+        "hiring|",
+        "|h i r i n g|",
+        "|HiRiNg|",
+      ];
+      validHiringTags.forEach((tag) => {
+        const [parsed] = parseContent(tag);
+        expect(parsed).toMatchObject({ tags: ["hiring"] });
+      });
     });
   });
   it("parses description", () => {

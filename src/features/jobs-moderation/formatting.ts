@@ -1,4 +1,4 @@
-import { extractEmoji } from "../../helpers/string";
+import { extractEmoji, simplifyString } from "../../helpers/string";
 import {
   JobPostValidator,
   PostFailures,
@@ -57,10 +57,27 @@ export const parseContent = (inputString: string): Post[] => {
   });
 };
 
+type SimplifiedTag = string;
+type OriginalString = string;
+// The tag map exists as an abstraction point to hopefully make it easier in the
+// future to expand this into things like, "APAC/EMEA/etc" for region,
+// interpreting compensation, all sorts of fun follow ons.
+const tagMap = new Map<string, (s: SimplifiedTag) => OriginalString>([
+  ["forhire", () => "forhire"],
+  ["hiring", () => "hiring"],
+  ["hire", () => "hiring"],
+]);
+
+const standardizeTag = (tag: string) => {
+  const simpleTag = simplifyString(tag).replace(/\W/g, "");
+  const standardTagBuilder = tagMap.get(simpleTag);
+  return standardTagBuilder?.(simpleTag) ?? simpleTag;
+};
+
 const parseTags = (tags: string) => {
   return tags
     .split(/[|[\]]/g)
-    .map((tag) => tag.trim())
+    .map((tag) => standardizeTag(tag.trim()))
     .filter((tag) => tag !== "");
 };
 
