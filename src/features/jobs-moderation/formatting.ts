@@ -60,11 +60,11 @@ export const parseContent = (inputString: string): Post[] => {
 };
 
 type SimplifiedTag = string;
-type OriginalString = string;
+type StandardTag = string;
 // The tag map exists as an abstraction point to hopefully make it easier in the
 // future to expand this into things like, "APAC/EMEA/etc" for region,
 // interpreting compensation, all sorts of fun follow ons.
-const tagMap = new Map<string, (s: SimplifiedTag) => OriginalString>([
+const tagMap = new Map<string, (s: SimplifiedTag) => StandardTag>([
   ["forhire", () => "forhire"],
   ["hiring", () => "hiring"],
   ["hire", () => "hiring"],
