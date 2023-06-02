@@ -47,13 +47,35 @@ describe("parseContent", () => {
     });
   });
   it("parses description", () => {
-    const content = `Company|Title|Location
+    let parsed = parseContent(`[hiring]
 
-Lorem ipsum dolor sit amet`;
-    const parsed = parseContent(content);
+Lorem ipsum dolor sit amet`);
     expectTypeOf(parsed).toBeArray();
     expect(parsed[0]).toMatchObject({
       description: "Lorem ipsum dolor sit amet",
+    });
+
+    parsed = parseContent(`[hiring]
+Lorem ipsum dolor sit amet
+test butts
+many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text`);
+    expect(parsed[0]).toMatchObject({
+      description: `Lorem ipsum dolor sit amet
+test butts
+many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text`,
+    });
+
+    parsed = parseContent(`[hiring]
+
+Lorem ipsum dolor sit amet
+
+test butts
+
+many long lines of text`);
+    expect(parsed[0]).toMatchObject({
+      description: `Lorem ipsum dolor sit amet
+test butts
+many long lines of text`,
     });
   });
 

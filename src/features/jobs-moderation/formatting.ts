@@ -28,6 +28,7 @@ interface Post {
 export const parseContent = (inputString: string): Post[] => {
   const lines = inputString.trim().split("\n");
   const posts = lines.reduce<Post[]>((acc, line) => {
+    if (line === "") return acc;
     if (line.includes("|") || line.includes("[")) {
       // This line contains tags, so we're starting a new post
       acc.push({
@@ -41,13 +42,14 @@ export const parseContent = (inputString: string): Post[] => {
       // If there are no tags, we should still parse correctly
       if (!currentPost) {
         acc.push({ tags: [], description: line });
-      } else if (currentPost.description === "") {
-        currentPost.description = line;
         // } else if (currentPost.contact === "") {
-        // currentPost.description += "\n" + line;
         // currentPost.contact = "";
         // } else {
         // currentPost.contact += "\n" + line;
+      } else if (currentPost.description === "") {
+        currentPost.description += line;
+      } else {
+        currentPost.description += "\n" + line;
       }
     }
     return acc;
