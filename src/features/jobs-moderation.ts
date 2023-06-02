@@ -113,7 +113,7 @@ const jobModeration = async (bot: Client) => {
     await message.delete();
 
     const thread = await channel.threads.create({
-      name: "Your job was not posted",
+      name: "Your post has been removed",
       type: ChannelType.PrivateThread,
     });
     await thread.send(
