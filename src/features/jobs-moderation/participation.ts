@@ -3,7 +3,7 @@ import { MessageType } from "discord.js";
 import { JobPostValidator, POST_FAILURE_REASONS } from "./job-mod-helpers";
 import { storedMessages } from "./job-mod-helpers";
 
-const participationRules: JobPostValidator = (message) => {
+const participationRules: JobPostValidator = (posts, message) => {
   // Block replies and mentions
   if (message.type === MessageType.Reply || message.mentions.members?.size) {
     // if (message.type === "REPLY" || (message.mentions.members?.size || 0) > 0) {

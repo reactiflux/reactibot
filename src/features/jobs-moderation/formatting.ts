@@ -1,6 +1,7 @@
 import { extractEmoji, simplifyString } from "../../helpers/string";
 import {
   JobPostValidator,
+  Post,
   PostFailures,
   POST_FAILURE_REASONS,
 } from "./job-mod-helpers";
@@ -19,12 +20,6 @@ export const normalizeContent = (content: string) => {
 //   }
 //   return true;
 // };
-interface Post {
-  tags: string[];
-  description: string;
-  // contact: string;
-  validationErrors?: POST_FAILURE_REASONS[];
-}
 export const parseContent = (inputString: string): Post[] => {
   const lines = inputString.trim().split("\n");
   const posts = lines.reduce<Post[]>((acc, line) => {
@@ -84,10 +79,9 @@ const parseTags = (tags: string) => {
 };
 
 const NEWLINE = /\n/g;
-export const formatting: JobPostValidator = (message) => {
-  // Handle missing tags
-  const jobPosts = parseContent(message.content);
-  const hasTags = jobPosts.every(
+export const formatting: JobPostValidator = (posts, message) => {
+  // Handle missing tags;
+  const hasTags = posts.every(
     ({ tags }) => tags.length > 0 || tags.includes("hiring") || tags.includes,
   );
   const errors: PostFailures[] = [];

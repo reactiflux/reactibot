@@ -21,9 +21,11 @@ export const removeFromCache = (idToClear: string) => {
   return 0;
 };
 
-export const web3Jobs: JobPostValidator = (message) => {
+export const web3Jobs: JobPostValidator = (posts, message) => {
   const now = new Date();
   const lastCryptoPost = cryptoPosters.get(message.author.id);
+  // Fail posts that are sent by someone who was already blocked for posting
+  // web3 jobs
   if (
     lastCryptoPost &&
     // extend duration for each repeated post
@@ -45,7 +47,10 @@ export const web3Jobs: JobPostValidator = (message) => {
     ];
   }
 
-  if (bannedWords.test(simplifyString(message.content))) {
+  // Block posts that trigger our web3 detection
+  if (
+    posts.some((post) => bannedWords.test(simplifyString(post.description)))
+  ) {
     cryptoPosters.set(message.author.id, { count: 1, last: new Date() });
     return [
       {

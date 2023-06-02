@@ -88,7 +88,16 @@ export const failedWeb3Content = (
 export const failedWeb3Poster = (e: PostFailures): e is PostFailureWeb3Poster =>
   e.type === POST_FAILURE_REASONS.web3Poster;
 
-export type JobPostValidator = (message: Message<boolean>) => PostFailures[];
+export interface Post {
+  tags: string[];
+  description: string;
+  // contact: string;
+}
+
+export type JobPostValidator = (
+  posts: Post[],
+  message: Message<boolean>,
+) => PostFailures[];
 
 interface StoredMessage {
   id: Snowflake;

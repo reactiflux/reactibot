@@ -9,7 +9,7 @@ import {
 import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { formatting } from "./jobs-moderation/formatting";
+import { formatting, parseContent } from "./jobs-moderation/formatting";
 import {
   loadJobs,
   purgeMember,
@@ -99,10 +99,11 @@ const jobModeration = async (bot: Client) => {
     ) {
       return;
     }
+    const posts = parseContent(message.content);
     const errors: PostFailures[] = [];
-    errors.push(...participationRules(message));
-    errors.push(...web3Jobs(message));
-    errors.push(...formatting(message));
+    errors.push(...participationRules(posts, message));
+    errors.push(...web3Jobs(posts, message));
+    errors.push(...formatting(posts, message));
 
     if (errors.length === 0) {
       updateJobs(message);
