@@ -1,57 +1,12 @@
 import { extractEmoji, simplifyString } from "../../helpers/string";
 import {
   JobPostValidator,
-  Post,
   PostFailures,
   POST_FAILURE_REASONS,
 } from "./job-mod-helpers";
 
 export const normalizeContent = (content: string) => {
   return content.replace(/\n+/g, "\n").trim();
-};
-
-// export const validateMessageContent = (content: string) => {
-//   const normalized = normalizeContent(content);
-//   if (
-//     !normalized.includes("|") ||
-//     !(normalized.includes("hiring") || normalized.includes("forhire"))
-//   ) {
-//     return false;
-//   }
-//   return true;
-// };
-export const parseContent = (inputString: string): Post[] => {
-  const lines = inputString.trim().split("\n");
-  const posts = lines.reduce<Post[]>((acc, line) => {
-    if (line === "") return acc;
-    if (line.includes("|") || line.includes("[")) {
-      // This line contains tags, so we're starting a new post
-      acc.push({
-        tags: parseTags(line),
-        description: "",
-        // contact: "",
-      });
-    } else {
-      // This line belongs to the current post
-      const currentPost = acc[acc.length - 1];
-      // If there are no tags, we should still parse correctly
-      if (!currentPost) {
-        acc.push({ tags: [], description: line });
-        // } else if (currentPost.contact === "") {
-        // currentPost.contact = "";
-        // } else {
-        // currentPost.contact += "\n" + line;
-      } else if (currentPost.description === "") {
-        currentPost.description += line;
-      } else {
-        currentPost.description += "\n" + line;
-      }
-    }
-    return acc;
-  }, []);
-  return posts.map((post) => {
-    return { ...post };
-  });
 };
 
 type SimplifiedTag = string;
@@ -71,7 +26,7 @@ const standardizeTag = (tag: string) => {
   return standardTagBuilder?.(simpleTag) ?? simpleTag;
 };
 
-const parseTags = (tags: string) => {
+export const parseTags = (tags: string) => {
   return tags
     .split(/[|[\]]/g)
     .map((tag) => standardizeTag(tag.trim()))

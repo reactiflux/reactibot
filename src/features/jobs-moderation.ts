@@ -9,7 +9,8 @@ import {
 import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { formatting, parseContent } from "./jobs-moderation/formatting";
+import { formatting } from "./jobs-moderation/formatting";
+import { parseContent } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
   purgeMember,

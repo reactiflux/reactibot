@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { parseContent } from "./formatting";
+import { parseContent } from "./parse-content";
 
 describe("parseContent", () => {
   describe("tags", () => {
