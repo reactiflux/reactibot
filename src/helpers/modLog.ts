@@ -152,25 +152,19 @@ ${reportedMessage}
 
 ${postfix}`;
 
-    case ReportReasons.jobAge:
-      return `${preface}, account too young:
-${extra}
-${reportedMessage}
-`;
-
-    case ReportReasons.jobFrequency:
-      return `${preface}, posting too frequently:
-${extra}
-${reportedMessage}
-`;
-
     case ReportReasons.jobRemoved:
       return `${preface}, post was deleted:
 ${extra}
 ${reportedMessage}
 `;
+
+    case ReportReasons.jobAge:
+      return `${preface}, for hire post expired.`;
+    case ReportReasons.jobFrequency:
+      return `${preface}, posting too frequently.`;
     case ReportReasons.jobCrypto:
       return `<@${message.author.id}> posted a crypto job.`;
+
     case ReportReasons.lowEffortQuestionRemoved:
       return `
 <@${message.author.id}> posted a low effort question in <#${message.channel.id}> that was removed: 

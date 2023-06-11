@@ -6,6 +6,8 @@ import {
   Snowflake,
   TextChannel,
 } from "discord.js";
+import { ReportReasons, reportUser } from "../../helpers/modLog";
+import { parseContent, Post } from "./parse-content";
 
 export class RuleViolation extends Error {
   reasons: POST_FAILURE_REASONS[];
@@ -88,25 +90,27 @@ export const failedWeb3Content = (
 export const failedWeb3Poster = (e: PostFailures): e is PostFailureWeb3Poster =>
   e.type === POST_FAILURE_REASONS.web3Poster;
 
-export interface Post {
-  tags: string[];
-  description: string;
-  // contact: string;
-}
-
 export type JobPostValidator = (
   posts: Post[],
   message: Message<boolean>,
 ) => PostFailures[];
 
+enum PostType {
+  hiring = "hiring",
+  forHire = "forHire",
+}
+
 interface StoredMessage {
-  id: Snowflake;
+  message: Message;
   authorId: Snowflake;
   createdAt: Date;
+  type: PostType;
 }
 export const storedMessages: Array<StoredMessage> = [];
 
-const DAYS_OF_POSTS = 7;
+const DAYS_OF_POSTS = 30;
+const HIRING_AGE_LIMIT = 7;
+const FORHIRE_AGE_LIMIT = 5;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
@@ -122,15 +126,24 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     const newMessages: typeof storedMessages = (
       await channel.messages.fetch({
         limit: 10,
-        ...(oldestMessage ? { after: oldestMessage.id } : {}),
+        ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
       })
-    ).map(({ id, author, createdAt }) => ({
-      id,
-      authorId: author.id,
-      createdAt,
-    }));
+    )
+      // Convert fetched messages to be stored in the cache
+      .map((message) => ({
+        message,
+        authorId: message.author.id,
+        createdAt: message.createdAt,
+        // By searching for "hiring", we treat posts without tags as "forhire",
+        // which makes the subject to deletion after aging out. This will only be
+        // relevant when this change is first shipped, because afterwards all
+        // un-tagged posts will be removed.
+        type: parseContent(message.content)[0].tags.includes("hiring")
+          ? PostType.hiring
+          : PostType.forHire,
+      }));
     if (newMessages.length === 0) {
-      return;
+      break;
     }
     oldestMessage = newMessages
       .sort((a, b) => compareAsc(a.createdAt, b.createdAt))
@@ -146,29 +159,55 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
         )
         .values(),
     );
-    console.log(storedMessages.length);
+  }
+  await deleteAgedPosts();
+};
+
+const deleteAgedPosts = async () => {
+  // Delete all `forhire` messages that are older than 5 days
+  while (
+    storedMessages[0] &&
+    storedMessages[0].type === PostType.forHire &&
+    differenceInDays(new Date(), storedMessages[0].createdAt) >=
+      FORHIRE_AGE_LIMIT
+  ) {
+    const { message } = storedMessages[0];
+    await message.fetch();
+    if (!message.deletable) return;
+    trackModeratedMessage(message);
+    // Log deletion so we have a record of it
+    reportUser({ reason: ReportReasons.jobAge, message });
+    message.delete();
+    storedMessages.shift();
   }
 };
 
 export const updateJobs = (message: Message) => {
+  // Assume all posts in a message have the same tag
+  const [parsed] = parseContent(message.content);
   storedMessages.push({
-    id: message.id,
+    message,
     authorId: message.author.id,
     createdAt: message.createdAt,
+    type: parsed.tags.includes("forhire") ? PostType.forHire : PostType.hiring,
   });
+
+  deleteAgedPosts();
 
   // Allow posts every 6.75 days by pretending "now" is 6 hours in the future
   const now = add(new Date(), { hours: 6 });
   // Remove all posts that are older than the limit
   while (
     storedMessages[0] &&
-    differenceInDays(now, storedMessages[0].createdAt) >= DAYS_OF_POSTS
+    differenceInDays(now, storedMessages[0].createdAt) >= HIRING_AGE_LIMIT
   ) {
     storedMessages.shift();
   }
 };
 export const removeSpecificJob = (message: Message) => {
-  storedMessages.splice(storedMessages.findIndex((m) => m.id === message.id));
+  storedMessages.splice(
+    storedMessages.findIndex((m) => m.message.id === message.id),
+  );
 };
 
 export const purgeMember = (idToRemove: string) => {
