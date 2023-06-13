@@ -7,7 +7,7 @@ import {
   TextChannel,
 } from "discord.js";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
-import { parseContent, Post } from "./parse-content";
+import { parseContent, Post, PostType } from "./parse-content";
 
 export class RuleViolation extends Error {
   reasons: POST_FAILURE_REASONS[];
@@ -94,11 +94,6 @@ export type JobPostValidator = (
   posts: Post[],
   message: Message<boolean>,
 ) => PostFailures[];
-
-enum PostType {
-  hiring = "hiring",
-  forHire = "forHire",
-}
 
 interface StoredMessage {
   message: Message;

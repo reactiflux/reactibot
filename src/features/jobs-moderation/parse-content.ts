@@ -6,15 +6,20 @@ export interface Post {
   // contact: string;
 }
 
+export enum PostType {
+  hiring = "hiring",
+  forHire = "forHire",
+}
+
 type SimplifiedTag = string;
 type StandardTag = string;
 // The tag map exists as an abstraction point to hopefully make it easier in the
 // future to expand this into things like, "APAC/EMEA/etc" for region,
 // interpreting compensation, all sorts of fun follow ons.
 const tagMap = new Map<string, (s: SimplifiedTag) => StandardTag>([
-  ["forhire", () => "forhire"],
-  ["hiring", () => "hiring"],
-  ["hire", () => "hiring"],
+  ["forhire", () => PostType.forHire],
+  ["hiring", () => PostType.hiring],
+  ["hire", () => PostType.hiring],
 ]);
 
 const standardizeTag = (tag: string) => {

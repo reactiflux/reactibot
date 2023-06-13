@@ -106,11 +106,13 @@ const jobModeration = async (bot: Client) => {
     errors.push(...web3Jobs(posts, message));
     errors.push(...formatting(posts, message));
 
+    // If the job post is valid, update the list of stored jobs and stop.
     if (errors.length === 0) {
       updateJobs(message);
       return;
     }
 
+    // If there are errors, notify the member and moderate the post.
     trackModeratedMessage(message);
     await message.delete();
 
