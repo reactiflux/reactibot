@@ -8,7 +8,7 @@ export interface Post {
 
 export enum PostType {
   hiring = "hiring",
-  forHire = "forHire",
+  forHire = "forhire",
 }
 
 type SimplifiedTag = string;
