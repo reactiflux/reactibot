@@ -28,11 +28,6 @@ import {
   failedWeb3Content,
   failedWeb3Poster,
 } from "./jobs-moderation/job-mod-helpers";
-import participationRules from "./jobs-moderation/participation";
-import {
-  removeFromCache as removeFromWeb3Cache,
-  web3Jobs,
-} from "./jobs-moderation/web3";
 
 const REPOST_THRESHOLD = 10; // minutes
 
@@ -58,8 +53,7 @@ export const resetJobCacheCommand = {
     }
 
     const memberToClear = user.id;
-    const removed =
-      removeFromWeb3Cache(memberToClear) + purgeMember(memberToClear);
+    const removed = purgeMember(memberToClear);
     await interaction.reply({
       ephemeral: true,
       content: `Cleared ${removed} posts from ${user?.username} out of cache`,

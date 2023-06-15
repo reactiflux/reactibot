@@ -206,8 +206,7 @@ export const removeSpecificJob = (message: Message) => {
 };
 
 export const purgeMember = (idToRemove: string) => {
-  let removed = 0;
-  console.log({ storedMessages });
+  let removed = removeFromCryptoCache(idToRemove);
 
   let index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
   while (index > 0) {
