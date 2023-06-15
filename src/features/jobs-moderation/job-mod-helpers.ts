@@ -105,7 +105,7 @@ export const jobBoardMessageCache: Array<StoredMessage> = [];
 
 const DAYS_OF_POSTS = 30;
 const HIRING_AGE_LIMIT = 7;
-const FORHIRE_AGE_LIMIT = 5;
+const FORHIRE_AGE_LIMIT = 1.25;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
