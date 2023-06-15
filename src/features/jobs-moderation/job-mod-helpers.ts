@@ -209,7 +209,7 @@ export const purgeMember = (idToRemove: string) => {
   let removed = removeFromCryptoCache(idToRemove);
 
   let index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
-  while (index > 0) {
+  while (index >= 0) {
     removed += 1;
     jobBoardMessageCache.splice(index, 1);
     index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
