@@ -78,6 +78,13 @@ test butts
 many long lines of text`,
     });
   });
+  it("isn’t tricked by empty lines", () => {
+    const parsed = parseContent(`[hiring]
+    
+    
+    `);
+    expect(parsed[0]).toMatchObject({ tags: ["hiring"], description: "" });
+  });
 
   // Disable this, not relevant right now. Also broken as of May '23
   it.skip("parses contact", () => {
