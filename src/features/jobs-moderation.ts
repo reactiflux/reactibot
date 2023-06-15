@@ -9,7 +9,7 @@ import {
 import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
-import { formatting } from "./jobs-moderation/formatting";
+import validate from "./jobs-moderation/validate";
 import { parseContent } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
@@ -101,10 +101,7 @@ const jobModeration = async (bot: Client) => {
       return;
     }
     const posts = parseContent(message.content);
-    const errors: PostFailures[] = [];
-    errors.push(...participationRules(posts, message));
-    errors.push(...web3Jobs(posts, message));
-    errors.push(...formatting(posts, message));
+    const errors = validate(posts, message);
 
     // If the job post is valid, update the list of stored jobs and stop.
     if (errors.length === 0) {

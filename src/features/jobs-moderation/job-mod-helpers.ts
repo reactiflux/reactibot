@@ -229,3 +229,14 @@ export const untrackModeratedMessage = (message: Message | PartialMessage) => {
   }
   return false;
 };
+
+const cryptoPosters: Map<string, { count: number; last: Date }> = new Map();
+export const removeFromCryptoCache = (idToClear: string) => {
+  if (cryptoPosters.has(idToClear)) {
+    cryptoPosters.delete(idToClear);
+    return 1;
+  }
+  return 0;
+};
+export const getCryptoCache = cryptoPosters.get.bind(cryptoPosters);
+export const setCryptoCache = cryptoPosters.set.bind(cryptoPosters);
