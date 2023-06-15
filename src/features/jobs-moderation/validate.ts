@@ -95,9 +95,13 @@ export const web3: JobPostValidator = (posts, message) => {
 };
 
 export const participation: JobPostValidator = (posts, message) => {
-  // Block replies and mentions
-  if (message.type === MessageType.Reply || message.mentions.members?.size) {
-    // if (message.type === "REPLY" || (message.mentions.members?.size || 0) > 0) {
+  const { members: mentions } = message.mentions;
+  if (
+    // Is a reply
+    message.type === MessageType.Reply ||
+    // Mentions a user other than self
+    (mentions?.size && !mentions.every((m) => m.id === message.author.id))
+  ) {
     return [{ type: POST_FAILURE_REASONS.replyOrMention }];
   }
 
