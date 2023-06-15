@@ -101,7 +101,7 @@ interface StoredMessage {
   createdAt: Date;
   type: PostType;
 }
-export const storedMessages: Array<StoredMessage> = [];
+export const jobBoardMessageCache: Array<StoredMessage> = [];
 
 const DAYS_OF_POSTS = 30;
 const HIRING_AGE_LIMIT = 7;
@@ -110,7 +110,7 @@ const FORHIRE_AGE_LIMIT = 5;
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
 
-  let oldestMessage: typeof storedMessages[0] | undefined;
+  let oldestMessage: typeof jobBoardMessageCache[0] | undefined;
 
   // Iteratively add all messages that are less than DAYS_OF_POSTS days old.
   // Fetch by 10 messages at a time, paging through the channel history.
@@ -118,7 +118,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const newMessages: typeof storedMessages = (
+    const newMessages: typeof jobBoardMessageCache = (
       await channel.messages.fetch({
         limit: 10,
         ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
@@ -145,7 +145,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       .at(-1);
     if (!oldestMessage) break;
 
-    storedMessages.push(
+    jobBoardMessageCache.push(
       ...newMessages
         .filter(
           (m) =>
@@ -161,26 +161,26 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
 const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than 5 days
   while (
-    storedMessages[0] &&
-    storedMessages[0].type === PostType.forHire &&
-    differenceInDays(new Date(), storedMessages[0].createdAt) >=
+    jobBoardMessageCache[0] &&
+    jobBoardMessageCache[0].type === PostType.forHire &&
+    differenceInDays(new Date(), jobBoardMessageCache[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
-    const { message } = storedMessages[0];
+    const { message } = jobBoardMessageCache[0];
     await message.fetch();
     if (!message.deletable) return;
     trackModeratedMessage(message);
     // Log deletion so we have a record of it
     reportUser({ reason: ReportReasons.jobAge, message });
     message.delete();
-    storedMessages.shift();
+    jobBoardMessageCache.shift();
   }
 };
 
 export const updateJobs = (message: Message) => {
   // Assume all posts in a message have the same tag
   const [parsed] = parseContent(message.content);
-  storedMessages.push({
+  jobBoardMessageCache.push({
     message,
     authorId: message.author.id,
     createdAt: message.createdAt,
@@ -193,15 +193,15 @@ export const updateJobs = (message: Message) => {
   const now = add(new Date(), { hours: 6 });
   // Remove all posts that are older than the limit
   while (
-    storedMessages[0] &&
-    differenceInDays(now, storedMessages[0].createdAt) >= HIRING_AGE_LIMIT
+    jobBoardMessageCache[0] &&
+    differenceInDays(now, jobBoardMessageCache[0].createdAt) >= HIRING_AGE_LIMIT
   ) {
-    storedMessages.shift();
+    jobBoardMessageCache.shift();
   }
 };
 export const removeSpecificJob = (message: Message) => {
-  storedMessages.splice(
-    storedMessages.findIndex((m) => m.message.id === message.id),
+  jobBoardMessageCache.splice(
+    jobBoardMessageCache.findIndex((m) => m.message.id === message.id),
   );
 };
 
@@ -209,11 +209,11 @@ export const purgeMember = (idToRemove: string) => {
   let removed = 0;
   console.log({ storedMessages });
 
-  let index = storedMessages.findIndex((x) => x.authorId === idToRemove);
+  let index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
   while (index > 0) {
     removed += 1;
-    storedMessages.splice(index, 1);
-    index = storedMessages.findIndex((x) => x.authorId === idToRemove);
+    jobBoardMessageCache.splice(index, 1);
+    index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
   }
   return removed;
 };
