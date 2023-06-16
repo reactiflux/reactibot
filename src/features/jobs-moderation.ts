@@ -89,9 +89,15 @@ const jobModeration = async (bot: Client) => {
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
+    if (message.author.id === bot.user?.id) {
+      return;
+    }
+    if (channel.type === ChannelType.PrivateThread) {
+      validationRepl(message);
+      return;
+    }
     if (
       message.channelId !== CHANNELS.jobBoard ||
-      message.author.id === bot.user?.id ||
       channel.type !== ChannelType.GuildText
     ) {
       return;
@@ -150,6 +156,17 @@ const jobModeration = async (bot: Client) => {
 
 export default jobModeration;
 
+const validationRepl = async (message: Message) => {
+  const posts = parseContent(message.content);
+  const errors = validate(posts, message);
+
+  await message.channel.send(
+    errors.length > 0
+      ? errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")
+      : "This post passes our validation rules!",
+  );
+};
+
 const handleErrors = async (
   channel: TextChannel,
   message: Message,
@@ -172,7 +189,9 @@ const handleErrors = async (
   await thread.send(
     `Hey <@${
       message.author.id
-    }>, your message does not meet our requirements to be posted to the board. It was removed for these reasons:
+    }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules.
+    
+It was removed for these reasons:
 
 ${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
   );
