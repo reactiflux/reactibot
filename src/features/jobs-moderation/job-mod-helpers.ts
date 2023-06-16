@@ -19,8 +19,10 @@ export class RuleViolation extends Error {
 
 export const enum POST_FAILURE_REASONS {
   missingType = "missingType",
+  inconsistentType = "inconsistentType",
   tooManyEmojis = "tooManyEmojis",
-  tooManyLines = "tooManyLines",
+  tooLong = "tooLong",
+  tooManyGaps = "tooManyGaps",
   tooFrequent = "tooFrequent",
   replyOrMention = "replyOrMention",
   web3Content = "web3Content",
@@ -33,11 +35,17 @@ export const enum POST_FAILURE_REASONS {
 export interface PostFailureMissingType {
   type: POST_FAILURE_REASONS.missingType;
 }
+export interface PostFailureInconsistentType {
+  type: POST_FAILURE_REASONS.inconsistentType;
+}
 export interface PostFailureTooManyEmojis {
   type: POST_FAILURE_REASONS.tooManyEmojis;
 }
-export interface PostFailureTooManyLines {
-  type: POST_FAILURE_REASONS.tooManyLines;
+export interface PostFailureTooLong {
+  type: POST_FAILURE_REASONS.tooLong;
+}
+export interface PostFailureTooManyGaps {
+  type: POST_FAILURE_REASONS.tooManyGaps;
 }
 export interface PostFailureTooFrequent {
   type: POST_FAILURE_REASONS.tooFrequent;
@@ -60,9 +68,11 @@ export interface PostFailureWeb3Poster {
 }
 export type PostFailures =
   | PostFailureMissingType
+  | PostFailureInconsistentType
   | PostFailureTooFrequent
   | PostFailureReplyOrMention
-  | PostFailureTooManyLines
+  | PostFailureTooLong
+  | PostFailureTooManyGaps
   | PostFailureTooManyEmojis
   | PostFailureWeb3Content
   | PostFailureWeb3Poster;
@@ -70,6 +80,10 @@ export type PostFailures =
 export const failedMissingType = (
   e: PostFailures,
 ): e is PostFailureMissingType => e.type === POST_FAILURE_REASONS.missingType;
+export const failedOnconsistentType = (
+  e: PostFailures,
+): e is PostFailureMissingType =>
+  e.type === POST_FAILURE_REASONS.inconsistentType;
 export const failedTooFrequent = (
   e: PostFailures,
 ): e is PostFailureTooFrequent => e.type === POST_FAILURE_REASONS.tooFrequent;
@@ -77,9 +91,8 @@ export const failedReplyOrMention = (
   e: PostFailures,
 ): e is PostFailureReplyOrMention =>
   e.type === POST_FAILURE_REASONS.replyOrMention;
-export const failedTooManyLines = (
-  e: PostFailures,
-): e is PostFailureTooManyLines => e.type === POST_FAILURE_REASONS.tooManyLines;
+export const failedTooManyLines = (e: PostFailures): e is PostFailureTooLong =>
+  e.type === POST_FAILURE_REASONS.tooLong;
 export const failedTooManyEmojis = (
   e: PostFailures,
 ): e is PostFailureTooManyEmojis =>

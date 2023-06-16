@@ -67,8 +67,12 @@ export const resetJobCacheCommand = {
 const ValidationMessages = {
   [POST_FAILURE_REASONS.missingType]:
     "Your post does not include our required `HIRING` or `FOR HIRE` tag. Make sure the first line of your post includes `HIRING` if you’re looking to pay someone for their work, and `FOR HIRE` if you’re offering your services.",
+  [POST_FAILURE_REASONS.inconsistentType]:
+    "Your message has multiple job postings, but the types are inconsistent. Please only post FOR HIRE or HIRING posts.",
   [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
-  [POST_FAILURE_REASONS.tooManyLines]: "Your post has too many lines.",
+  [POST_FAILURE_REASONS.tooLong]: "Your post is too long.",
+  [POST_FAILURE_REASONS.tooManyGaps]:
+    "Your post has too many spaces between lines. Make sure it’s either single spaced or double spaced.",
   [POST_FAILURE_REASONS.tooFrequent]: "You’re posting too frequently. ",
   [POST_FAILURE_REASONS.replyOrMention]:
     "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",

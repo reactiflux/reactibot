@@ -27,23 +27,46 @@ export default validate;
 const NEWLINE = /\n/g;
 export const formatting: JobPostValidator = (posts, message) => {
   // Handle missing tags;
-  const hasTags = posts.every(
-    ({ tags }) => tags.length > 0 || tags.includes("hiring") || tags.includes,
-  );
+  const tags = [
+    ...posts
+      .reduce((accum, { tags }) => {
+        tags.forEach((t) => accum.add(t));
+        return accum;
+      }, new Set<string>())
+      .values(),
+  ];
+
+  const isHiring = tags.includes(PostType.hiring);
+  const isForHire = tags.includes(PostType.forHire);
+  const hasTags = tags.length > 0 && (isHiring || isForHire);
+
   const errors: PostFailures[] = [];
 
   if (!hasTags) {
     errors.push({ type: POST_FAILURE_REASONS.missingType });
   }
-  // If > 1 in 150 chars is an emoji
-  const emojiCount = extractEmoji(message.content).length;
-  if (emojiCount / message.content.length > 1 / 150) {
-    errors.push({ type: POST_FAILURE_REASONS.tooManyEmojis });
+  if (isHiring && isForHire) {
+    errors.push({ type: POST_FAILURE_REASONS.inconsistentType });
   }
-  const lineCount = message.content.match(NEWLINE)?.length || 0;
-  if (lineCount > 18) {
-    errors.push({ type: POST_FAILURE_REASONS.tooManyLines });
-  }
+
+  posts.forEach((post) => {
+    // If > 1 in 150 chars is an emoji
+    const emojiCount = extractEmoji(post.description).length;
+    if (emojiCount / post.description.length > 1 / 150) {
+      errors.push({ type: POST_FAILURE_REASONS.tooManyEmojis });
+    }
+    const messageLineCount = message.content.match(NEWLINE)?.length || 0;
+    const lineCount = post.description.match(NEWLINE)?.length || 0;
+    if (
+      lineCount >
+      (isForHire ? 5 : 18 || post.description.length > (isForHire ? 300 : 1500))
+    ) {
+      errors.push({ type: POST_FAILURE_REASONS.tooLong });
+    }
+    if (messageLineCount - 2 > lineCount) {
+      errors.push({ type: POST_FAILURE_REASONS.tooManyGaps });
+    }
+  });
 
   return errors;
 };

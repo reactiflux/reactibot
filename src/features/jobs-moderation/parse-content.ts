@@ -59,7 +59,7 @@ export const parseContent = (inputString: string): Post[] => {
       } else if (currentPost.description === "") {
         currentPost.description += line;
       } else {
-        currentPost.description += "\n" + line;
+        currentPost.description += "\n\n" + line;
       }
     }
     return acc;

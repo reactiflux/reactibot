@@ -61,7 +61,9 @@ test butts
 many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text`);
     expect(parsed[0]).toMatchObject({
       description: `Lorem ipsum dolor sit amet
+
 test butts
+
 many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text many long lines of text`,
     });
 
@@ -74,7 +76,9 @@ test butts
 many long lines of text`);
     expect(parsed[0]).toMatchObject({
       description: `Lorem ipsum dolor sit amet
+
 test butts
+
 many long lines of text`,
     });
   });
