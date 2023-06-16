@@ -5,6 +5,8 @@ import {
   CommandInteraction,
   Client,
   ChannelType,
+  Message,
+  TextChannel,
 } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
@@ -97,79 +99,9 @@ const jobModeration = async (bot: Client) => {
     const posts = parseContent(message.content);
     const errors = validate(posts, message);
 
-    // If the job post is valid, update the list of stored jobs and stop.
-    if (errors.length === 0) {
-      updateJobs(message);
-      return;
+    if (errors) {
+      await handleErrors(channel, message, errors);
     }
-
-    // If there are errors, notify the member and moderate the post.
-    trackModeratedMessage(message);
-    await message.delete();
-
-    const thread = await channel.threads.create({
-      name: "Your post has been removed",
-      type: ChannelType.PrivateThread,
-    });
-    await thread.send(
-      `Hey <@${
-        message.author.id
-      }>, your message does not meet our requirements to be posted to the board. It was removed for these reasons:
-
-${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
-    );
-
-    // Handle missing post type
-    let error: PostFailures | undefined = errors.find(failedMissingType);
-    if (error) {
-      return;
-    }
-
-    // Handle posting too frequently
-    error = errors.find(failedTooFrequent);
-    if (error) {
-      reportUser({ reason: ReportReasons.jobFrequency, message });
-    }
-
-    // Handle replies or posts with mentions
-    error = errors.find(failedReplyOrMention);
-    if (error) {
-      //
-    }
-
-    // Handle posts that have too many newlines
-    error = errors.find(failedTooManyLines);
-    if (error) {
-      //
-    }
-
-    // Handle posts with too many emonis
-    error = errors.find(failedTooManyEmojis);
-    if (error) {
-      //
-    }
-
-    // Handle posts that contain web3 content and posters who have been blocked
-    // for posting web3 roles
-    error = errors.find(failedWeb3Poster) || errors.find(failedWeb3Content);
-    console.log(error);
-    if (error) {
-      reportUser({ reason: ReportReasons.jobCrypto, message });
-      if (error.count >= 3) {
-        await message.member?.timeout(20 * 60 * 60 * 1000);
-      }
-      const { hiring, forHire } = error;
-      await thread.send(
-        !hiring && !forHire
-          ? `If you're hiring: ${freeflowHiring}
-If you're seeking work: ${freeflowForHire}`
-          : hiring
-          ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
-          : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
-      );
-    }
-    await thread.send("Your post:");
-    await thread.send(quoteMessageContent(message.content));
   });
 
   /*
@@ -217,3 +149,82 @@ If you're seeking work: ${freeflowForHire}`
 };
 
 export default jobModeration;
+
+const handleErrors = async (
+  channel: TextChannel,
+  message: Message,
+  errors: ReturnType<typeof validate>,
+) => {
+  // If the job post is valid, update the list of stored jobs and stop.
+  if (errors.length === 0) {
+    updateJobs(message);
+    return;
+  }
+
+  // If there are errors, notify the member and moderate the post.
+  trackModeratedMessage(message);
+  await message.delete();
+
+  const thread = await channel.threads.create({
+    name: "Your post has been removed",
+    type: ChannelType.PrivateThread,
+  });
+  await thread.send(
+    `Hey <@${
+      message.author.id
+    }>, your message does not meet our requirements to be posted to the board. It was removed for these reasons:
+
+${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+  );
+
+  // Handle missing post type
+  let error: PostFailures | undefined = errors.find(failedMissingType);
+  if (error) {
+    return;
+  }
+
+  // Handle posting too frequently
+  error = errors.find(failedTooFrequent);
+  if (error) {
+    reportUser({ reason: ReportReasons.jobFrequency, message });
+  }
+
+  // Handle replies or posts with mentions
+  error = errors.find(failedReplyOrMention);
+  if (error) {
+    //
+  }
+
+  // Handle posts that have too many newlines
+  error = errors.find(failedTooManyLines);
+  if (error) {
+    //
+  }
+
+  // Handle posts with too many emonis
+  error = errors.find(failedTooManyEmojis);
+  if (error) {
+    //
+  }
+
+  // Handle posts that contain web3 content and posters who have been blocked
+  // for posting web3 roles
+  error = errors.find(failedWeb3Poster) || errors.find(failedWeb3Content);
+  if (error) {
+    reportUser({ reason: ReportReasons.jobCrypto, message });
+    if (error.count >= 3) {
+      await message.member?.timeout(20 * 60 * 60 * 1000);
+    }
+    const { hiring, forHire } = error;
+    await thread.send(
+      !hiring && !forHire
+        ? `If you're hiring: ${freeflowHiring}
+If you're seeking work: ${freeflowForHire}`
+        : hiring
+        ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
+        : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
+    );
+  }
+  await thread.send("Your post:");
+  await thread.send(quoteMessageContent(message.content));
+};
