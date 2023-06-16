@@ -57,10 +57,10 @@ export const formatting: JobPostValidator = (posts, message) => {
     }
     const messageLineCount = message.content.match(NEWLINE)?.length || 0;
     const lineCount = post.description.match(NEWLINE)?.length || 0;
-    if (
-      lineCount >
-      (isForHire ? 5 : 18 || post.description.length > (isForHire ? 300 : 1500))
-    ) {
+    if (lineCount > (isForHire ? 8 : 18)) {
+      errors.push({ type: POST_FAILURE_REASONS.tooManyLines });
+    }
+    if (post.description.length > (isForHire ? 350 : 1800)) {
       errors.push({ type: POST_FAILURE_REASONS.tooLong });
     }
     if (messageLineCount - 2 > lineCount) {

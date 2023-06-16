@@ -71,6 +71,7 @@ const ValidationMessages = {
     "Your message has multiple job postings, but the types are inconsistent. Please only post FOR HIRE or HIRING posts.",
   [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
   [POST_FAILURE_REASONS.tooLong]: "Your post is too long.",
+  [POST_FAILURE_REASONS.tooManyLines]: "Your post has too many lines.",
   [POST_FAILURE_REASONS.tooManyGaps]:
     "Your post has too many spaces between lines. Make sure it’s either single spaced or double spaced.",
   [POST_FAILURE_REASONS.tooFrequent]: "You’re posting too frequently. ",
@@ -102,7 +103,8 @@ const jobModeration = async (bot: Client) => {
     }
     if (
       message.channelId !== CHANNELS.jobBoard ||
-      channel.type !== ChannelType.GuildText
+      channel.type !== ChannelType.GuildText ||
+      isStaff(message.member)
     ) {
       return;
     }
