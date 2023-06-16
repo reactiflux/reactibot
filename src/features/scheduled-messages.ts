@@ -53,9 +53,9 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
 
 * Posts should be reasonably descriptive.
 * Jobs are paid — unpaid, equity-only, or similar are not allowed.
-* We don't allow "small gigs," like pay-for-help, one-off work of only a few hours, .
+* We don't allow "small gigs," like pay-for-help or one-off work of only a few hours.
 
-Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently, with or without warning. If you believe you have been removed in error, you can dispute at \`hello@reactiflux.com\`.
+Moderators may remove posts at any time, with or without warning. Repeat violators of these rules will be removed from the server permanently, with or without warning. We have more information on our Promotion Guidelines: https://www.reactiflux.com/promotion#job-board. If you believe you have been removed in error, you can dispute at \`hello@reactiflux.com\`.
 
 `,
         embeds: [

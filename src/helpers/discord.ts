@@ -67,7 +67,12 @@ export const fetchReactionMembers = (
  * backticks escaped to render correctly when sent in a quote.
  */
 export const quoteMessageContent = (content: string) => {
-  return `> ${content.replace("`", "\\`").replace(/[\n]/g, "\n> ")}`;
+  const quoted = `> ${content.replace("`", "\\`").replace(/[\n]/g, "\n> ")}`;
+  // If it's longer than the character limit, truncate
+  if (quoted.length > 2000) {
+    return quoted.slice(0, 2000);
+  }
+  return quoted;
 };
 
 /*

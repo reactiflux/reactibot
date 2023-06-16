@@ -7,8 +7,11 @@
     "start": "node dist/index.js",
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
+    "dev:test": "vitest",
     "build": "tsc",
-    "test": "eslint --ext js,ts . && prettier --check .",
+    "test": "npm-run-all -c --parallel 'test:*'",
+    "test:vitest": "vitest --run",
+    "test:lint": "eslint --ext js,ts . && prettier --check .",
     "prettier": "prettier --write ."
   },
   "repository": {
@@ -42,7 +45,8 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.3.2",
     "ts-node": "^10.8.1",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vitest": "^0.29.2"
   },
   "prettier": {
     "trailingComma": "all"

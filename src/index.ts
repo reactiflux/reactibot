@@ -193,14 +193,6 @@ bot.on("messageCreate", async (msg) => {
   handleMessage(msg);
 });
 
-bot.on("error", (err) => {
-  try {
-    logger.log("ERR", err.message);
-  } catch (e) {
-    logger.log("ERR", err + "");
-  }
-});
-
 const errorHandler = (error: unknown) => {
   if (error instanceof Error) {
     logger.log("ERROR", `${error.message} ${error.stack}`);
@@ -208,6 +200,7 @@ const errorHandler = (error: unknown) => {
     logger.log("ERROR", error);
   }
 };
+bot.on("error", errorHandler);
 
 process.on("uncaughtException", errorHandler);
 process.on("unhandledRejection", errorHandler);
