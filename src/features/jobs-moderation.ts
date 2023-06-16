@@ -185,6 +185,7 @@ const handleErrors = async (
   const thread = await channel.threads.create({
     name: "Your post has been removed",
     type: ChannelType.PrivateThread,
+    invitable: false,
   });
   await thread.send(
     `Hey <@${
