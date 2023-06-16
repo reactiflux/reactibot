@@ -22,6 +22,7 @@ export const enum POST_FAILURE_REASONS {
   inconsistentType = "inconsistentType",
   tooManyEmojis = "tooManyEmojis",
   tooLong = "tooLong",
+  tooManyLines = "tooManyLines",
   tooManyGaps = "tooManyGaps",
   tooFrequent = "tooFrequent",
   replyOrMention = "replyOrMention",
@@ -40,6 +41,9 @@ export interface PostFailureInconsistentType {
 }
 export interface PostFailureTooManyEmojis {
   type: POST_FAILURE_REASONS.tooManyEmojis;
+}
+export interface PostFailureTooManyLines {
+  type: POST_FAILURE_REASONS.tooManyLines;
 }
 export interface PostFailureTooLong {
   type: POST_FAILURE_REASONS.tooLong;
@@ -72,6 +76,7 @@ export type PostFailures =
   | PostFailureTooFrequent
   | PostFailureReplyOrMention
   | PostFailureTooLong
+  | PostFailureTooManyLines
   | PostFailureTooManyGaps
   | PostFailureTooManyEmojis
   | PostFailureWeb3Content
