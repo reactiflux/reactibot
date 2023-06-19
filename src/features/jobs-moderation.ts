@@ -1,4 +1,6 @@
 import { differenceInMinutes, format } from "date-fns";
+import { LRUCache } from "lru-cache";
+
 import {
   PermissionFlagsBits,
   SlashCommandBuilder,
@@ -7,6 +9,7 @@ import {
   ChannelType,
   Message,
   TextChannel,
+  ThreadChannel,
 } from "discord.js";
 import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
@@ -22,11 +25,7 @@ import {
   PostFailures,
   POST_FAILURE_REASONS,
   trackModeratedMessage,
-  failedReplyOrMention,
   failedTooFrequent,
-  failedMissingType,
-  failedTooManyLines,
-  failedTooManyEmojis,
   failedWeb3Content,
   failedWeb3Poster,
 } from "./jobs-moderation/job-mod-helpers";
@@ -63,6 +62,14 @@ export const resetJobCacheCommand = {
     return;
   },
 };
+
+const rulesThreadCache = new LRUCache<string, ThreadChannel>({
+  max: 100,
+  ttl: 1000 * 60 * 60 * 2, // 1 hours
+  dispose: (value) => {
+    value.delete();
+  },
+});
 
 const ValidationMessages = {
   [POST_FAILURE_REASONS.missingType]:
@@ -188,49 +195,39 @@ const handleErrors = async (
   trackModeratedMessage(message);
   await message.delete();
 
-  const thread = await channel.threads.create({
-    name: "Your post has been removed",
-    type: ChannelType.PrivateThread,
-    invitable: false,
-  });
-  await thread.send(
-    `Hey <@${
-      message.author.id
-    }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules.
+  let thread: ThreadChannel;
+  const existingThread = rulesThreadCache.get(message.author.id);
+  if (existingThread) {
+    thread = existingThread;
+    await existingThread.send(
+      `Hey <@${
+        message.author.id
+      }>, please use this thread to test out new posts against our validation rules. Your was removed for these reasons:
+
+${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+    );
+  } else {
+    thread = await channel.threads.create({
+      name: "Your post has been removed",
+      type: ChannelType.PrivateThread,
+      invitable: false,
+    });
+    rulesThreadCache.set(message.author.id, thread);
+    await thread.send(
+      `Hey <@${
+        message.author.id
+      }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules.
     
 It was removed for these reasons:
 
 ${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
-  );
+    );
+  }
 
   // Handle missing post type
-  let error: PostFailures | undefined = errors.find(failedMissingType);
-  if (error) {
-    return;
-  }
-
-  // Handle posting too frequently
-  error = errors.find(failedTooFrequent);
+  let error: PostFailures | undefined = errors.find(failedTooFrequent);
   if (error) {
     reportUser({ reason: ReportReasons.jobFrequency, message });
-  }
-
-  // Handle replies or posts with mentions
-  error = errors.find(failedReplyOrMention);
-  if (error) {
-    //
-  }
-
-  // Handle posts that have too many newlines
-  error = errors.find(failedTooManyLines);
-  if (error) {
-    //
-  }
-
-  // Handle posts with too many emonis
-  error = errors.find(failedTooManyEmojis);
-  if (error) {
-    //
   }
 
   // Handle posts that contain web3 content and posters who have been blocked
