@@ -15,7 +15,7 @@ import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
-import { parseContent } from "./jobs-moderation/parse-content";
+import { parseContent, PostType } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
   purgeMember,
@@ -120,6 +120,36 @@ const jobModeration = async (bot: Client) => {
 
     if (errors) {
       await handleErrors(channel, message, errors);
+    }
+  });
+
+  bot.on("messageUpdate", async (_, newMessage) => {
+    const { channel } = newMessage;
+    if (newMessage.author?.bot) {
+      return;
+    }
+    if (channel.type === ChannelType.PrivateThread) {
+      validationRepl(await newMessage.fetch());
+      return;
+    }
+    if (
+      newMessage.channelId !== CHANNELS.jobBoard ||
+      channel.type !== ChannelType.GuildText ||
+      isStaff(newMessage.member)
+    ) {
+      return;
+    }
+    const message = await newMessage.fetch();
+    const posts = parseContent(message.content);
+    const errors = validate(posts, message);
+
+    if (errors) {
+      if (posts.some((p) => p.tags.includes(PostType.forHire))) {
+        reportUser({ reason: ReportReasons.jobCircumvent, message });
+        await newMessage.delete();
+      } else {
+        await handleErrors(channel, message, errors);
+      }
     }
   });
 

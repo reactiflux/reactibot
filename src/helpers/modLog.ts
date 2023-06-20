@@ -28,6 +28,7 @@ const warningMessages = new Map<
 export const enum ReportReasons {
   userWarn = "userWarn",
   userDelete = "userDelete",
+  jobCircumvent = "jobCircumvent",
   jobAge = "jobAge",
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
@@ -158,6 +159,8 @@ ${extra}
 ${reportedMessage}
 `;
 
+    case ReportReasons.jobCircumvent:
+      return `${preface}, kicked for attempting to circumvent job board rules.`;
     case ReportReasons.jobAge:
       return `${preface}, for hire post expired.`;
     case ReportReasons.jobFrequency:
