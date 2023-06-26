@@ -101,7 +101,7 @@ const jobModeration = async (bot: Client) => {
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
-    if (message.author.id === bot.user?.id) {
+    if (message.author.bot) {
       return;
     }
     if (channel.type === ChannelType.PrivateThread) {
