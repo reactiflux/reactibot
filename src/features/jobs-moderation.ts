@@ -279,5 +279,8 @@ If you're seeking work: ${freeflowForHire}`
     );
   }
   await thread.send("Your post:");
-  await thread.send(quoteMessageContent(message.content));
+  await thread.send({
+    content: quoteMessageContent(message.content),
+    allowedMentions: { users: [] },
+  });
 };
