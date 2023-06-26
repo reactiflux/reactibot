@@ -1,15 +1,21 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { parseContent } from "./parse-content";
+import { parseContent, PostType } from "./parse-content";
 
 describe("parseContent", () => {
   describe("tags", () => {
     it("basics", () => {
-      let parsed = parseContent(
+      const parsed = parseContent(
         "| Company | Job Title | Location | Compensation | Job Type |",
       );
       expectTypeOf(parsed).toBeArray();
       expect(parsed[0]).toMatchObject({
         tags: ["company", "jobtitle", "location", "compensation", "jobtype"],
+      });
+
+      const emptyTags = ["|", "|||", "[]", " [ ] "];
+      emptyTags.forEach((tag) => {
+        const [parsed] = parseContent(tag);
+        expect(parsed).toMatchObject({ tags: [] });
       });
 
       // "for hire" standardization. All forms should end as "for hire".
@@ -25,10 +31,8 @@ describe("parseContent", () => {
       ];
       validForHireTags.forEach((tag) => {
         const [parsed] = parseContent(tag);
-        expect(parsed).toMatchObject({ tags: ["forhire"] });
+        expect(parsed).toMatchObject({ tags: [PostType.forHire] });
       });
-      parsed = parseContent("for hire");
-      expect(parsed[0]).toMatchObject({ tags: [] });
 
       // "hiring" standardization. All forms should end as "for hire".
       const validHiringTags = [
@@ -42,7 +46,7 @@ describe("parseContent", () => {
       ];
       validHiringTags.forEach((tag) => {
         const [parsed] = parseContent(tag);
-        expect(parsed).toMatchObject({ tags: ["hiring"] });
+        expect(parsed).toMatchObject({ tags: [PostType.hiring] });
       });
     });
   });
@@ -69,6 +73,19 @@ many long lines of text many long lines of text many long lines of text many lon
 
     parsed = parseContent(`[hiring]
 
+Lorem ipsum dolor sit amet
+
+test butts
+
+many long lines of text`);
+    expect(parsed[0]).toMatchObject({
+      description: `Lorem ipsum dolor sit amet
+
+test butts
+
+many long lines of text`,
+    });
+    parsed = parseContent(`[hiring]
 Lorem ipsum dolor sit amet
 
 test butts
