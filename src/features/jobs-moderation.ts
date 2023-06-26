@@ -28,7 +28,9 @@ import {
   failedTooFrequent,
   failedWeb3Content,
   failedWeb3Poster,
+  deleteAgedPosts,
 } from "./jobs-moderation/job-mod-helpers";
+import { FREQUENCY, scheduleTask } from "../helpers/schedule";
 
 const REPOST_THRESHOLD = 10; // minutes
 
@@ -92,6 +94,10 @@ const ValidationMessages = {
 
 const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
 const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
+
+scheduleTask(FREQUENCY.hourly, () => {
+  deleteAgedPosts();
+});
 
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
