@@ -15,7 +15,7 @@ import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
-import { parseContent } from "./jobs-moderation/parse-content";
+import { parseContent, PostType } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
   purgeMember,
@@ -28,7 +28,9 @@ import {
   failedTooFrequent,
   failedWeb3Content,
   failedWeb3Poster,
+  deleteAgedPosts,
 } from "./jobs-moderation/job-mod-helpers";
+import { FREQUENCY, scheduleTask } from "../helpers/schedule";
 
 const REPOST_THRESHOLD = 10; // minutes
 
@@ -93,6 +95,10 @@ const ValidationMessages = {
 const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
 const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
 
+scheduleTask(FREQUENCY.hourly, () => {
+  deleteAgedPosts();
+});
+
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
@@ -101,7 +107,7 @@ const jobModeration = async (bot: Client) => {
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
-    if (message.author.id === bot.user?.id) {
+    if (message.author.bot) {
       return;
     }
     if (channel.type === ChannelType.PrivateThread) {
@@ -120,6 +126,36 @@ const jobModeration = async (bot: Client) => {
 
     if (errors) {
       await handleErrors(channel, message, errors);
+    }
+  });
+
+  bot.on("messageUpdate", async (_, newMessage) => {
+    const { channel } = newMessage;
+    if (newMessage.author?.bot) {
+      return;
+    }
+    if (channel.type === ChannelType.PrivateThread) {
+      validationRepl(await newMessage.fetch());
+      return;
+    }
+    if (
+      newMessage.channelId !== CHANNELS.jobBoard ||
+      channel.type !== ChannelType.GuildText ||
+      isStaff(newMessage.member)
+    ) {
+      return;
+    }
+    const message = await newMessage.fetch();
+    const posts = parseContent(message.content);
+    const errors = validate(posts, message);
+
+    if (errors) {
+      if (posts.some((p) => p.tags.includes(PostType.forHire))) {
+        reportUser({ reason: ReportReasons.jobCircumvent, message });
+        await newMessage.delete();
+      } else {
+        await handleErrors(channel, message, errors);
+      }
     }
   });
 
@@ -249,5 +285,8 @@ If you're seeking work: ${freeflowForHire}`
     );
   }
   await thread.send("Your post:");
-  await thread.send(quoteMessageContent(message.content));
+  await thread.send({
+    content: quoteMessageContent(message.content),
+    allowedMentions: { users: [] },
+  });
 };

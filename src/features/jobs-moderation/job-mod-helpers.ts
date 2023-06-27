@@ -122,8 +122,6 @@ interface StoredMessage {
 export const jobBoardMessageCache: Array<StoredMessage> = [];
 
 const DAYS_OF_POSTS = 30;
-const HIRING_AGE_LIMIT = 7;
-const FORHIRE_AGE_LIMIT = 1.25;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
@@ -173,11 +171,13 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
         .values(),
     );
   }
-  await deleteAgedPosts();
 };
 
-const deleteAgedPosts = async () => {
-  // Delete all `forhire` messages that are older than 5 days
+const HIRING_AGE_LIMIT = 7;
+const FORHIRE_AGE_LIMIT = 1.25;
+
+export const deleteAgedPosts = async () => {
+  // Delete all `forhire` messages that are older than the age limit
   while (
     jobBoardMessageCache[0] &&
     jobBoardMessageCache[0].type === PostType.forHire &&
@@ -204,8 +204,6 @@ export const updateJobs = (message: Message) => {
     createdAt: message.createdAt,
     type: parsed.tags.includes("forhire") ? PostType.forHire : PostType.hiring,
   });
-
-  deleteAgedPosts();
 
   // Allow posts every 6.75 days by pretending "now" is 6 hours in the future
   const now = add(new Date(), { hours: 6 });

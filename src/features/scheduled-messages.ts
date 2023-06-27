@@ -2,20 +2,8 @@ import type * as discord from "discord.js";
 import { guildId as defaultGuildId } from "../helpers/env";
 import { CHANNELS } from "../constants/channels";
 import { logger } from "./log";
-import { scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";
+import { FREQUENCY, scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule";
 import { ChannelType } from "discord.js";
-
-const HOURLY = 60 * 60 * 1000;
-// By keeping these off 24 hr, we can make sure they show up at all timezones. If
-// it were 24 hours, for instance, it would consistently show up in the middle of
-// the night for some timezones.
-const DAILY = 20 * HOURLY;
-const FREQUENCY = {
-  often: 9 * HOURLY,
-  daily: DAILY,
-  moreThanWeekly: 3 * DAILY,
-  weekly: 6 * DAILY,
-};
 
 type MessageConfig = {
   postTo: {

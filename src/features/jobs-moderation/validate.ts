@@ -49,6 +49,10 @@ export const formatting: JobPostValidator = (posts, message) => {
     errors.push({ type: POST_FAILURE_REASONS.inconsistentType });
   }
 
+  if (isHiring) {
+    return errors;
+  }
+
   posts.forEach((post) => {
     // If > 1 in 150 chars is an emoji
     const emojiCount = extractEmoji(post.description).length;

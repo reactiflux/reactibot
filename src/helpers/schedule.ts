@@ -25,6 +25,19 @@ export const enum SPECIFIED_TIMES {
   "midnight" = "0 0 * * *",
 }
 
+const HOURLY = 60 * 60 * 1000;
+// By keeping these off 24 hr, we can make sure they show up at all timezones. If
+// it were 24 hours, for instance, it would consistently show up in the middle of
+// the night for some timezones.
+const DAILY = 20 * HOURLY;
+export const FREQUENCY = {
+  hourly: HOURLY,
+  often: 9 * HOURLY,
+  daily: DAILY,
+  moreThanWeekly: 3 * DAILY,
+  weekly: 6 * DAILY,
+};
+
 /**
  * Schedule messages to run on a consistent interval, assuming a constant
  * first-run time of Sunday at midnight.
