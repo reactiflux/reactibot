@@ -58,6 +58,10 @@ export const reactionHandlers: ReactionHandlers = {
       return;
     }
 
+    if (message.mentions.everyone || message.mentions.roles.size > 0) {
+      return;
+    }
+
     cooldown.addCooldown(reactor.id, "thumbsdown", 60); // 1 minute
 
     const totalReacts = usersWhoReacted.length;
