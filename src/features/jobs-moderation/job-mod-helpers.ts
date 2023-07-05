@@ -1,4 +1,4 @@
-import { add, compareAsc, differenceInDays } from "date-fns";
+import { add, compareAsc, differenceInDays, differenceInHours } from "date-fns";
 import {
   Client,
   Message,
@@ -187,6 +187,9 @@ const FORHIRE_AGE_LIMIT = 1.25;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
+  const forHirePosts = jobBoardMessageCache.filter(
+    (p) => p.type === PostType.forHire,
+  );
   console.log(
     `[INFO]: deleteAgedPosts() ${
       forHirePosts.length
@@ -199,9 +202,8 @@ export const deleteAgedPosts = async () => {
     )}\``,
   );
   while (
-    jobBoardMessageCache[0] &&
-    jobBoardMessageCache[0].type === PostType.forHire &&
-    differenceInDays(new Date(), jobBoardMessageCache[0].createdAt) >=
+    forHirePosts[0] &&
+    differenceInHours(new Date(), jobBoardMessageCache[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
     const { message } = jobBoardMessageCache[0];
@@ -217,7 +219,7 @@ export const deleteAgedPosts = async () => {
     trackModeratedMessage(message);
     // Log deletion so we have a record of it
     reportUser({ reason: ReportReasons.jobAge, message });
-    message.delete();
+    await message.delete();
     jobBoardMessageCache.shift();
     console.log(
       `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(message)}`,

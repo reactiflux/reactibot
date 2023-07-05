@@ -1,4 +1,4 @@
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInHours, differenceInMinutes, format } from "date-fns";
 import { LRUCache } from "lru-cache";
 
 import {
@@ -77,15 +77,29 @@ const rulesThreadCache = new LRUCache<string, ThreadChannel>({
 const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
 const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
 
-scheduleTask(FREQUENCY.hourly, () => {
-  deleteAgedPosts();
-});
-
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
 
+  scheduleTask("expired post cleanup", FREQUENCY.hourly, () => {
+    deleteAgedPosts();
+  });
+  scheduleTask("enforcement thread cleanup", FREQUENCY.hourly, async () => {
+    const threads = await jobBoard.threads.fetch({
+      archived: { fetchAll: true },
+    });
+    for (const thread of threads.threads.values()) {
+      if (
+        !thread.createdAt ||
+        differenceInHours(new Date(), thread.createdAt) > 1
+      ) {
+        await thread.delete();
+      }
+    }
+  });
+
   await loadJobs(bot, jobBoard);
+  await deleteAgedPosts();
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
