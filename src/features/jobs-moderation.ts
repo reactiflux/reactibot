@@ -92,7 +92,10 @@ const jobModeration = async (bot: Client) => {
     if (message.author.bot) {
       return;
     }
-    if (channel.type === ChannelType.PrivateThread) {
+    if (
+      message.channelId === CHANNELS.jobBoard &&
+      channel.type === ChannelType.PrivateThread
+    ) {
       validationRepl(message);
       return;
     }
