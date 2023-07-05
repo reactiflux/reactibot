@@ -18,7 +18,7 @@ const getFirstRun = (interval: number, now = new Date()) => {
   );
 
   const diff = now.getTime() - sundayMidnight.getTime();
-  return diff % interval;
+  return interval - (diff % interval);
 };
 
 export const enum SPECIFIED_TIMES {
