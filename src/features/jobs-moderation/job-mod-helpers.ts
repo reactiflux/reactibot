@@ -85,9 +85,9 @@ export type PostFailures =
 export const failedMissingType = (
   e: PostFailures,
 ): e is PostFailureMissingType => e.type === POST_FAILURE_REASONS.missingType;
-export const failedOnconsistentType = (
+export const failedInconsistentType = (
   e: PostFailures,
-): e is PostFailureMissingType =>
+): e is PostFailureInconsistentType =>
   e.type === POST_FAILURE_REASONS.inconsistentType;
 export const failedTooFrequent = (
   e: PostFailures,
@@ -96,8 +96,14 @@ export const failedReplyOrMention = (
   e: PostFailures,
 ): e is PostFailureReplyOrMention =>
   e.type === POST_FAILURE_REASONS.replyOrMention;
-export const failedTooManyLines = (e: PostFailures): e is PostFailureTooLong =>
+export const failedTooLong = (e: PostFailures): e is PostFailureTooLong =>
   e.type === POST_FAILURE_REASONS.tooLong;
+export const failedTooManyLines = (
+  e: PostFailures,
+): e is PostFailureTooManyLines => e.type === POST_FAILURE_REASONS.tooManyLines;
+export const failedTooManyGaps = (
+  e: PostFailures,
+): e is PostFailureTooManyGaps => e.type === POST_FAILURE_REASONS.tooManyGaps;
 export const failedTooManyEmojis = (
   e: PostFailures,
 ): e is PostFailureTooManyEmojis =>
