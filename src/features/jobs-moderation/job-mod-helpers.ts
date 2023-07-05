@@ -6,6 +6,7 @@ import {
   Snowflake,
   TextChannel,
 } from "discord.js";
+import { constructDiscordLink } from "../../helpers/discord";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
 import { parseContent, Post, PostType } from "./parse-content";
 
@@ -184,6 +185,17 @@ const FORHIRE_AGE_LIMIT = 1.25;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
+  console.log(
+    `[INFO]: deleteAgedPosts() ${
+      forHirePosts.length
+    } forhire posts. max age is ${FORHIRE_AGE_LIMIT} JSON: \`${JSON.stringify(
+      forHirePosts.map(({ message, ...p }) => ({
+        ...p,
+        hoursOld: differenceInHours(new Date(), p.createdAt),
+        messageId: message.id,
+      })),
+    )}\``,
+  );
   while (
     jobBoardMessageCache[0] &&
     jobBoardMessageCache[0].type === PostType.forHire &&
@@ -192,18 +204,37 @@ export const deleteAgedPosts = async () => {
   ) {
     const { message } = jobBoardMessageCache[0];
     await message.fetch();
-    if (!message.deletable) return;
+    if (!message.deletable) {
+      console.log(
+        `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+          message,
+        )}' not deletable`,
+      );
+      return;
+    }
     trackModeratedMessage(message);
     // Log deletion so we have a record of it
     reportUser({ reason: ReportReasons.jobAge, message });
     message.delete();
     jobBoardMessageCache.shift();
+    console.log(
+      `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(message)}`,
+    );
   }
 };
 
 export const updateJobs = (message: Message) => {
   // Assume all posts in a message have the same tag
   const [parsed] = parseContent(message.content);
+  console.log(
+    `[INFO]: updateJobs() adding new post to cache. JSON:${JSON.stringify({
+      authorId: message.author.id,
+      createdAt: message.createdAt,
+      type: parsed.tags.includes("forhire")
+        ? PostType.forHire
+        : PostType.hiring,
+    })}}`,
+  );
   jobBoardMessageCache.push({
     message,
     authorId: message.author.id,

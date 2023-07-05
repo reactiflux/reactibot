@@ -108,7 +108,11 @@ const jobModeration = async (bot: Client) => {
     }
     const posts = parseContent(message.content);
     const errors = validate(posts, message);
-
+    console.log(
+      `[DEBUG] validating new job post from @${
+        message.author.username
+      }, errors: [${JSON.stringify(errors)}]`,
+    );
     if (errors) {
       await handleErrors(channel, message, errors);
     }

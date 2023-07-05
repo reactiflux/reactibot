@@ -154,7 +154,7 @@ const sendMessage = async (
       return;
     }
 
-    scheduleTask(interval, () => {
+    scheduleTask("scheduled message", interval, () => {
       if (typeof message === "function") {
         message(channel);
         return;
