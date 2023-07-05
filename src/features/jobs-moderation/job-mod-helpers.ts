@@ -45,9 +45,11 @@ export interface PostFailureTooManyEmojis {
 }
 export interface PostFailureTooManyLines {
   type: POST_FAILURE_REASONS.tooManyLines;
+  overage: number;
 }
 export interface PostFailureTooLong {
   type: POST_FAILURE_REASONS.tooLong;
+  overage: number;
 }
 export interface PostFailureTooManyGaps {
   type: POST_FAILURE_REASONS.tooManyGaps;
