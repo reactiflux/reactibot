@@ -30,6 +30,7 @@ import {
   failedWeb3Poster,
   deleteAgedPosts,
 } from "./jobs-moderation/job-mod-helpers";
+import { getValidationMessage } from "./jobs-moderation/validation-messages";
 import { FREQUENCY, scheduleTask } from "../helpers/schedule";
 
 const REPOST_THRESHOLD = 10; // minutes
@@ -72,25 +73,6 @@ const rulesThreadCache = new LRUCache<string, ThreadChannel>({
     value.delete();
   },
 });
-
-const ValidationMessages = {
-  [POST_FAILURE_REASONS.missingType]:
-    "Your post does not include our required `HIRING` or `FOR HIRE` tag. Make sure the first line of your post includes `HIRING` if you’re looking to pay someone for their work, and `FOR HIRE` if you’re offering your services.",
-  [POST_FAILURE_REASONS.inconsistentType]:
-    "Your message has multiple job postings, but the types are inconsistent. Please only post FOR HIRE or HIRING posts.",
-  [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
-  [POST_FAILURE_REASONS.tooLong]: "Your post is too long.",
-  [POST_FAILURE_REASONS.tooManyLines]: "Your post has too many lines.",
-  [POST_FAILURE_REASONS.tooManyGaps]:
-    "Your post has too many spaces between lines. Make sure it’s either single spaced or double spaced.",
-  [POST_FAILURE_REASONS.tooFrequent]: "You’re posting too frequently. ",
-  [POST_FAILURE_REASONS.replyOrMention]:
-    "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",
-  [POST_FAILURE_REASONS.web3Content]:
-    "We do not allow web3 positions to be advertised here. If you continue posting, you’ll be timed out overnight.",
-  [POST_FAILURE_REASONS.web3Poster]:
-    "We do not allow posers who arrived to post web3 positions to create posts. If you continue posting, you’ll be timed out overnight.",
-};
 
 const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
 const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
@@ -211,7 +193,7 @@ const validationRepl = async (message: Message) => {
 
   await message.channel.send(
     errors.length > 0
-      ? errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")
+      ? errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")
       : "This post passes our validation rules!",
   );
 };
@@ -240,7 +222,7 @@ const handleErrors = async (
         message.author.id
       }>, please use this thread to test out new posts against our validation rules. Your was removed for these reasons:
 
-${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
     );
   } else {
     thread = await channel.threads.create({
@@ -256,7 +238,7 @@ ${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
     
 It was removed for these reasons:
 
-${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
     );
   }
 
