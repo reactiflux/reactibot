@@ -1,15 +1,5 @@
 import { simplifyString } from "../../helpers/string";
-
-export interface Post {
-  tags: string[];
-  description: string;
-  // contact: string;
-}
-
-export enum PostType {
-  hiring = "hiring",
-  forHire = "forhire",
-}
+import { Post, PostType } from "../../types/jobs-moderation";
 
 type SimplifiedTag = string;
 type StandardTag = string;

@@ -1,17 +1,19 @@
 import {
+  POST_FAILURE_REASONS,
   PostFailures,
   PostFailureTooFrequent,
   PostFailureTooLong,
+  PostFailureTooManyLines,
+} from "../../types/jobs-moderation";
+import {
   failedMissingType,
   failedReplyOrMention,
   failedTooManyLines,
   failedTooManyEmojis,
-  POST_FAILURE_REASONS,
   failedTooFrequent,
   failedWeb3Content,
   failedWeb3Poster,
   failedInconsistentType,
-  PostFailureTooManyLines,
   failedTooLong,
   failedTooManyGaps,
 } from "./job-mod-helpers";

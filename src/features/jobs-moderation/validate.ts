@@ -6,14 +6,14 @@ import { jobBoardMessageCache } from "./job-mod-helpers";
 
 import { simplifyString } from "../../helpers/string";
 import { extractEmoji } from "../../helpers/string";
+import { getCryptoCache, setCryptoCache } from "./job-mod-helpers";
+import { parseContent } from "./parse-content";
 import {
-  getCryptoCache,
   JobPostValidator,
-  PostFailures,
   POST_FAILURE_REASONS,
-  setCryptoCache,
-} from "./job-mod-helpers";
-import { parseContent, PostType } from "./parse-content";
+  PostFailures,
+  PostType,
+} from "../../types/jobs-moderation";
 
 const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   const errors: PostFailures[] = [];

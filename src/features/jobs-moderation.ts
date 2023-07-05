@@ -15,15 +15,13 @@ import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
-import { parseContent, PostType } from "./jobs-moderation/parse-content";
+import { parseContent } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
   purgeMember,
   removeSpecificJob,
   untrackModeratedMessage,
   updateJobs,
-  PostFailures,
-  POST_FAILURE_REASONS,
   trackModeratedMessage,
   failedTooFrequent,
   failedWeb3Content,
@@ -32,6 +30,11 @@ import {
 } from "./jobs-moderation/job-mod-helpers";
 import { getValidationMessage } from "./jobs-moderation/validation-messages";
 import { FREQUENCY, scheduleTask } from "../helpers/schedule";
+import {
+  POST_FAILURE_REASONS,
+  PostFailures,
+  PostType,
+} from "../types/jobs-moderation";
 
 const REPOST_THRESHOLD = 10; // minutes
 
@@ -81,9 +84,13 @@ const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
 
+  // Remove forhire posts that have expired
   scheduleTask("expired post cleanup", FREQUENCY.hourly, () => {
     deleteAgedPosts();
   });
+  // Clean up enforcement threads that have been open for more than an hour
+  // This _should_ be handled by the cache eviction, but that doesn't appear to
+  // be working
   scheduleTask("enforcement thread cleanup", FREQUENCY.hourly, async () => {
     const threads = await jobBoard.threads.fetch({
       archived: { fetchAll: true },
@@ -106,6 +113,8 @@ const jobModeration = async (bot: Client) => {
     if (message.author.bot) {
       return;
     }
+    // If this is an existing enforcement thread, process the through a "REPL"
+    // that lets people test messages against the rules
     if (
       message.channelId === CHANNELS.jobBoard &&
       channel.type === ChannelType.PrivateThread
@@ -113,6 +122,7 @@ const jobModeration = async (bot: Client) => {
       validationRepl(message);
       return;
     }
+    // If this is a staff member, bail early
     if (
       message.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
