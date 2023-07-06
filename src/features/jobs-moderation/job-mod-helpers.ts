@@ -146,10 +146,10 @@ export const deleteAgedPosts = async () => {
   );
   while (
     forHirePosts[0] &&
-    differenceInHours(new Date(), jobBoardMessageCache[0].createdAt) >=
+    differenceInHours(new Date(), forHirePosts[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
-    const { message } = jobBoardMessageCache[0];
+    const { message } = forHirePosts[0];
     await message.fetch();
     if (!message.deletable) {
       console.log(
