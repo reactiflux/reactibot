@@ -18,7 +18,7 @@ const getFirstRun = (interval: number, now = new Date()) => {
   );
 
   const diff = now.getTime() - sundayMidnight.getTime();
-  return diff % interval;
+  return interval - (diff % interval);
 };
 
 export const enum SPECIFIED_TIMES {
@@ -45,15 +45,28 @@ export const FREQUENCY = {
  * @param task A function to run every interval
  */
 export const scheduleTask = (
+  name: string,
   interval: number | SPECIFIED_TIMES,
   task: () => void,
 ) => {
   if (typeof interval === "number") {
+    const firstRun = getFirstRun(interval);
+    console.log(
+      `[INFO] Scheduling '${name}' task to run every ${Math.floor(
+        interval / 1000 / 60,
+      )}min, first run in ${Math.floor(firstRun / 1000 / 60)}min`,
+    );
     setTimeout(() => {
       task();
       setInterval(task, interval);
-    }, getFirstRun(interval));
+    }, firstRun);
   } else {
-    scheduleCron(interval, task);
+    console.log(
+      `[INFO] Scheduling '${name}' cron task to run on schedule \`${interval}\``,
+    );
+    scheduleCron(interval, () => {
+      console.log(`[INFO] Running scheduled task '${name}'`);
+      task();
+    });
   }
 };

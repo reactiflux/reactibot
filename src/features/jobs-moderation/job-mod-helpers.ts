@@ -1,4 +1,4 @@
-import { add, compareAsc, differenceInDays } from "date-fns";
+import { add, compareAsc, differenceInDays, differenceInHours } from "date-fns";
 import {
   Client,
   Message,
@@ -6,8 +6,24 @@ import {
   Snowflake,
   TextChannel,
 } from "discord.js";
+import { constructDiscordLink } from "../../helpers/discord";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
-import { parseContent, Post, PostType } from "./parse-content";
+import { parseContent } from "./parse-content";
+import {
+  POST_FAILURE_REASONS,
+  PostFailureInconsistentType,
+  PostFailureMissingType,
+  PostFailureReplyOrMention,
+  PostFailureTooFrequent,
+  PostFailureTooLong,
+  PostFailureTooManyEmojis,
+  PostFailureTooManyGaps,
+  PostFailureTooManyLines,
+  PostFailureWeb3Content,
+  PostFailureWeb3Poster,
+  PostFailures,
+  PostType,
+} from "../../types/jobs-moderation";
 
 export class RuleViolation extends Error {
   reasons: POST_FAILURE_REASONS[];
@@ -17,77 +33,12 @@ export class RuleViolation extends Error {
   }
 }
 
-export const enum POST_FAILURE_REASONS {
-  missingType = "missingType",
-  inconsistentType = "inconsistentType",
-  tooManyEmojis = "tooManyEmojis",
-  tooLong = "tooLong",
-  tooManyLines = "tooManyLines",
-  tooManyGaps = "tooManyGaps",
-  tooFrequent = "tooFrequent",
-  replyOrMention = "replyOrMention",
-  web3Content = "web3Content",
-  web3Poster = "web3Poster",
-  // invalidContact = 'invalidContact',
-  // unknownLocation = 'unknownLocation',
-  // invalidPostType = 'invalidPostType',
-}
-
-export interface PostFailureMissingType {
-  type: POST_FAILURE_REASONS.missingType;
-}
-export interface PostFailureInconsistentType {
-  type: POST_FAILURE_REASONS.inconsistentType;
-}
-export interface PostFailureTooManyEmojis {
-  type: POST_FAILURE_REASONS.tooManyEmojis;
-}
-export interface PostFailureTooManyLines {
-  type: POST_FAILURE_REASONS.tooManyLines;
-}
-export interface PostFailureTooLong {
-  type: POST_FAILURE_REASONS.tooLong;
-}
-export interface PostFailureTooManyGaps {
-  type: POST_FAILURE_REASONS.tooManyGaps;
-}
-export interface PostFailureTooFrequent {
-  type: POST_FAILURE_REASONS.tooFrequent;
-  lastSent: number;
-}
-export interface PostFailureReplyOrMention {
-  type: POST_FAILURE_REASONS.replyOrMention;
-}
-export interface PostFailureWeb3Content {
-  type: POST_FAILURE_REASONS.web3Content;
-  count: number;
-  hiring: boolean;
-  forHire: boolean;
-}
-export interface PostFailureWeb3Poster {
-  type: POST_FAILURE_REASONS.web3Poster;
-  count: number;
-  hiring: boolean;
-  forHire: boolean;
-}
-export type PostFailures =
-  | PostFailureMissingType
-  | PostFailureInconsistentType
-  | PostFailureTooFrequent
-  | PostFailureReplyOrMention
-  | PostFailureTooLong
-  | PostFailureTooManyLines
-  | PostFailureTooManyGaps
-  | PostFailureTooManyEmojis
-  | PostFailureWeb3Content
-  | PostFailureWeb3Poster;
-
 export const failedMissingType = (
   e: PostFailures,
 ): e is PostFailureMissingType => e.type === POST_FAILURE_REASONS.missingType;
-export const failedOnconsistentType = (
+export const failedInconsistentType = (
   e: PostFailures,
-): e is PostFailureMissingType =>
+): e is PostFailureInconsistentType =>
   e.type === POST_FAILURE_REASONS.inconsistentType;
 export const failedTooFrequent = (
   e: PostFailures,
@@ -96,8 +47,14 @@ export const failedReplyOrMention = (
   e: PostFailures,
 ): e is PostFailureReplyOrMention =>
   e.type === POST_FAILURE_REASONS.replyOrMention;
-export const failedTooManyLines = (e: PostFailures): e is PostFailureTooLong =>
+export const failedTooLong = (e: PostFailures): e is PostFailureTooLong =>
   e.type === POST_FAILURE_REASONS.tooLong;
+export const failedTooManyLines = (
+  e: PostFailures,
+): e is PostFailureTooManyLines => e.type === POST_FAILURE_REASONS.tooManyLines;
+export const failedTooManyGaps = (
+  e: PostFailures,
+): e is PostFailureTooManyGaps => e.type === POST_FAILURE_REASONS.tooManyGaps;
 export const failedTooManyEmojis = (
   e: PostFailures,
 ): e is PostFailureTooManyEmojis =>
@@ -107,11 +64,6 @@ export const failedWeb3Content = (
 ): e is PostFailureWeb3Content => e.type === POST_FAILURE_REASONS.web3Content;
 export const failedWeb3Poster = (e: PostFailures): e is PostFailureWeb3Poster =>
   e.type === POST_FAILURE_REASONS.web3Poster;
-
-export type JobPostValidator = (
-  posts: Post[],
-  message: Message<boolean>,
-) => PostFailures[];
 
 interface StoredMessage {
   message: Message;
@@ -173,31 +125,63 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
   }
 };
 
-const HIRING_AGE_LIMIT = 7;
+const POST_INTERVAL = 7;
 const FORHIRE_AGE_LIMIT = 1.25;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
+  const forHirePosts = jobBoardMessageCache.filter(
+    (p) => p.type === PostType.forHire,
+  );
+  console.log(
+    `[INFO]: deleteAgedPosts() ${
+      forHirePosts.length
+    } forhire posts. max age is ${FORHIRE_AGE_LIMIT} JSON: \`${JSON.stringify(
+      forHirePosts.map(({ message, ...p }) => ({
+        ...p,
+        hoursOld: differenceInHours(new Date(), p.createdAt),
+        messageId: message.id,
+      })),
+    )}\``,
+  );
   while (
-    jobBoardMessageCache[0] &&
-    jobBoardMessageCache[0].type === PostType.forHire &&
-    differenceInDays(new Date(), jobBoardMessageCache[0].createdAt) >=
+    forHirePosts[0] &&
+    differenceInHours(new Date(), jobBoardMessageCache[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
     const { message } = jobBoardMessageCache[0];
     await message.fetch();
-    if (!message.deletable) return;
+    if (!message.deletable) {
+      console.log(
+        `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+          message,
+        )}' not deletable`,
+      );
+      return;
+    }
     trackModeratedMessage(message);
     // Log deletion so we have a record of it
     reportUser({ reason: ReportReasons.jobAge, message });
-    message.delete();
+    await message.delete();
     jobBoardMessageCache.shift();
+    console.log(
+      `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(message)}`,
+    );
   }
 };
 
 export const updateJobs = (message: Message) => {
   // Assume all posts in a message have the same tag
   const [parsed] = parseContent(message.content);
+  console.log(
+    `[INFO]: updateJobs() adding new post to cache. JSON:${JSON.stringify({
+      authorId: message.author.id,
+      createdAt: message.createdAt,
+      type: parsed.tags.includes("forhire")
+        ? PostType.forHire
+        : PostType.hiring,
+    })}}`,
+  );
   jobBoardMessageCache.push({
     message,
     authorId: message.author.id,
@@ -210,7 +194,7 @@ export const updateJobs = (message: Message) => {
   // Remove all posts that are older than the limit
   while (
     jobBoardMessageCache[0] &&
-    differenceInDays(now, jobBoardMessageCache[0].createdAt) >= HIRING_AGE_LIMIT
+    differenceInDays(now, jobBoardMessageCache[0].createdAt) >= POST_INTERVAL
   ) {
     jobBoardMessageCache.shift();
   }

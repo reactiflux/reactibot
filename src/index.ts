@@ -176,7 +176,7 @@ addHandler(threadChannels, autothread);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
-  scheduleTask(1000 * 60 * 30, () => {
+  scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });
 });

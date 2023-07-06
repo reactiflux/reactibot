@@ -6,14 +6,14 @@ import { jobBoardMessageCache } from "./job-mod-helpers";
 
 import { simplifyString } from "../../helpers/string";
 import { extractEmoji } from "../../helpers/string";
+import { getCryptoCache, setCryptoCache } from "./job-mod-helpers";
+import { parseContent } from "./parse-content";
 import {
-  getCryptoCache,
   JobPostValidator,
-  PostFailures,
   POST_FAILURE_REASONS,
-  setCryptoCache,
-} from "./job-mod-helpers";
-import { parseContent, PostType } from "./parse-content";
+  PostFailures,
+  PostType,
+} from "../../types/jobs-moderation";
 
 const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   const errors: PostFailures[] = [];
@@ -25,6 +25,7 @@ const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
 export default validate;
 
 const NEWLINE = /\n/g;
+const GAP = /\n\s*\n\s*\n/g;
 export const formatting: JobPostValidator = (posts, message) => {
   // Handle missing tags;
   const tags = [
@@ -59,15 +60,22 @@ export const formatting: JobPostValidator = (posts, message) => {
     if (emojiCount / post.description.length > 1 / 150) {
       errors.push({ type: POST_FAILURE_REASONS.tooManyEmojis });
     }
-    const messageLineCount = message.content.match(NEWLINE)?.length || 0;
     const lineCount = post.description.match(NEWLINE)?.length || 0;
-    if (lineCount > (isForHire ? 8 : 18)) {
-      errors.push({ type: POST_FAILURE_REASONS.tooManyLines });
+    const maxLines = isForHire ? 8 : 18;
+    if (lineCount > maxLines) {
+      errors.push({
+        type: POST_FAILURE_REASONS.tooManyLines,
+        overage: lineCount - maxLines,
+      });
     }
-    if (post.description.length > (isForHire ? 350 : 1800)) {
-      errors.push({ type: POST_FAILURE_REASONS.tooLong });
+    const maxChars = isForHire ? 350 : 1800;
+    if (post.description.length > maxChars) {
+      errors.push({
+        type: POST_FAILURE_REASONS.tooLong,
+        overage: post.description.length - maxChars,
+      });
     }
-    if (messageLineCount - 2 > lineCount) {
+    if (message.content.match(GAP)) {
       errors.push({ type: POST_FAILURE_REASONS.tooManyGaps });
     }
   });

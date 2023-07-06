@@ -1,4 +1,4 @@
-import { differenceInMinutes, format } from "date-fns";
+import { differenceInHours, differenceInMinutes, format } from "date-fns";
 import { LRUCache } from "lru-cache";
 
 import {
@@ -15,22 +15,26 @@ import { CHANNELS } from "../constants/channels";
 import { isStaff, quoteMessageContent } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
-import { parseContent, PostType } from "./jobs-moderation/parse-content";
+import { parseContent } from "./jobs-moderation/parse-content";
 import {
   loadJobs,
   purgeMember,
   removeSpecificJob,
   untrackModeratedMessage,
   updateJobs,
-  PostFailures,
-  POST_FAILURE_REASONS,
   trackModeratedMessage,
   failedTooFrequent,
   failedWeb3Content,
   failedWeb3Poster,
   deleteAgedPosts,
 } from "./jobs-moderation/job-mod-helpers";
+import { getValidationMessage } from "./jobs-moderation/validation-messages";
 import { FREQUENCY, scheduleTask } from "../helpers/schedule";
+import {
+  POST_FAILURE_REASONS,
+  PostFailures,
+  PostType,
+} from "../types/jobs-moderation";
 
 const REPOST_THRESHOLD = 10; // minutes
 
@@ -73,47 +77,52 @@ const rulesThreadCache = new LRUCache<string, ThreadChannel>({
   },
 });
 
-const ValidationMessages = {
-  [POST_FAILURE_REASONS.missingType]:
-    "Your post does not include our required `HIRING` or `FOR HIRE` tag. Make sure the first line of your post includes `HIRING` if you’re looking to pay someone for their work, and `FOR HIRE` if you’re offering your services.",
-  [POST_FAILURE_REASONS.inconsistentType]:
-    "Your message has multiple job postings, but the types are inconsistent. Please only post FOR HIRE or HIRING posts.",
-  [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
-  [POST_FAILURE_REASONS.tooLong]: "Your post is too long.",
-  [POST_FAILURE_REASONS.tooManyLines]: "Your post has too many lines.",
-  [POST_FAILURE_REASONS.tooManyGaps]:
-    "Your post has too many spaces between lines. Make sure it’s either single spaced or double spaced.",
-  [POST_FAILURE_REASONS.tooFrequent]: "You’re posting too frequently. ",
-  [POST_FAILURE_REASONS.replyOrMention]:
-    "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",
-  [POST_FAILURE_REASONS.web3Content]:
-    "We do not allow web3 positions to be advertised here. If you continue posting, you’ll be timed out overnight.",
-  [POST_FAILURE_REASONS.web3Poster]:
-    "We do not allow posers who arrived to post web3 positions to create posts. If you continue posting, you’ll be timed out overnight.",
-};
-
 const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
 const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
-
-scheduleTask(FREQUENCY.hourly, () => {
-  deleteAgedPosts();
-});
 
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
   if (jobBoard?.type !== ChannelType.GuildText) return;
 
+  // Remove forhire posts that have expired
+  scheduleTask("expired post cleanup", FREQUENCY.hourly, () => {
+    deleteAgedPosts();
+  });
+  // Clean up enforcement threads that have been open for more than an hour
+  // This _should_ be handled by the cache eviction, but that doesn't appear to
+  // be working
+  scheduleTask("enforcement thread cleanup", FREQUENCY.hourly, async () => {
+    const threads = await jobBoard.threads.fetch({
+      archived: { fetchAll: true },
+    });
+    for (const thread of threads.threads.values()) {
+      if (
+        !thread.createdAt ||
+        differenceInHours(new Date(), thread.createdAt) > 1
+      ) {
+        await thread.delete();
+      }
+    }
+  });
+
   await loadJobs(bot, jobBoard);
+  await deleteAgedPosts();
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
     if (message.author.bot) {
       return;
     }
-    if (channel.type === ChannelType.PrivateThread) {
+    // If this is an existing enforcement thread, process the through a "REPL"
+    // that lets people test messages against the rules
+    if (
+      message.channelId === CHANNELS.jobBoard &&
+      channel.type === ChannelType.PrivateThread
+    ) {
       validationRepl(message);
       return;
     }
+    // If this is a staff member, bail early
     if (
       message.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
@@ -123,7 +132,11 @@ const jobModeration = async (bot: Client) => {
     }
     const posts = parseContent(message.content);
     const errors = validate(posts, message);
-
+    console.log(
+      `[DEBUG] validating new job post from @${
+        message.author.username
+      }, errors: [${JSON.stringify(errors)}]`,
+    );
     if (errors) {
       await handleErrors(channel, message, errors);
     }
@@ -147,7 +160,10 @@ const jobModeration = async (bot: Client) => {
     }
     const message = await newMessage.fetch();
     const posts = parseContent(message.content);
-    const errors = validate(posts, message);
+    // You can't post too frequently when editing a message, so filter those out
+    const errors = validate(posts, message).filter(
+      (e) => e.type !== POST_FAILURE_REASONS.tooFrequent,
+    );
 
     if (errors) {
       if (posts.some((p) => p.tags.includes(PostType.forHire))) {
@@ -211,7 +227,7 @@ const validationRepl = async (message: Message) => {
 
   await message.channel.send(
     errors.length > 0
-      ? errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")
+      ? errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")
       : "This post passes our validation rules!",
   );
 };
@@ -240,7 +256,7 @@ const handleErrors = async (
         message.author.id
       }>, please use this thread to test out new posts against our validation rules. Your was removed for these reasons:
 
-${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
     );
   } else {
     thread = await channel.threads.create({
@@ -256,7 +272,7 @@ ${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
     
 It was removed for these reasons:
 
-${errors.map((e) => `- ${ValidationMessages[e.type]}`).join("\n")}`,
+${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
     );
   }
 
