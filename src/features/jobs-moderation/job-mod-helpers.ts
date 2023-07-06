@@ -126,7 +126,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
 };
 
 const POST_INTERVAL = 7;
-const FORHIRE_AGE_LIMIT = 1.25;
+const FORHIRE_AGE_LIMIT = 1.25 * 24;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
@@ -146,10 +146,10 @@ export const deleteAgedPosts = async () => {
   );
   while (
     forHirePosts[0] &&
-    differenceInHours(new Date(), jobBoardMessageCache[0].createdAt) >=
+    differenceInHours(new Date(), forHirePosts[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
-    const { message } = jobBoardMessageCache[0];
+    const { message } = forHirePosts[0];
     await message.fetch();
     if (!message.deletable) {
       console.log(
