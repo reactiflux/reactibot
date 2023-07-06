@@ -126,7 +126,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
 };
 
 const POST_INTERVAL = 7;
-const FORHIRE_AGE_LIMIT = 1.25;
+const FORHIRE_AGE_LIMIT = 1.25 * 24;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
