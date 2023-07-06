@@ -110,7 +110,11 @@ const jobModeration = async (bot: Client) => {
 
   bot.on("messageCreate", async (message) => {
     const { channel } = message;
-    if (message.author.bot) {
+    if (
+      message.author.bot ||
+      // Don't treat newly fetched old messages as new posts
+      differenceInHours(new Date(), message.createdAt) < 1
+    ) {
       return;
     }
     // If this is an existing enforcement thread, process the through a "REPL"
