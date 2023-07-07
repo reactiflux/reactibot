@@ -113,7 +113,7 @@ const jobModeration = async (bot: Client) => {
     if (
       message.author.bot ||
       // Don't treat newly fetched old messages as new posts
-      differenceInHours(new Date(), message.createdAt) < 1
+      differenceInHours(new Date(), message.createdAt) >= 1
     ) {
       return;
     }
@@ -269,25 +269,31 @@ ${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
       invitable: false,
     });
     rulesThreadCache.set(message.author.id, thread);
-    await thread.send(
-      `Hey <@${
+    await thread.send({
+      content: `Hey <@${
         message.author.id
-      }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules. Here's an example of a valid post:
+      }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules.
 
-> HIRING | REMOTE | FULL-TIME
-> 
-> Senior React Engineer: $min - $max
-> 
-> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-> 
-> More details & apply: https://example.com/apply
-      
-You can view our guidance for job posts here: <https://www.reactiflux.com/promotion#job-board>.
-    
-It was removed for these reasons:
+You can view our guidance for job posts here: <https://www.reactiflux.com/promotion#job-board>. It was removed for these reasons:
 
 ${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
-    );
+      embeds: [
+        {
+          title: "Job Board Rules",
+          description: `Here's an example of a valid post:
+\`\`\`
+HIRING | REMOTE | FULL-TIME
+
+Senior React Engineer: $min - $max
+
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+More details & apply: https://example.com/apply
+\`\`\``,
+          color: 0x7289da,
+        },
+      ],
+    });
   }
 
   // Handle missing post type
