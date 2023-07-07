@@ -113,7 +113,7 @@ const jobModeration = async (bot: Client) => {
     if (
       message.author.bot ||
       // Don't treat newly fetched old messages as new posts
-      differenceInHours(new Date(), message.createdAt) < 1
+      differenceInHours(new Date(), message.createdAt) >= 1
     ) {
       return;
     }
