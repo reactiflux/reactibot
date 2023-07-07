@@ -20,16 +20,16 @@ import {
 
 const ValidationMessages = {
   [POST_FAILURE_REASONS.missingType]:
-    "Your post does not include our required `HIRING` or `FOR HIRE` tag. Make sure the first line of your post includes `HIRING` if you’re looking to pay someone for their work, and `FOR HIRE` if you’re offering your services.",
+    "Your post does not include our required `[HIRING]` or `[FOR HIRE]` tag. Make sure the first line of your post includes `[HIRING]` if you’re looking to pay someone for their work, and `[FOR HIRE]` if you’re offering your services.",
   [POST_FAILURE_REASONS.inconsistentType]:
-    "Your message has multiple job postings, but the types are inconsistent. Please only post FOR HIRE or HIRING posts.",
+    "Your message has multiple job postings, but the types are inconsistent. Please only post `[FOR HIRE]` or `[HIRING]` posts.",
   [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
   [POST_FAILURE_REASONS.tooLong]: (e: PostFailureTooLong) =>
-    `Your post is too long. Reduce its length by ${e.overage} characters.`,
+    `Your post is too long, please shorten it by ${e.overage} characters.`,
   [POST_FAILURE_REASONS.tooManyLines]: (e: PostFailureTooManyLines) =>
-    `Your post has too many lines. Reduce its length by ${e.overage} lines.`,
+    `Your post has too many, please shorten it by ${e.overage} lines.`,
   [POST_FAILURE_REASONS.tooManyGaps]:
-    "Your post has too many spaces between lines. Make sure it’s either single spaced or double spaced.",
+    "Your post has too many spaces between lines, please make sure it’s either single spaced or double spaced.",
   [POST_FAILURE_REASONS.tooFrequent]: (e: PostFailureTooFrequent) =>
     `You’re posting too frequently. You last posted ${e.lastSent} days ago, please wait at least 7 days.`,
   [POST_FAILURE_REASONS.replyOrMention]:
