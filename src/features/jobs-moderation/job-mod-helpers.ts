@@ -187,8 +187,11 @@ export const deleteAgedPosts = async () => {
         "[DEBUG]",
         `deleteAgedPosts() message '${constructDiscordLink(
           message,
-        )}' not found`,
+        )}' not found, originally sent by ${
+          message.author.username
+        } at ${format(message.createdAt, "P p")}`,
       );
+      jobBoardMessageCache.shift();
     }
   }
 };
