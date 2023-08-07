@@ -175,19 +175,24 @@ export const deleteAgedPosts = async () => {
         message,
         extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
       });
+      await message.delete();
+      jobBoardMessageCache.shift();
+      console.log(
+        `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(
+          message,
+        )}`,
+      );
     } catch (e) {
       logger.log(
         "[DEBUG]",
         `deleteAgedPosts() message '${constructDiscordLink(
           message,
-        )}' not found`,
+        )}' not found, originally sent by ${
+          message.author.username
+        } at ${format(message.createdAt, "P p")}`,
       );
+      jobBoardMessageCache.shift();
     }
-    await message.delete();
-    jobBoardMessageCache.shift();
-    console.log(
-      `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(message)}`,
-    );
   }
 };
 
