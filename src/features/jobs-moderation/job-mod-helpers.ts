@@ -146,6 +146,7 @@ export const deleteAgedPosts = async () => {
   );
   while (
     forHirePosts[0] &&
+    differenceInDays(new Date(), forHirePosts[0].createdAt) < 90 &&
     differenceInHours(new Date(), forHirePosts[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
