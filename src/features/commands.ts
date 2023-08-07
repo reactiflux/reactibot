@@ -574,7 +574,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title:
-              "Is JWT the right approach for my applications authentication?",
+              "Is JWT the right approach for my application's authentication?",
             type: EmbedType.Rich,
             description: `
 Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
