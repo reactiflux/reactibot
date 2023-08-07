@@ -1,4 +1,10 @@
-import { add, compareAsc, differenceInDays, differenceInHours } from "date-fns";
+import {
+  add,
+  compareAsc,
+  differenceInDays,
+  differenceInHours,
+  format,
+} from "date-fns";
 import {
   Client,
   Message,
@@ -24,6 +30,7 @@ import {
   PostFailures,
   PostType,
 } from "../../types/jobs-moderation";
+import { logger } from "../log";
 
 export class RuleViolation extends Error {
   reasons: POST_FAILURE_REASONS[];
@@ -151,18 +158,31 @@ export const deleteAgedPosts = async () => {
       FORHIRE_AGE_LIMIT
   ) {
     const { message } = forHirePosts[0];
-    await message.fetch();
-    if (!message.deletable) {
-      console.log(
-        `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+    try {
+      await message.fetch();
+      if (!message.deletable) {
+        console.log(
+          `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+            message,
+          )}' not deletable`,
+        );
+        return;
+      }
+      trackModeratedMessage(message);
+      // Log deletion so we have a record of it
+      reportUser({
+        reason: ReportReasons.jobAge,
+        message,
+        extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
+      });
+    } catch (e) {
+      logger.log(
+        "[DEBUG]",
+        `deleteAgedPosts() message '${constructDiscordLink(
           message,
-        )}' not deletable`,
+        )}' not found`,
       );
-      return;
     }
-    trackModeratedMessage(message);
-    // Log deletion so we have a record of it
-    reportUser({ reason: ReportReasons.jobAge, message });
     await message.delete();
     jobBoardMessageCache.shift();
     console.log(
