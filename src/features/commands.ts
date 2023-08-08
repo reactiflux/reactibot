@@ -574,25 +574,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         embeds: [
           {
             title:
-              "Is JWT the right approach for my applications authentication?",
+              "Is JWT the right approach for my application's authentication?",
             type: EmbedType.Rich,
             description: `
-            Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
-            
-            That said there are also scenarios when using a JWT token is the best approach:
-            - When using a third party auth service ( OpenID, Auth0, Firestore)
-            - Service to service calls
-            - Distributed architectures ( i.e Microservices)
-  
-            See below to help you decide which works best for you:
+Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
 
-            https://evertpot.com/jwt-is-a-bad-default
-            https://redis.com/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions
-            https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
-            https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
-            https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
-            https://gist.github.com/samsch/a5c99b9faaac9f131967e8a6d61682b0
+That said there are also scenarios when using a JWT token is the best approach:
 
+- When using a third party auth service ( OpenID, Auth0, Firestore)
+- Service to service calls
+- Distributed architectures ( i.e Microservices)
+
+See below to help you decide which works best for you:
+
+- [JWT is a Bad Default - Evert Pot](https://evertpot.com/jwt-is-a-bad-default)
+- [JWT are Dangerous for User Sessions - Raja Rao](https://redis.com/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions)
+- [Authentication Cheat Sheet - OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- [Session Management Cheat Sheet - OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
+- [JSON Web Token Cheat Sheet for Java - OWASP](https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html)
+- [Gist - samsch](https://gist.github.com/samsch/a5c99b9faaac9f131967e8a6d61682b0)
             `,
             color: EMBED_COLOR,
           },
