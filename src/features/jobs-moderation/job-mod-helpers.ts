@@ -184,12 +184,24 @@ export const deleteAgedPosts = async () => {
       );
     } catch (e) {
       logger.log(
-        "[DEBUG]",
+        "DEBUG",
         `deleteAgedPosts() message '${constructDiscordLink(
           message,
         )}' not found, originally sent by ${
           message.author.username
-        } at ${format(message.createdAt, "P p")}`,
+        } at ${format(
+          message.createdAt,
+          "P p",
+        )}. Message cache has: [${jobBoardMessageCache
+          .map(
+            (c) =>
+              `${c.message.id} ${c.message.author.username} ${format(
+                c.message.createdAt,
+                "P p",
+              )}]`,
+          )
+          .join(",\n")}
+${e}`,
       );
       jobBoardMessageCache.shift();
     }
