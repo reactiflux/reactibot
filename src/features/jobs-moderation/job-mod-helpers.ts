@@ -183,27 +183,26 @@ export const deleteAgedPosts = async () => {
         )}`,
       );
     } catch (e) {
-      jobBoardMessageCache.shift();
       logger.log(
         "DEBUG",
         `deleteAgedPosts() message '${constructDiscordLink(
           message,
         )}' not found, originally sent by ${
           message.author.username
-        } at ${format(
-          message.createdAt,
-          "P p",
-        )}. Message cache has: [${jobBoardMessageCache
+        } at ${format(message.createdAt, "P p")}. Message cache (${
+          jobBoardMessageCache.length
+        } entries) has: [${jobBoardMessageCache
           .map(
             (c) =>
               `${c.message.id} ${c.message.author.username} ${format(
                 c.message.createdAt,
                 "P p",
-              )}]`,
+              )}`,
           )
-          .join(",\n")}
+          .join(",\n")}]
 ${e}`,
       );
+      break;
     }
   }
 };
