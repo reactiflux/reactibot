@@ -183,7 +183,6 @@ export const deleteAgedPosts = async () => {
         )}`,
       );
     } catch (e) {
-      jobBoardMessageCache.shift();
       logger.log(
         "DEBUG",
         `deleteAgedPosts() message '${constructDiscordLink(
@@ -203,6 +202,7 @@ export const deleteAgedPosts = async () => {
           .join(",\n")}]
 ${e}`,
       );
+      break;
     }
   }
 };
