@@ -78,7 +78,7 @@ interface StoredMessage {
   createdAt: Date;
   type: PostType;
 }
-export let jobBoardMessageCache: {
+let jobBoardMessageCache: {
   forHire: StoredMessage[];
   hiring: StoredMessage[];
 } = { forHire: [], hiring: [] };
@@ -144,7 +144,7 @@ const FORHIRE_AGE_LIMIT = 1.25 * 24;
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
   console.log(
-    `[INFO]: deleteAgedPosts() ${
+    `[INFO] deleteAgedPosts() ${
       jobBoardMessageCache.forHire.length
     } forhire posts. max age is ${FORHIRE_AGE_LIMIT} JSON: \`${JSON.stringify(
       jobBoardMessageCache.forHire.map(({ message, ...p }) => ({
@@ -250,6 +250,18 @@ export const updateJobs = (message: Message) => {
   ) {
     jobBoardMessageCache.forHire.shift();
   }
+};
+
+type NumberOfDays = number;
+export const getLastPostAge = (author: Message["author"]): NumberOfDays => {
+  const now = Date.now();
+  const existingMessage =
+    jobBoardMessageCache.hiring.find((m) => m.authorId === author.id) ||
+    jobBoardMessageCache.forHire.find((m) => m.authorId === author.id);
+  // If we didn't find a message, return larger than the minimum interval
+  if (!existingMessage) return POST_INTERVAL + 1;
+
+  return differenceInDays(now, existingMessage.createdAt);
 };
 
 export const removeSpecificJob = (message: Message) => {
