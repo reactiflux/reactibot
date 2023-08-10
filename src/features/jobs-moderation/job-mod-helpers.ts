@@ -1,4 +1,10 @@
-import { add, compareAsc, differenceInDays, differenceInHours } from "date-fns";
+import {
+  add,
+  compareAsc,
+  differenceInDays,
+  differenceInHours,
+  format,
+} from "date-fns";
 import {
   Client,
   Message,
@@ -7,6 +13,7 @@ import {
   TextChannel,
 } from "discord.js";
 import { constructDiscordLink } from "../../helpers/discord";
+import { partition } from "../../helpers/array";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
 import { parseContent } from "./parse-content";
 import {
@@ -71,14 +78,17 @@ interface StoredMessage {
   createdAt: Date;
   type: PostType;
 }
-export const jobBoardMessageCache: Array<StoredMessage> = [];
+let jobBoardMessageCache: {
+  forHire: StoredMessage[];
+  hiring: StoredMessage[];
+} = { forHire: [], hiring: [] };
 
 const DAYS_OF_POSTS = 30;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
 
-  let oldestMessage: typeof jobBoardMessageCache[0] | undefined;
+  let oldestMessage: StoredMessage | undefined;
 
   // Iteratively add all messages that are less than DAYS_OF_POSTS days old.
   // Fetch by 10 messages at a time, paging through the channel history.
@@ -86,7 +96,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const newMessages: typeof jobBoardMessageCache = (
+    const newMessages: StoredMessage[] = (
       await channel.messages.fetch({
         limit: 10,
         ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
@@ -113,15 +123,18 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       .at(-1);
     if (!oldestMessage) break;
 
-    jobBoardMessageCache.push(
-      ...newMessages
-        .filter(
-          (m) =>
-            differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
-            m.authorId !== bot.user?.id,
-        )
-        .values(),
+    const humanMessages = newMessages.filter(
+      (m) =>
+        differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
+        !m.message.system &&
+        m.authorId !== bot.user?.id,
     );
+    const [hiring, forHire] = partition(
+      (m) => m.type === PostType.hiring,
+      humanMessages,
+    );
+
+    jobBoardMessageCache = { hiring, forHire };
   }
 };
 
@@ -130,14 +143,11 @@ const FORHIRE_AGE_LIMIT = 1.25 * 24;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
-  const forHirePosts = jobBoardMessageCache.filter(
-    (p) => p.type === PostType.forHire,
-  );
   console.log(
-    `[INFO]: deleteAgedPosts() ${
-      forHirePosts.length
+    `[INFO] deleteAgedPosts() ${
+      jobBoardMessageCache.forHire.length
     } forhire posts. max age is ${FORHIRE_AGE_LIMIT} JSON: \`${JSON.stringify(
-      forHirePosts.map(({ message, ...p }) => ({
+      jobBoardMessageCache.forHire.map(({ message, ...p }) => ({
         ...p,
         hoursOld: differenceInHours(new Date(), p.createdAt),
         messageId: message.id,
@@ -145,74 +155,151 @@ export const deleteAgedPosts = async () => {
     )}\``,
   );
   while (
-    forHirePosts[0] &&
-    differenceInHours(new Date(), forHirePosts[0].createdAt) >=
+    jobBoardMessageCache.forHire[0] &&
+    differenceInDays(new Date(), jobBoardMessageCache.forHire[0].createdAt) <
+      90 &&
+    differenceInHours(new Date(), jobBoardMessageCache.forHire[0].createdAt) >=
       FORHIRE_AGE_LIMIT
   ) {
-    const { message } = forHirePosts[0];
-    await message.fetch();
-    if (!message.deletable) {
+    const { message } = jobBoardMessageCache.forHire[0];
+    jobBoardMessageCache.forHire.shift();
+    try {
+      await message.fetch();
+      if (!message.deletable) {
+        console.log(
+          `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+            message,
+          )}' not deletable`,
+        );
+        return;
+      }
+      trackModeratedMessage(message);
+      // Log deletion so we have a record of it
+      reportUser({
+        reason: ReportReasons.jobAge,
+        message,
+        extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
+      });
+      await message.delete();
       console.log(
-        `[DEBUG] deleteAgedPosts() message '${constructDiscordLink(
+        `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(
           message,
-        )}' not deletable`,
+        )}`,
       );
-      return;
+    } catch (e) {
+      console.log(
+        "[DEBUG]",
+        `deleteAgedPosts() message '${constructDiscordLink(
+          message,
+        )}' not found, originally sent by ${
+          message.author.username
+        } at ${format(message.createdAt, "P p")}. Message cache (${
+          jobBoardMessageCache.forHire.length
+        } entries) has: [${jobBoardMessageCache.forHire
+          .map(
+            (c) =>
+              `${c.message.id} ${c.message.author.username} ${format(
+                c.message.createdAt,
+                "P p",
+              )}`,
+          )
+          .join(",\n")}]
+${e}`,
+      );
     }
-    trackModeratedMessage(message);
-    // Log deletion so we have a record of it
-    reportUser({ reason: ReportReasons.jobAge, message });
-    await message.delete();
-    jobBoardMessageCache.shift();
-    console.log(
-      `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(message)}`,
-    );
   }
 };
 
 export const updateJobs = (message: Message) => {
   // Assume all posts in a message have the same tag
   const [parsed] = parseContent(message.content);
+  const type = parsed.tags.includes("forhire")
+    ? PostType.forHire
+    : PostType.hiring;
   console.log(
     `[INFO]: updateJobs() adding new post to cache. JSON:${JSON.stringify({
       authorId: message.author.id,
       createdAt: message.createdAt,
-      type: parsed.tags.includes("forhire")
-        ? PostType.forHire
-        : PostType.hiring,
+      type,
     })}}`,
   );
-  jobBoardMessageCache.push({
+  (type === PostType.hiring
+    ? jobBoardMessageCache.hiring
+    : jobBoardMessageCache.forHire
+  ).push({
     message,
     authorId: message.author.id,
     createdAt: message.createdAt,
-    type: parsed.tags.includes("forhire") ? PostType.forHire : PostType.hiring,
+    type,
   });
 
   // Allow posts every 6.75 days by pretending "now" is 6 hours in the future
   const now = add(new Date(), { hours: 6 });
   // Remove all posts that are older than the limit
   while (
-    jobBoardMessageCache[0] &&
-    differenceInDays(now, jobBoardMessageCache[0].createdAt) >= POST_INTERVAL
+    jobBoardMessageCache.hiring[0] &&
+    differenceInDays(now, jobBoardMessageCache.hiring[0].createdAt) >=
+      POST_INTERVAL
   ) {
-    jobBoardMessageCache.shift();
+    jobBoardMessageCache.hiring.shift();
+  }
+  while (
+    jobBoardMessageCache.forHire[0] &&
+    differenceInDays(now, jobBoardMessageCache.forHire[0].createdAt) >=
+      POST_INTERVAL
+  ) {
+    jobBoardMessageCache.forHire.shift();
   }
 };
+
+type NumberOfDays = number;
+export const getLastPostAge = (author: Message["author"]): NumberOfDays => {
+  const now = Date.now();
+  const existingMessage =
+    jobBoardMessageCache.hiring.find((m) => m.authorId === author.id) ||
+    jobBoardMessageCache.forHire.find((m) => m.authorId === author.id);
+  // If we didn't find a message, return larger than the minimum interval
+  if (!existingMessage) return POST_INTERVAL + 1;
+
+  return differenceInDays(now, existingMessage.createdAt);
+};
+
 export const removeSpecificJob = (message: Message) => {
-  jobBoardMessageCache.splice(
-    jobBoardMessageCache.findIndex((m) => m.message.id === message.id),
+  const index = jobBoardMessageCache.hiring.findIndex(
+    (m) => m.message.id === message.id,
   );
+  if (index) {
+    jobBoardMessageCache.hiring.splice(index);
+  } else
+    jobBoardMessageCache.forHire.splice(
+      jobBoardMessageCache.forHire.findIndex(
+        (m) => m.message.id === message.id,
+      ),
+    );
 };
 
 export const purgeMember = (idToRemove: string) => {
   let removed = removeFromCryptoCache(idToRemove);
 
-  let index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
+  let index = jobBoardMessageCache.hiring.findIndex(
+    (x) => x.authorId === idToRemove,
+  );
   while (index >= 0) {
     removed += 1;
-    jobBoardMessageCache.splice(index, 1);
-    index = jobBoardMessageCache.findIndex((x) => x.authorId === idToRemove);
+    jobBoardMessageCache.hiring.splice(index, 1);
+    index = jobBoardMessageCache.hiring.findIndex(
+      (x) => x.authorId === idToRemove,
+    );
+  }
+  index = jobBoardMessageCache.forHire.findIndex(
+    (x) => x.authorId === idToRemove,
+  );
+  while (index >= 0) {
+    removed += 1;
+    jobBoardMessageCache.forHire.splice(index, 1);
+    index = jobBoardMessageCache.forHire.findIndex(
+      (x) => x.authorId === idToRemove,
+    );
   }
   return removed;
 };

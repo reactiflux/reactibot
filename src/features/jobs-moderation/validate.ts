@@ -1,8 +1,7 @@
-import { differenceInDays } from "date-fns";
 import { Message, MessageType } from "discord.js";
 import { differenceInHours } from "date-fns";
 
-import { jobBoardMessageCache } from "./job-mod-helpers";
+import { getLastPostAge } from "./job-mod-helpers";
 
 import { simplifyString } from "../../helpers/string";
 import { extractEmoji } from "../../helpers/string";
@@ -141,12 +140,8 @@ export const participation: JobPostValidator = (posts, message) => {
   }
 
   // Handle posting too frequently
-  const now = Date.now();
-  const existingMessage = jobBoardMessageCache.find(
-    (m) => m.authorId === message.author.id,
-  );
-  if (existingMessage) {
-    const lastSent = differenceInDays(now, existingMessage.createdAt);
+  const lastSent = getLastPostAge(message.author);
+  if (lastSent < 7) {
     return [{ type: POST_FAILURE_REASONS.tooFrequent, lastSent }];
   }
   return [];
