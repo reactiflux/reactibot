@@ -30,7 +30,6 @@ import {
   PostFailures,
   PostType,
 } from "../../types/jobs-moderation";
-import { logger } from "../log";
 
 export class RuleViolation extends Error {
   reasons: POST_FAILURE_REASONS[];
@@ -183,8 +182,8 @@ export const deleteAgedPosts = async () => {
         )}`,
       );
     } catch (e) {
-      logger.log(
-        "DEBUG",
+      console.log(
+        "[DEBUG]",
         `deleteAgedPosts() message '${constructDiscordLink(
           message,
         )}' not found, originally sent by ${
