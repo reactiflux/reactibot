@@ -521,16 +521,15 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             type: EmbedType.Rich,
             description: `Redux and Context are different tools that solve different problems, with some overlap.
 
-          Context is a Dependency Injection tool for a single value.
+Context is a Dependency Injection tool for a single value.
 
-          Redux is a tool for predictable state management outside React.
+Redux is a tool for predictable state management outside React.
 
-          See these articles for more details on the differences:
-
-          https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
-          https://blog.isquaredsoftware.com/2020/01/blogged-answers-react-redux-and-context-behavior/
-          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
-          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
+See these articles for more details on the differences:
+- [Blogged Answers: Why React Context is Not a "State Management" Tool](https://blog.isquaredsoftware.com/2021/01/context-redux-differences/)
+- [Blogged Answers: React, Redux, and Context Behavior](https://blog.isquaredsoftware.com/2020/01/blogged-answers-react-redux-and-context-behavior/)
+- [Blogged Answers: Redux - Not Dead Yet!](https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/)
+- [When (and when not) to reach for Redux - Mark Erikson](https://changelog.com/posts/when-and-when-not-to-reach-for-redux)
           `,
             color: EMBED_COLOR,
           },
