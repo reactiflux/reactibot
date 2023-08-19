@@ -84,11 +84,15 @@ export const reactionHandlers: ReactionHandlers = {
 
     const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
 
-    const newThread = await message.startThread({
-      name: newThreadName,
-    });
+    const thread = message.hasThread
+      ? // This is safe because we're checking if it has a thread
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        message.thread!
+      : await message.startThread({
+          name: newThreadName,
+        });
 
-    await newThread.send({
+    await thread.send({
       embeds: [
         {
           title: "Please improve your question",
