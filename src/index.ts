@@ -111,6 +111,9 @@ const addHandler = (
 };
 
 const handleMessage = async (message: Message) => {
+  if (message.system) {
+    return;
+  }
   const msg = message.partial ? await message.fetch() : message;
 
   const channelId = msg.channel.id;
