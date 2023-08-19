@@ -13,6 +13,7 @@ import {
   SlashCommandBuilder,
   APIApplicationCommand,
   APIApplicationCommandOption,
+  ForumChannel,
 } from "discord.js";
 import prettyBytes from "pretty-bytes";
 
@@ -111,6 +112,16 @@ export const escapeDisruptiveContent = (content: string) => {
 
 export const quoteAndEscape = (content: string) => {
   return escapeDisruptiveContent(quoteMessageContent(content));
+};
+
+export const mapAppliedTagsToTagNames = (
+  appliedTags: string[],
+  channel: ForumChannel,
+) => {
+  const { availableTags: tags } = channel;
+  const tagLookup = new Map(tags.map((e) => [e.id, e]));
+
+  return appliedTags.map((id) => tagLookup.get(id)?.name ?? "");
 };
 
 //
