@@ -79,16 +79,25 @@ const stats = (client: Client) => {
   client.on("messageCreate", async (msg) => {
     const { member, author, channel, content } = msg;
 
-    if (!channel || !author || author.bot || msg.system) return;
-
-    const channelId =
+    if (
+      !channel ||
+      !channel.isTextBased() ||
+      channel.isDMBased() ||
+      !author ||
+      author.bot ||
+      msg.system
+    ) {
+      return;
+    }
+    const rootChannel =
       channel.isThread() && channel.parent
-        ? (await channel.parent.fetch()).id
-        : channel.id;
+        ? await channel.parent.fetch()
+        : channel;
 
     emitEvent(message, {
       data: {
-        channel: channelId,
+        channel: rootChannel.id,
+        category: rootChannel.parentId ?? "0",
         messageLength: content?.length ?? 0,
         roles: member
           ? [...member.roles.cache.values()]
