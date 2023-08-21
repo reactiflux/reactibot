@@ -45,7 +45,9 @@ const promotionThread: ChannelHandlers = {
         } else {
           try {
             const { result, error } = await ogs({ url: firstLink });
-            console.log({ result, error });
+            if (error) {
+              console.log("[DEBUG] Erorr when fetching og tags: ", error);
+            }
             if (result.success) {
               if (result.ogSiteName === "Twitter") {
                 maybeTitle = `${msg.author.username} tweet`;

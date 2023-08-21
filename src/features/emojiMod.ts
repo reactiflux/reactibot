@@ -14,7 +14,6 @@ import {
   isStaffOrHelpful,
 } from "../helpers/discord";
 import { partition } from "../helpers/array";
-import { sleep } from "../helpers/misc";
 import { EMBED_COLOR } from "./commands";
 
 const config = {
@@ -40,19 +39,6 @@ type ReactionHandlers = {
 };
 
 export const reactionHandlers: ReactionHandlers = {
-  "⚠️": async ({ author, reactor, message }) => {
-    // Skip if the post is from someone from the staff, or if the reaction isn't
-    // from staff
-    if (isStaff(author) || !isStaff(reactor)) {
-      return;
-    }
-
-    const reply = await message.reply(
-      'This has been replaced by a "Track" command in the message command options! Right click the message instead.',
-    );
-    await sleep(10);
-    await reply.delete();
-  },
   "👎": async ({ message, reactor, usersWhoReacted }) => {
     if (cooldown.hasCooldown(reactor.id, "thumbsdown")) {
       return;
@@ -98,11 +84,15 @@ export const reactionHandlers: ReactionHandlers = {
 
     const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
 
-    const newThread = await message.startThread({
-      name: newThreadName,
-    });
+    const thread = message.hasThread
+      ? // This is safe because we're checking if it has a thread
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        message.thread!
+      : await message.startThread({
+          name: newThreadName,
+        });
 
-    await newThread.send({
+    await thread.send({
       embeds: [
         {
           title: "Please improve your question",
