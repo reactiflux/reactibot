@@ -88,7 +88,7 @@ const commandsList: Command[] = [
           {
             title: "Helpful links",
             type: EmbedType.Rich,
-            description: `Reactiflux's Mark Erikson has put together a curated list of useful React & Redux links for developers of all skill levels. Check out https://github.com/markerikson/react-redux-links`,
+            description: `Reactiflux's Mark Erikson has put together [a curated list of useful React & Redux links](https://github.com/markerikson/react-redux-links) for developers of all skill levels.`,
             color: EMBED_COLOR,
           },
         ],
