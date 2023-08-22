@@ -54,7 +54,7 @@ const commandsList: Command[] = [
           {
             title: "Code of Conduct",
             type: EmbedType.Rich,
-            description: `Reactiflux is the largest chat community of React developers. We make a deliberate effort to have a light touch when it comes to moderating, but we do have some expectations of how our members will behave. Please read the full Code of Conduct at https://www.reactiflux.com/conduct`,
+            description: `Reactiflux is the largest chat community of React developers. We make a deliberate effort to have a light touch when it comes to moderating, but we do have some expectations of how our members will behave. Please read the [full Reactiflux Code of Conduct](https://www.reactiflux.com/conduct)`,
             color: EMBED_COLOR,
           },
         ],
