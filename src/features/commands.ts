@@ -71,7 +71,7 @@ const commandsList: Command[] = [
           {
             title: "Self Promotion",
             type: EmbedType.Rich,
-            description: `Reactiflux is a peer group, not an advertising channel or a free audience. Please review our guidelines around self-promotion at https://www.reactiflux.com/promotion`,
+            description: `Reactiflux is a peer group, not an advertising channel or a free audience. Please review [our guidelines around self-promotion](https://www.reactiflux.com/promotion)`,
             color: EMBED_COLOR,
           },
         ],
