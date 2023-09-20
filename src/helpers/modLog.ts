@@ -160,7 +160,9 @@ ${reportedMessage}
 `;
 
     case ReportReasons.jobCircumvent:
-      return `${preface}, tried to circumvent job board rules by editing their message. The message has been removed.`;
+      return `${preface}, tried to circumvent job board rules by editing their message. The message has been removed:
+
+${reportedMessage}`;
     case ReportReasons.jobAge:
       return `${preface}, for hire post expired.`;
     case ReportReasons.jobFrequency:
