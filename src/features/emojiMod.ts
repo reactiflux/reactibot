@@ -4,11 +4,13 @@ import {
   GuildMember,
   Guild,
   EmbedType,
+  ChannelType,
 } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { ReportReasons, reportUser } from "../helpers/modLog";
+import { ReportReasons, reportUser, truncateMessage } from "../helpers/modLog";
 import {
+  createPrivateThreadFromMessage,
   fetchReactionMembers,
   isStaff,
   isStaffOrHelpful,
@@ -75,22 +77,18 @@ export const reactionHandlers: ReactionHandlers = {
 
     const staffOrHelpfulReactors = usersWhoReacted.filter(isStaffOrHelpful);
 
+    const { channel } = message;
     if (
       staffOrHelpfulReactors.length < STAFF_OR_HELPFUL_REACTOR_THRESHOLD ||
-      message.channel.isThread()
+      channel.type === ChannelType.PublicThread
     ) {
       return;
     }
 
-    const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
-
-    const thread = message.hasThread
-      ? // This is safe because we're checking if it has a thread
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        message.thread!
-      : await message.startThread({
-          name: newThreadName,
-        });
+    const thread = await createPrivateThreadFromMessage(message, {
+      name: `Sorry ${message.author.username}, your question needs some work`,
+      autoArchiveDuration: 60,
+    });
 
     await thread.send({
       embeds: [
@@ -110,6 +108,8 @@ https://zellwk.com/blog/asking-questions/
         },
       ],
     });
+    await thread.send("Your message:");
+    await thread.send(truncateMessage(message.content));
 
     await message.delete();
 
