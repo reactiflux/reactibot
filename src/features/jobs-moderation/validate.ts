@@ -3,7 +3,7 @@ import { differenceInHours } from "date-fns";
 
 import { getLastPostAge } from "./job-mod-helpers";
 
-import { simplifyString } from "../../helpers/string";
+import { countLines, simplifyString } from "../../helpers/string";
 import { extractEmoji } from "../../helpers/string";
 import { getCryptoCache, setCryptoCache } from "./job-mod-helpers";
 import { parseContent } from "./parse-content";
@@ -23,7 +23,6 @@ const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
 };
 export default validate;
 
-const NEWLINE = /\n/g;
 const GAP = /\n\s*\n\s*\n/g;
 export const formatting: JobPostValidator = (posts, message) => {
   // Handle missing tags;
@@ -59,7 +58,7 @@ export const formatting: JobPostValidator = (posts, message) => {
     if (emojiCount / post.description.length > 1 / 150) {
       errors.push({ type: POST_FAILURE_REASONS.tooManyEmojis });
     }
-    const lineCount = post.description.match(NEWLINE)?.length || 0;
+    const lineCount = countLines(post.description.trim());
     const maxLines = isForHire ? 8 : 18;
     if (lineCount > maxLines) {
       errors.push({
