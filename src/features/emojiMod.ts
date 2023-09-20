@@ -63,7 +63,7 @@ export const reactionHandlers: ReactionHandlers = {
     }
 
     const staffReactionCount = usersWhoReacted.filter(isStaff).length;
-    const [members, staff] = partition(isStaff, usersWhoReacted);
+    const [staff, members] = partition(isStaff, usersWhoReacted);
     const meetsDeletion = staffReactionCount >= config.deletionThreshold;
 
     if (meetsDeletion) {
