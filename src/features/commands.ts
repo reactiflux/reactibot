@@ -446,13 +446,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
           {
             title: "Understanding CORS",
             type: EmbedType.Rich,
-            description: `
-          Cross-Origin Resource Sharing (CORS) is a mechanism that lets remote servers restrict which origin (i.e your website) can access it.
+            description: `Cross-Origin Resource Sharing (CORS) is a mechanism that lets remote servers restrict which origin (i.e your website) can access it.
 
-          Read more at:
-          https://medium.com/@baphemot/understanding-cors-18ad6b478e2b
-          https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/
-          https://jakearchibald.com/2021/cors/
+Read more:
+- [BTM's "Understanding CORS"](https://medium.com/@baphemot/understanding-cors-18ad6b478e2b)
+- [A Guide to Cross-Origin Resource Sharing](https://auth0.com/blog/cors-tutorial-a-guide-to-cross-origin-resource-sharing/)
+- [How to win at CORS](https://jakearchibald.com/2021/cors/)
           `,
             color: EMBED_COLOR,
           },
@@ -471,12 +470,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             title: "Immutable updates",
             type: EmbedType.Rich,
             description: `Immutable updates involve modifying data by creating new, updated objects instead of modifying the original object directly.
-          You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
+You should not modify existing data directly in React or Redux, as mutating data can lead to bugs.
 
-          https://daveceddia.com/react-redux-immutability-guide/
-          https://react.dev/learn/updating-objects-in-state
-          https://react.dev/learn/updating-arrays-in-state
-          https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
+- [Immutability in React and Redux](https://daveceddia.com/react-redux-immutability-guide/)
+- [React Docs: Updating Objects in State](https://react.dev/learn/updating-objects-in-state)
+- [React Docs: Updating Arrays in State](https://react.dev/learn/updating-arrays-in-state)
+- [Redux Toolkit, Immutability and Redux](https://redux-toolkit.js.org/usage/immer-reducers#immutability-and-redux)
           `,
             color: EMBED_COLOR,
           },
@@ -496,12 +495,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             type: EmbedType.Rich,
             description: `Redux is still the most widely used state management tool for React, but it's important to always ask "what problems am I trying to solve?", and choose tools that solve those problems.  Redux, Context, React Query, and Apollo all solve different problems, with some overlap.
 
-          See these articles for advice on what Redux does and when it makes sense to use it:
+See these articles for advice on what Redux does and when it makes sense to use it:
 
-          https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/
-          https://blog.isquaredsoftware.com/2021/01/context-redux-differences/
-          https://changelog.com/posts/when-and-when-not-to-reach-for-redux
-          https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/
+[Redux - Not Dead Yet! (2018)](https://blog.isquaredsoftware.com/2018/03/redux-not-dead-yet/)
+[Why React Context is Not a "State Management" Tool](https://blog.isquaredsoftware.com/2021/01/context-redux-differences/)
+[When (and when not) to reach for Redux](https://changelog.com/posts/when-and-when-not-to-reach-for-redux)
+[Idiomatic Redux](https://blog.isquaredsoftware.com/2017/05/idiomatic-redux-tao-of-redux-part-1/)
           `,
             color: EMBED_COLOR,
           },
@@ -549,14 +548,14 @@ See these articles for more details on the differences:
             type: EmbedType.Rich,
             description: `There are several common misunderstandings about how React renders components. It's important to know that:
 
-          - React re-renders components recursively by default
-          - State updates must be immutable
-          - Updates are usually batched together
-          - Context updates always cause components to re-render
+- React re-renders components recursively by default
+- State updates must be immutable
+- Updates are usually batched together
+- Context updates always cause components to re-render
 
-          See this post for a detailed explanation of how React rendering actually works:
+See this post for a detailed explanation of how React rendering actually works:
 
-          https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
+https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/
           `,
             color: EMBED_COLOR,
           },
@@ -655,13 +654,13 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
             type: EmbedType.Rich,
             description: `The best resource for how to use TypeScript and React together is the React TypeScript CheatSheet. It has advice on how to type function components, hooks, event handlers, and much more:
 
-          https://react-typescript-cheatsheet.netlify.app/
+https://react-typescript-cheatsheet.netlify.app/
 
-          Also, we advise against using the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
-          \`function MyComp(props: MyCompProps) {}\`:
-          See this issue for details on why to avoid \`React.FC\`:
+Also, we advise against using the \`React.FC\` type for function components. Instead, declare the type of \`props\` directly, like:
+\`function MyComp(props: MyCompProps) {}\`:
+See this issue for details on why to avoid \`React.FC\`:
 
-          https://github.com/facebook/create-react-app/pull/8177
+https://github.com/facebook/create-react-app/pull/8177
           `,
             color: EMBED_COLOR,
           },
@@ -679,13 +678,9 @@ To integrate it into your editor: https://prettier.io/docs/en/editors.html`,
           {
             title: "Learning React",
             type: EmbedType.Rich,
-            description: `
-          The official React docs are the best resource for learning React:
-          https://react.dev
+            description: `The [official React docs](https://react.dev) are the best resource for learning React.
 
-          The Reactiflux "Learning Resources" page has curated links for learning JS, React, Redux, and TS:
-          https://www.reactiflux.com/learning
-          `,
+The [Reactiflux "Learning Resources" page](https://www.reactiflux.com/learning) has curated links for learning JS, React, Redux, and TS:`,
           },
         ],
       });
