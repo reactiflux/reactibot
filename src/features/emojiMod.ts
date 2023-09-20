@@ -98,9 +98,12 @@ export const reactionHandlers: ReactionHandlers = {
           description: `
 Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
 
-This is a good resource about asking good programming questions: 
+Zell Liew [wrote a great resource](https://zellwk.com/blog/asking-questions/) about asking good programming questions.
 
-https://zellwk.com/blog/asking-questions/
+- The onus is on the asker to craft a question that is easy to answer.
+- A good question is specific, clear, concise, and shows effort on the part of the asker.
+- Share just the relevant parts of the code, using tools like Codepen, CodeSandbox, or GitHub for better clarity.
+- Making a question specific and to the point is a sign of respecting the responder’s time, which increases the likelihood of getting a good answer.
 
 (this was triggered by crossing a threshold of "🔍" reactions on the original message)
           `,
