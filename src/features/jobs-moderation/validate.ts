@@ -63,7 +63,7 @@ export const formatting: JobPostValidator = (posts, message) => {
     if (lineCount > maxLines) {
       errors.push({
         type: POST_FAILURE_REASONS.tooManyLines,
-        overage: lineCount - maxLines,
+        overage: maxLines - lineCount,
       });
     }
     const maxChars = isForHire ? 350 : 1800;
