@@ -27,7 +27,7 @@ const ValidationMessages = {
   [POST_FAILURE_REASONS.tooLong]: (e: PostFailureTooLong) =>
     `Your post is too long, please shorten it by ${e.overage} characters.`,
   [POST_FAILURE_REASONS.tooManyLines]: (e: PostFailureTooManyLines) =>
-    `Your post has too many, please shorten it by ${e.overage} lines.`,
+    `Your post has too many lines, please shorten it by ${e.overage} lines.`,
   [POST_FAILURE_REASONS.tooManyGaps]:
     "Your post has too many spaces between lines, please make sure it’s either single spaced or double spaced.",
   [POST_FAILURE_REASONS.tooFrequent]: (e: PostFailureTooFrequent) =>

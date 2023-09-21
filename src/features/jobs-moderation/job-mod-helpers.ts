@@ -129,7 +129,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
         !m.message.system &&
         m.authorId !== bot.user?.id,
     );
-    const [forHire, hiring] = partition(
+    const [hiring, forHire] = partition(
       (m) => m.type === PostType.hiring,
       humanMessages,
     );

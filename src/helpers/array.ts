@@ -9,7 +9,7 @@
 export const partition = <Data>(predicate: (d: Data) => boolean, xs: Data[]) =>
   xs.reduce(
     (acc, cur) => {
-      acc[predicate(cur) ? 1 : 0].push(cur);
+      acc[predicate(cur) ? 0 : 1].push(cur);
       return acc;
     },
     [[], []] as [Data[], Data[]],

@@ -4,11 +4,13 @@ import {
   GuildMember,
   Guild,
   EmbedType,
+  ChannelType,
 } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
-import { ReportReasons, reportUser } from "../helpers/modLog";
+import { ReportReasons, reportUser, truncateMessage } from "../helpers/modLog";
 import {
+  createPrivateThreadFromMessage,
   fetchReactionMembers,
   isStaff,
   isStaffOrHelpful,
@@ -61,7 +63,7 @@ export const reactionHandlers: ReactionHandlers = {
     }
 
     const staffReactionCount = usersWhoReacted.filter(isStaff).length;
-    const [members, staff] = partition(isStaff, usersWhoReacted);
+    const [staff, members] = partition(isStaff, usersWhoReacted);
     const meetsDeletion = staffReactionCount >= config.deletionThreshold;
 
     if (meetsDeletion) {
@@ -75,22 +77,18 @@ export const reactionHandlers: ReactionHandlers = {
 
     const staffOrHelpfulReactors = usersWhoReacted.filter(isStaffOrHelpful);
 
+    const { channel } = message;
     if (
       staffOrHelpfulReactors.length < STAFF_OR_HELPFUL_REACTOR_THRESHOLD ||
-      message.channel.isThread()
+      channel.type === ChannelType.PublicThread
     ) {
       return;
     }
 
-    const newThreadName = `Sorry ${message.author.username}, your question needs some work`;
-
-    const thread = message.hasThread
-      ? // This is safe because we're checking if it has a thread
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        message.thread!
-      : await message.startThread({
-          name: newThreadName,
-        });
+    const thread = await createPrivateThreadFromMessage(message, {
+      name: `Sorry ${message.author.username}, your question needs some work`,
+      autoArchiveDuration: 60,
+    });
 
     await thread.send({
       embeds: [
@@ -100,9 +98,12 @@ export const reactionHandlers: ReactionHandlers = {
           description: `
 Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
 
-This is a good resource about asking good programming questions: 
+Zell Liew [wrote a great resource](https://zellwk.com/blog/asking-questions/) about asking good programming questions.
 
-https://zellwk.com/blog/asking-questions/
+- The onus is on the asker to craft a question that is easy to answer.
+- A good question is specific, clear, concise, and shows effort on the part of the asker.
+- Share just the relevant parts of the code, using tools like Codepen, CodeSandbox, or GitHub for better clarity.
+- Making a question specific and to the point is a sign of respecting the responder’s time, which increases the likelihood of getting a good answer.
 
 (this was triggered by crossing a threshold of "🔍" reactions on the original message)
           `,
@@ -110,6 +111,8 @@ https://zellwk.com/blog/asking-questions/
         },
       ],
     });
+    await thread.send("Your message:");
+    await thread.send(truncateMessage(message.content));
 
     await message.delete();
 

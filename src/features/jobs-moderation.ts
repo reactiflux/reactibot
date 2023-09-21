@@ -164,6 +164,10 @@ const jobModeration = async (bot: Client) => {
     }
     const message = await newMessage.fetch();
     const posts = parseContent(message.content);
+    // Don't validate hiring posts
+    if (posts.every((p) => p.tags.includes(PostType.hiring))) {
+      return;
+    }
     // You can't post too frequently when editing a message, so filter those out
     const errors = validate(posts, message).filter(
       (e) => e.type !== POST_FAILURE_REASONS.tooFrequent,

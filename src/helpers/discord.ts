@@ -14,6 +14,8 @@ import {
   APIApplicationCommand,
   APIApplicationCommandOption,
   ForumChannel,
+  ChannelType,
+  GuildTextThreadCreateOptions,
 } from "discord.js";
 import prettyBytes from "pretty-bytes";
 
@@ -61,6 +63,25 @@ export const fetchReactionMembers = (
   } catch (e) {
     return Promise.resolve([] as GuildMember[]);
   }
+};
+
+export const createPrivateThreadFromMessage = async (
+  msg: Message,
+  options: GuildTextThreadCreateOptions<ChannelType.PrivateThread>,
+) => {
+  options = { ...options, type: ChannelType.PrivateThread };
+  if (msg.channel.type === ChannelType.GuildText) {
+    return msg.channel.threads.create(options);
+  }
+  if (
+    msg.channel.type === ChannelType.PublicThread &&
+    msg.channel.parent?.type === ChannelType.GuildText
+  ) {
+    return msg.channel.parent.threads.create(options);
+  }
+  throw new Error(
+    `Could not create private thread from message. channel: ${msg.channel.id} type: ${msg.channel.type}`,
+  );
 };
 
 /*

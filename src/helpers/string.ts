@@ -13,3 +13,6 @@ export const simplifyString = (s: string) =>
     .replace(SPECIAL_CHARACTERS, "");
 
 export const extractEmoji = (s: string) => s.match(EMOJI_RANGE) || [];
+
+const NEWLINE = /\n/g;
+export const countLines = (s: string) => s.match(NEWLINE)?.length || 0;
