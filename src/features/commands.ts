@@ -169,9 +169,9 @@ console.log(state);
 where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
 
 Check out these resources for more information:
-https://react.dev/learn/queueing-a-series-of-state-updates
-https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
-https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
+- [React.dev: Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates)
+- [ReactJS.org: State Updates May Be Asynchronous](https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous)
+- [Blogged Answers: Render Batching and Timing](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing)`,
             color: EMBED_COLOR,
           },
         ],
