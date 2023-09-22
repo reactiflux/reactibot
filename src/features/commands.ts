@@ -265,9 +265,10 @@ Good:
 > I'm seeing an error, but I don't know if it's related.
 > \`Uncaught TypeError: undefined is not a function\`
 
-How to ask for programming help: http://wp.me/p2oIwo-26
-How do I ask a good question https://stackoverflow.com/help/how-to-ask
-How To Ask Questions The Smart Way https://git.io/JKscV
+Have a look at these resources on how to ask good questions:
+- [Coding Killed the Cat: "How to Ask for Programming Help"](http://wp.me/p2oIwo-26)
+- [Stack Overflow: "How do I ask a good question?"](https://stackoverflow.com/help/how-to-ask)
+- [Eric S. Raymond; "How To Ask Questions The Smart Way"](https://git.io/JKscV)
 `,
             color: EMBED_COLOR,
           },
