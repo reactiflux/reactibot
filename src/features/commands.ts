@@ -105,7 +105,7 @@ const commandsList: Command[] = [
           {
             title: "The XY Issue",
             type: EmbedType.Rich,
-            description: `You may be experiencing an XY problem: http://xyproblem.info/ .  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
+            description: `You may be experiencing an [XY problem](http://xyproblem.info/). Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
             color: EMBED_COLOR,
           },
         ],
@@ -122,9 +122,9 @@ const commandsList: Command[] = [
           {
             title: "You Might Not Need Redux",
             type: EmbedType.Rich,
-            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
+            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?"
 
-https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
+Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367)`,
             color: EMBED_COLOR,
           },
         ],
@@ -142,9 +142,7 @@ https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
             title:
               "You might not need getDerivedStateFrom props or state at all!",
             type: EmbedType.Rich,
-            description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed:
-
-https://legacy.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html`,
+            description: `Copying data from React props to component state is usually not necessary, and should generally be avoided. The React team offered advice on when "derived state" may actually be needed in their [article "You Probably Don't Need Derived State"](https://legacy.reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html)`,
             color: EMBED_COLOR,
           },
         ],
@@ -171,9 +169,9 @@ console.log(state);
 where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
 
 Check out these resources for more information:
-https://react.dev/learn/queueing-a-series-of-state-updates
-https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
-https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing`,
+- [React.dev: Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates)
+- [ReactJS.org: State Updates May Be Asynchronous](https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous)
+- [Blogged Answers: Render Batching and Timing](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing)`,
             color: EMBED_COLOR,
           },
         ],
@@ -218,7 +216,7 @@ handleClick = () => {
 }
 \`\`\`
 
-Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/ for more informations`,
+Check out [this article on "Why and how to bind methods in your React component classes?"](https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/) for more information.`,
             color: EMBED_COLOR,
           },
         ],
@@ -235,9 +233,9 @@ Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-re
           {
             title: "Lifting State Up",
             type: EmbedType.Rich,
-            description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. Let’s see how this works in action.
+            description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. 
 
-https://react.dev/learn/sharing-state-between-components`,
+Learn more about lifting state in the [React.dev article about "Sharing State Between Components"](https://react.dev/learn/sharing-state-between-components).`,
             color: EMBED_COLOR,
           },
         ],
@@ -267,9 +265,10 @@ Good:
 > I'm seeing an error, but I don't know if it's related.
 > \`Uncaught TypeError: undefined is not a function\`
 
-How to ask for programming help: http://wp.me/p2oIwo-26
-How do I ask a good question https://stackoverflow.com/help/how-to-ask
-How To Ask Questions The Smart Way https://git.io/JKscV
+Have a look at these resources on how to ask good questions:
+- [Coding Killed the Cat: "How to Ask for Programming Help"](http://wp.me/p2oIwo-26)
+- [Stack Overflow: "How do I ask a good question?"](https://stackoverflow.com/help/how-to-ask)
+- [Eric S. Raymond; "How To Ask Questions The Smart Way"](https://git.io/JKscV)
 `,
             color: EMBED_COLOR,
           },
