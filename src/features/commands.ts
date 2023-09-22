@@ -105,7 +105,7 @@ const commandsList: Command[] = [
           {
             title: "The XY Issue",
             type: EmbedType.Rich,
-            description: `You may be experiencing an [XY problem](http://xyproblem.info/).  Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
+            description: `You may be experiencing an [XY problem](http://xyproblem.info/). Try to explain your end goal, instead of the error you got stuck on. Maybe there's a better way to approach the problem.`,
             color: EMBED_COLOR,
           },
         ],
