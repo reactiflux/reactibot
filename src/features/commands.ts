@@ -216,7 +216,7 @@ handleClick = () => {
 }
 \`\`\`
 
-Check out https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/ for more informations`,
+Check out [this article on "Why and how to bind methods in your React component classes?"](https://reactkungfu.com/2015/07/why-and-how-to-bind-methods-in-your-react-component-classes/) for more information.`,
             color: EMBED_COLOR,
           },
         ],
