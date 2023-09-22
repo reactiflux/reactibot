@@ -122,9 +122,9 @@ const commandsList: Command[] = [
           {
             title: "You Might Not Need Redux",
             type: EmbedType.Rich,
-            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?
+            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?"
 
-https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367`,
+Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367)`,
             color: EMBED_COLOR,
           },
         ],
