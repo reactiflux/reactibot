@@ -66,7 +66,7 @@ Moderators may remove posts at any time, with or without warning. Repeat violato
     },
   },
   {
-    postTo: [{ interval: FREQUENCY.often, channelId: CHANNELS.helpJs }],
+    postTo: [{ interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.helpJs }],
     message: {
       content: `This channel is good for specific questions about syntax, debugging a small (< ~50 lines of code) snippet of JS, without React involved. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
 
