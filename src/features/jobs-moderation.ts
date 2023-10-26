@@ -120,8 +120,8 @@ const jobModeration = async (bot: Client) => {
     // If this is an existing enforcement thread, process the through a "REPL"
     // that lets people test messages against the rules
     if (
-      message.channelId === CHANNELS.jobBoard &&
-      channel.type === ChannelType.PrivateThread
+      channel.type === ChannelType.PrivateThread &&
+      channel.parentId === CHANNELS.jobBoard
     ) {
       validationRepl(message);
       return;
