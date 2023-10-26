@@ -12,7 +12,7 @@ import {
   Snowflake,
   TextChannel,
 } from "discord.js";
-import { constructDiscordLink } from "../../helpers/discord";
+import { constructDiscordLink, isStaff } from "../../helpers/discord";
 import { partition } from "../../helpers/array";
 import { ReportReasons, reportUser } from "../../helpers/modLog";
 import { parseContent } from "./parse-content";
@@ -171,6 +171,9 @@ export const deleteAgedPosts = async () => {
             message,
           )}' not deletable`,
         );
+        return;
+      }
+      if (isStaff(message.member)) {
         return;
       }
       trackModeratedMessage(message);
