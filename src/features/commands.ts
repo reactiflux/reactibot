@@ -851,6 +851,27 @@ https://remotive.io/remote-jobs/software-dev
     },
   },
   {
+    words: ["!junior", "!jobmarket"],
+    help: "provides resources for the remote work job search",
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "It's a rough market",
+            type: EmbedType.Rich,
+            description: `The job market right now sucks for folks just starting out, but it's never been easy for folks to get their first job. There are always ways in, but right now there are fewer and there's more competition. Layoffs mean that there are more experienced people job hunting than there have been in years.
+
+The experienced members of the server don't have experience with navigating a market like this as a newer developer, which limits our ability to give help. If you find something that works for you, please share it! That information helps us give better answers to the next person who asks.
+
+Remote work has the most competition, and thus is likely to be more difficult to land a role. We generally recommend going local, networking at meetups or conferences that you can find.`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!keys`],
     help: `Explains the importance of keys when rendering lists in React`,
     category: "React/Redux",
