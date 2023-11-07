@@ -574,7 +574,7 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
               "Is JWT the right approach for my application's authentication?",
             type: EmbedType.Rich,
             description: `
-Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Session have been used for decades, with a lot of back end frameworks supporting them out of the box.
+Most of the time, JWTs aren't the best approach for working with backend authentication, despite the multitude of tutorials that use JWT. Sessions have been used for decades, with a lot of back end frameworks supporting them out of the box.
 
 That said there are also scenarios when using a JWT token is the best approach:
 
