@@ -36,7 +36,7 @@ export const reviewResume = {
   command: new SlashCommandBuilder()
     .setName("review-resume")
     .setDescription(
-      "Provides one-shot AI guidance on resumes posted to #resume-review",
+      "BETA — AI may not be accurate. Use will upload a PDF resume to OpenAI systems temporarily.",
     ),
 
   handler: async (interaction: CommandInteraction) => {
