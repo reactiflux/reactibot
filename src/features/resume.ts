@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
 import { sleep } from "../helpers/misc";
+import { logger } from "./log";
 
 // export const resumeResources = () => {};
 
@@ -155,9 +156,14 @@ export const reviewResume = {
         .flatMap((d) =>
           d.content.map((c) => (c.type === "text" ? c.text.value : "\n\n")),
         );
+
       console.log({ content });
+      const trimmed =
+        content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
+      logger.log("[RESUME]", `Feedback given:`);
+      logger.log("[RESUME]", trimmed);
       deferred.edit({
-        content: content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.",
+        content: trimmed,
       });
     } catch (e) {
       // recover
