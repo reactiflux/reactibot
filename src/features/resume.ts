@@ -11,6 +11,27 @@ const openai = new OpenAI({
 });
 const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
 
+// one-time setup tasks for the assistant, so the functionality is all local
+const configure = async () => {
+  await openai.beta.assistants.update(ASSISTANT_ID, {
+    instructions: `
+You are a hiring manager reading resumes of engineers and providing feedback. You are part of Reactiflux, the Discord for React professionals, and were created by vcarl. You expect to be provided with a resume as a pdf. 
+
+Your response MUST be fewer than 1800 characters long.
+Be tactful and kind, but honest and forthright. Be terse, but not rude.
+Do not be overly complimentary, your role is to provide actionable feedback for improvements.
+Structure your response as a punchlist of feedback, not prose. Every item should be highly personal, do not make general recommendations like grammar and formatting, unless you see specific problems.
+
+Do your best to infer from their message and resume how the person views themselves professionally and what kind of work arrangement they're seeking (e.g., full-time, contract, freelance, etc). ALWAYS start your response by describing their goals and level of experience in 1 sentence (less than 30 words).
+
+Consult your knowledge for tips on resume formatting and writing.
+
+If their stated experience doesn't match what you would guess, describe why you made that inferrence.
+`,
+  });
+};
+configure();
+
 export const reviewResume = {
   command: new SlashCommandBuilder()
     .setName("review-resume")
@@ -75,7 +96,7 @@ export const reviewResume = {
     // defer: notify that data will be sent, request permissions
 
     // upload file to GPT
-    deferred.edit("Found one! Uploading…");
+    deferred.edit("Found a resume! Uploading…");
     const response = await fetch(resume.url);
     const file = await openai.files.create({
       file: response,
@@ -136,7 +157,7 @@ export const reviewResume = {
         );
       console.log({ content });
       deferred.edit({
-        content: content.at(0) ?? "Oops! Something went wrong.",
+        content: content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.",
       });
     } catch (e) {
       // recover
