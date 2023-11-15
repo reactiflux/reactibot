@@ -48,3 +48,8 @@ spec:
                 secretKeyRef:
                   name: reactibot-env
                   key: GUILD_ID
+            - name: OPENAI_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: OPENAI_KEY

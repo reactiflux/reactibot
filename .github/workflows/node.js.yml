@@ -90,4 +90,5 @@ jobs:
             --from-literal=GUILD_ID=${{ secrets.GUILD_ID }} \
             --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
             --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} || echo \n
+            --from-literal=OPENAI_KEY=${{ secrets.OPENAI_KEY }} || echo \n
           kubectl apply -k .
