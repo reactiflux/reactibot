@@ -565,7 +565,7 @@ https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guid
   {
     words: [`!jwt`],
     help: `Describes reasoning for and against the use of JWT tokens againt using standard sessions`,
-    category: "Reactiflux",
+    category: "Web",
     handleMessage: (msg) => {
       msg.channel.send({
         embeds: [
