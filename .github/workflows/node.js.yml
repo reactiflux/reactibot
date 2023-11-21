@@ -80,6 +80,8 @@ jobs:
           clusterName: k8s-rf
 
       - name: Deploy app
+        # `|| echo \n` is to allow each of these steps to return non-zero exits
+        # I don't remember why that was valuable but I'm afraid to remove it
         run: |
           kubectl diff -k . || echo \n
           kubectl delete secret reactibot-env || echo \n
@@ -89,6 +91,7 @@ jobs:
             --from-literal=DISCORD_APP_ID=${{ secrets.DISCORD_APP_ID }} \
             --from-literal=GUILD_ID=${{ secrets.GUILD_ID }} \
             --from-literal=GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
-            --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} || echo \n
-            --from-literal=OPENAI_KEY=${{ secrets.OPENAI_KEY }} || echo \n
+            --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} \
+            --from-literal=OPENAI_KEY=${{ secrets.OPENAI_KEY }} \
+            || echo \n
           kubectl apply -k .
