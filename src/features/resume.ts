@@ -97,12 +97,20 @@ export const reviewResume = {
     // defer: notify that data will be sent, request permissions
 
     // upload file to GPT
-    deferred.edit("Found a resume! Uploading…");
+    deferred.edit("Found a resume! Downloading…");
     const response = await fetch(resume.url);
-    const file = await openai.files.create({
-      file: response,
-      purpose: "assistants",
-    });
+    deferred.edit("Found a resume! Uploading…");
+    const file = await openai.files
+      .create({
+        file: response,
+        purpose: "assistants",
+      })
+      .catch((e) => {
+        deferred.edit(
+          "Oops, something went wrong. [Is it an outage?(https://status.openai.com/)",
+        );
+        throw e;
+      });
     if (!response.ok || file.status === "error") {
       return await deferred.edit({
         content: "Failed to upload resume, sorry! Please try again later.",
@@ -159,9 +167,9 @@ export const reviewResume = {
 
       console.log({ content });
       const trimmed =
-        content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
+        content.at(0)?.slice(0, 1995) ?? "Oops! Something went wrong.";
       logger.log("[RESUME]", `Feedback given:`);
-      logger.log("[RESUME]", trimmed);
+      logger.log("", trimmed);
       deferred.edit({
         content: trimmed,
       });
