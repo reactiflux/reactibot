@@ -16,6 +16,7 @@ import {
   failedInconsistentType,
   failedTooLong,
   failedTooManyGaps,
+  failedLinkRequired,
 } from "./job-mod-helpers";
 
 const ValidationMessages = {
@@ -26,6 +27,7 @@ const ValidationMessages = {
   [POST_FAILURE_REASONS.tooManyEmojis]: "Your post has too many emojis.",
   [POST_FAILURE_REASONS.tooLong]: (e: PostFailureTooLong) =>
     `Your post is too long, please shorten it by ${e.overage} characters.`,
+  [POST_FAILURE_REASONS.linkRequired]: `Hiring posts must include a link, either to the company website or a page to apply for the job. Make sure it includes \`https://\` so Discord makes it clickable.`,
   [POST_FAILURE_REASONS.tooManyLines]: (e: PostFailureTooManyLines) =>
     `Your post has too many lines, please shorten it by ${e.overage} lines.`,
   [POST_FAILURE_REASONS.tooManyGaps]:
@@ -55,6 +57,9 @@ export const getValidationMessage = (reason: PostFailures): string => {
   }
   if (failedTooLong(reason)) {
     return ValidationMessages[reason.type](reason);
+  }
+  if (failedLinkRequired(reason)) {
+    return ValidationMessages[reason.type];
   }
   if (failedTooManyLines(reason)) {
     return ValidationMessages[reason.type](reason);

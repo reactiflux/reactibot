@@ -19,6 +19,7 @@ const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   errors.push(...participation(posts, message));
   errors.push(...web3(posts, message));
   errors.push(...formatting(posts, message));
+  errors.push(...links(posts, message));
   return errors;
 };
 export default validate;
@@ -144,4 +145,20 @@ export const participation: JobPostValidator = (posts, message) => {
     return [{ type: POST_FAILURE_REASONS.tooFrequent, lastSent }];
   }
   return [];
+};
+
+const urlRegex = /(https):\/\/[^\s/$.?#].[^\s]*/g;
+export const links: JobPostValidator<false> = (posts) => {
+  const errors: PostFailures[] = [];
+  posts.forEach(({ tags, description }) => {
+    if (!tags.includes(PostType.hiring)) {
+      return;
+    }
+    const urls = description.match(urlRegex);
+    if (!urls) {
+      errors.push({ type: POST_FAILURE_REASONS.linkRequired });
+    }
+  });
+
+  return errors;
 };

@@ -23,6 +23,7 @@ export const enum POST_FAILURE_REASONS {
   inconsistentType = "inconsistentType",
   tooManyEmojis = "tooManyEmojis",
   tooLong = "tooLong",
+  linkRequired = "linkRequired",
   tooManyLines = "tooManyLines",
   tooManyGaps = "tooManyGaps",
   tooFrequent = "tooFrequent",
@@ -51,6 +52,9 @@ export interface PostFailureTooLong {
   type: POST_FAILURE_REASONS.tooLong;
   overage: number;
 }
+export interface PostFailureLinkRequired {
+  type: POST_FAILURE_REASONS.linkRequired;
+}
 export interface PostFailureTooManyGaps {
   type: POST_FAILURE_REASONS.tooManyGaps;
 }
@@ -78,6 +82,7 @@ export type PostFailures =
   | PostFailureInconsistentType
   | PostFailureTooFrequent
   | PostFailureReplyOrMention
+  | PostFailureLinkRequired
   | PostFailureTooLong
   | PostFailureTooManyLines
   | PostFailureTooManyGaps
