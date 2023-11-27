@@ -11,9 +11,11 @@ export enum PostType {
   forHire = "forhire",
 }
 
-export type JobPostValidator = (
+export type JobPostValidator<WithMessage = true> = (
   posts: Post[],
-  message: Message<boolean>,
+  message: WithMessage extends true
+    ? Message<boolean>
+    : Message<boolean> | undefined,
 ) => PostFailures[];
 
 export const enum POST_FAILURE_REASONS {
