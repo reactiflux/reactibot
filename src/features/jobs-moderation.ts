@@ -176,7 +176,7 @@ const jobModeration = async (bot: Client) => {
     if (errors) {
       if (posts.some((p) => p.tags.includes(PostType.forHire))) {
         reportUser({ reason: ReportReasons.jobCircumvent, message });
-        await newMessage.delete();
+        // await newMessage.delete();
       } else {
         await handleErrors(channel, message, errors);
       }
