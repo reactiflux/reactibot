@@ -176,7 +176,7 @@ const jobModeration = async (bot: Client) => {
     if (errors) {
       if (posts.some((p) => p.tags.includes(PostType.forHire))) {
         reportUser({ reason: ReportReasons.jobCircumvent, message });
-        await newMessage.delete();
+        // await newMessage.delete();
       } else {
         await handleErrors(channel, message, errors);
       }
@@ -276,15 +276,14 @@ ${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
     await thread.send({
       content: `Hey <@${
         message.author.id
-      }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules.
+      }>, your message does not meet our requirements to be posted to the board. This thread acts as a REPL where you can test out new posts against our validation rules. It was removed for these reasons:
 
-You can view our guidance for job posts here: <https://www.reactiflux.com/promotion#job-board>. It was removed for these reasons:
+${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}
 
-${errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")}`,
+View our [guidance for job posts](<https://www.reactiflux.com/promotion#job-board>).`,
       embeds: [
         {
-          title: "Job Board Rules",
-          description: `Here's an example of a valid post:
+          description: `Here's an example of a good HIRING post:
 \`\`\`
 HIRING | REMOTE | FULL-TIME
 

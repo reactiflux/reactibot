@@ -8,6 +8,9 @@ console.log("Running as", isProd() ? "PRODUCTION" : "TEST", "environment");
 
 let ok = true;
 const getEnv = (key: string, optional = false) => {
+  if (process.env.VITEST) {
+    return "dummystring";
+  }
   const value = process.env[key];
   if (!value && !optional) {
     console.log(`Add a ${key} value to .env`);

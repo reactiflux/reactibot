@@ -30,6 +30,7 @@ import {
   PostFailureWeb3Poster,
   PostFailures,
   PostType,
+  PostFailureLinkRequired,
 } from "../../types/jobs-moderation";
 
 export class RuleViolation extends Error {
@@ -56,6 +57,9 @@ export const failedReplyOrMention = (
   e.type === POST_FAILURE_REASONS.replyOrMention;
 export const failedTooLong = (e: PostFailures): e is PostFailureTooLong =>
   e.type === POST_FAILURE_REASONS.tooLong;
+export const failedLinkRequired = (
+  e: PostFailures,
+): e is PostFailureLinkRequired => e.type === POST_FAILURE_REASONS.linkRequired;
 export const failedTooManyLines = (
   e: PostFailures,
 ): e is PostFailureTooManyLines => e.type === POST_FAILURE_REASONS.tooManyLines;
@@ -139,7 +143,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
 };
 
 const POST_INTERVAL = 7;
-const FORHIRE_AGE_LIMIT = 1.25 * 24;
+const FORHIRE_AGE_LIMIT = 1.25 * 48;
 
 export const deleteAgedPosts = async () => {
   // Delete all `forhire` messages that are older than the age limit
