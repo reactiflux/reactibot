@@ -902,7 +902,6 @@ https://kentcdodds.com/blog/understanding-reacts-key-prop
     help: "Provides a list of popular backend- and meta-frameworks",
     category: "Web",
     handleMessage: (msg) => {
-      //
       msg.channel.send({
         embeds: [
           {
