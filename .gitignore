@@ -6,3 +6,4 @@ dist
 yarn.lock
 *.log
 k8s-context
+pnpm-lock.yaml
