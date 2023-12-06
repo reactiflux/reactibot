@@ -904,7 +904,54 @@ https://kentcdodds.com/blog/understanding-reacts-key-prop
     handleMessage: (msg) => {
       //
       msg.channel.send({
-        embeds: {},
+        embeds: [
+          {
+            title: "UI Development Libraries & Tools (React)",
+            type: EmbedType.Rich,
+            description: `User interfaces can be a tricky thing to get right, luckily there are a lot of tools out there to help you out. Here are some of the popular ones:
+_ _
+_ _
+`,
+            fields: [
+              {
+                name: "Libraries",
+                value: `
+- [Radix UI](https://www.radix-ui.com/)
+- [Mantine](https://mantine.dev/)
+- [NextUI](https://nextui.org/)
+- [Chakra UI](https://chakra-ui.com/)
+- [React Bootstrap](https://react-bootstrap.netlify.app/)
+`,
+                inline: true,
+              },
+              {
+                name: "_ _",
+                value: `
+- [Headless UI](https://headlessui.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Material UI](https://mui.com/)
+- [Ant Design](https://ant.design/)
+- [Flowbite](https://flowbite.com/)
+                `,
+                inline: true,
+              },
+              {
+                name: "Tools",
+                value: `
+- [Tailwind CSS](https://tailwindcss.com/)
+- [UnoCSS](https://unocss.dev/)
+- [Storybook](https://storybook.js.org/)
+- [Sass](https://sass-lang.com/)
+- [Styled-components](https://styled-components.com/)
+- [Vanilla-extract](https://vanilla-extract.style/)
+- [Stitches](https://stitches.dev/)
+                `,
+                inline: true,
+              },
+            ],
+            color: EMBED_COLOR,
+          },
+        ],
       });
     },
   },
