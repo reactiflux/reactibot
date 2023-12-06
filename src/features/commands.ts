@@ -944,7 +944,7 @@ _ _
 - [Sass](https://sass-lang.com/)
 - [Styled-components](https://styled-components.com/)
 - [Vanilla-extract](https://vanilla-extract.style/)
-- [Stitches](https://stitches.dev/)
+- [Panda CSS](https://panda-css.com/)
                 `,
                 inline: true,
               },
