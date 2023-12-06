@@ -897,6 +897,102 @@ https://kentcdodds.com/blog/understanding-reacts-key-prop
       });
     },
   },
+  {
+    words: ["!frameworks", "!framework"],
+    help: "Provides a list of popular backend- and meta-frameworks",
+    category: "Web",
+    handleMessage: (msg) => {
+      //
+      msg.channel.send({
+        embeds: [
+          {
+            title: "",
+            type: EmbedType.Rich,
+            description: `
+Making a choice of which framework to use is a difficult one and there are many options to choose from. Below are four lists of both frontend- and backend-frameworks including meta-frameworks, last but not least is a list of popular non-js http libraries.
+_ _
+_ _
+            `,
+            fields: [
+              {
+                name: "Frontend Frameworks",
+                value: `
+- [React](https://react.dev/)
+- [Svelte](https://svelte.dev/)
+- [Solid](https://www.solidjs.com/)
+- [Vue](https://vuejs.org/)
+- [Angular](https://angular.io/)
+- [Qwik](https://qwik.builder.io/)
+- [Lume](https://lume.land/)
+                                `,
+                inline: true,
+              },
+              {
+                name: "Backend Frameworks",
+                value: `
+- [Express](https://expressjs.com/)
+- [Koa](https://koajs.com/)
+- [Fastify](https://www.fastify.io/)
+- [Elysia.js](https://elysiajs.com/)
+- [Hono](https://hono.dev/)
+- [NestJS](https://nestjs.com/)
+- [Oak](https://deno.land/x/oak)
+- [Feathers](https://feathersjs.com/)
+- [AdonisJS](https://adonisjs.com/)
+- [Sails](https://sailsjs.com/)
+                                `,
+                inline: true,
+              },
+              {
+                name: "Meta Frameworks",
+                value: `
+- [Next.js](https://nextjs.org/)
+- [Remix](https://remix.run/)                
+- [Astro](https://astro.build/)
+- [SvelteKit](https://kit.svelte.dev/)
+- [Nuxt](https://nuxtjs.org/)
+- [Fresh](https://fresh.deno.dev/)
+- [Blitz](https://blitzjs.com/)
+                `,
+                inline: true,
+              },
+              {
+                name: "Other http frameworks",
+                value: `
+- [.NET](https://dotnet.microsoft.com/en-us/)
+- [Rocket](https://rocket.rs/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Spring Boot](https://spring.io/projects/spring-boot)
+                `,
+                inline: true,
+              },
+              {
+                name: "_ _",
+                value: `
+- [Laravel](https://laravel.com/)
+- [Actix](https://actix.rs/)
+- [Flask](https://flask.palletsprojects.com/en/3.0.x/)
+- [Gin](https://gin-gonic.com/)
+                `,
+                inline: true,
+              },
+              {
+                name: "_ _",
+                value: `
+- [Django](https://www.djangoproject.com/)
+- [Axum](https://github.com/tokio-rs/axum)
+- [Ruby on Rails](https://rubyonrails.org/)
+- [Fiber](https://gofiber.io/)
+                `,
+                inline: true,
+              },
+            ],
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
