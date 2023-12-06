@@ -897,6 +897,17 @@ https://kentcdodds.com/blog/understanding-reacts-key-prop
       });
     },
   },
+  {
+    words: ["!ui"],
+    category: "Web",
+    help: `A list of popular tools related to UI development`,
+    handleMessage: (msg) => {
+      //
+      msg.channel.send({
+        embeds: {},
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
