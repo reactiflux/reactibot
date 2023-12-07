@@ -95,18 +95,29 @@ const stats = (client: Client) => {
   });
   client.on("messageReactionAdd", async (reaction, user) => {
     const { message, emoji } = reaction;
-    const { channel } = message;
+    const { author, channel } = message;
+    if (
+      !channel ||
+      !channel.isTextBased() ||
+      channel.isDMBased() ||
+      !author ||
+      author.bot ||
+      message.system
+    ) {
+      return;
+    }
 
     if (!channel || !emoji || !user || user.bot) return;
 
-    const channelId =
+    const rootChannel =
       channel.isThread() && channel.parent
-        ? (await channel.parent.fetch()).id
-        : channel.id;
+        ? await channel.parent.fetch()
+        : channel;
 
     emitEvent(reacted, {
       data: {
-        channel: channelId,
+        channel: rootChannel.id,
+        category: rootChannel.parentId ?? "0",
         emoji: emoji.toString() ?? "n/a",
         target: message.author?.id ?? "0",
       },
