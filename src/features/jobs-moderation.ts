@@ -122,6 +122,7 @@ const jobModeration = async (bot: Client) => {
     // that lets people test messages against the rules
     if (
       channel.type === ChannelType.PrivateThread &&
+      channel.ownerId === bot.user?.id &&
       channel.parentId === CHANNELS.jobBoard
     ) {
       validationRepl(message);
