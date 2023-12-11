@@ -37,7 +37,7 @@ const voiceActivity: ChannelHandlers = {
 
       messages.push(`<@${member.id}> joined <#${channel.id}>.`);
     } else if (diffInPartipants <= 0) {
-      channel = oldState.channel
+      channel = oldState.channel;
       if (!channel) return;
 
       voiceChannelJoinTimestamps[channel.id] ??= {};
@@ -56,10 +56,7 @@ const voiceActivity: ChannelHandlers = {
       const members = channel.members
         .map(
           (member) =>
-            `<@${member.id}> (${getTimeInChannel(
-              channel,
-              member.id,
-            )} minutes)`,
+            `<@${member.id}> (${getTimeInChannel(channel, member.id)} minutes)`,
         )
         .join(", ");
       messages.push(`Members in <#${channel.id}>: ${members}`);
