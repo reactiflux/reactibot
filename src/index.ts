@@ -177,13 +177,21 @@ const handleVoiceStateUpdate = (
     channelHandlers.handleVoiceStateChange?.({ oldState, newState, bot });
   });
 };
+
+initCachedChannels(bot);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
 // Amplitude metrics
 setupStats(bot);
 
 // common
-addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener, voiceActivity]);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  tsPlaygroundLinkShortener,
+  voiceActivity,
+]);
 
 addHandler(
   [
