@@ -27,6 +27,7 @@ import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
+import voiceActivity from "./features/voice-activity";
 
 export const bot = new discord.Client({
   intents: [
@@ -35,6 +36,7 @@ export const bot = new discord.Client({
     IntentsBitField.Flags.GuildEmojisAndStickers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
+    IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
@@ -155,6 +157,27 @@ const handleReaction = (
   });
 };
 
+const handleVoiceStateUpdate = (
+  oldState: discord.VoiceState,
+  newState: discord.VoiceState,
+) => {
+  const channel = newState.channel || oldState.channel;
+  if (!channel) return;
+
+  const channelId = channel.id;
+  const handlers = channelHandlersById[channelId];
+
+  if (handlers) {
+    handlers.forEach((channelHandlers) => {
+      channelHandlers.handleVoiceStateChange?.({ oldState, newState, bot });
+    });
+  }
+
+  channelHandlersById["*"].forEach((channelHandlers) => {
+    channelHandlers.handleVoiceStateChange?.({ oldState, newState, bot });
+  });
+};
+
 initCachedChannels(bot);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
@@ -162,7 +185,13 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 setupStats(bot);
 
 // common
-addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  tsPlaygroundLinkShortener,
+  voiceActivity,
+]);
 
 addHandler(
   [
@@ -187,6 +216,8 @@ bot.on("ready", () => {
 });
 
 bot.on("messageReactionAdd", handleReaction);
+
+bot.on("voiceStateUpdate", handleVoiceStateUpdate);
 
 bot.on("threadCreate", (thread) => {
   thread.join();
