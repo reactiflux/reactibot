@@ -162,7 +162,6 @@ const handleVoiceStateUpdate = (
   newState: discord.VoiceState,
 ) => {
   const channel = newState.channel || oldState.channel;
-  console.log(channel)
   if (!channel) return;
 
   const channelId = channel.id;
