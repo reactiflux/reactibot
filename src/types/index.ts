@@ -6,6 +6,7 @@ import {
   PartialMessageReaction,
   PartialUser,
   PartialMessage,
+  VoiceState,
 } from "discord.js";
 
 type CommonArgs = {
@@ -21,7 +22,13 @@ export type HandleReactionArgs = CommonArgs & {
   user: User | PartialUser;
 };
 
+export type HandleVoiceStateChangeArgs = CommonArgs & {
+  oldState: VoiceState;
+  newState: VoiceState;
+};
+
 export type ChannelHandlers = {
   handleMessage?: (obj: HandleMessageArgs) => void;
   handleReaction?: (obj: HandleReactionArgs) => void;
+  handleVoiceStateChange?: (obj: HandleVoiceStateChangeArgs) => void;
 };
