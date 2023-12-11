@@ -112,6 +112,7 @@ const jobModeration = async (bot: Client) => {
     const { channel } = message;
     if (
       message.author.bot ||
+      message.channelId !== CHANNELS.jobBoard ||
       // Don't treat newly fetched old messages as new posts
       differenceInHours(new Date(), message.createdAt) >= 1
     ) {
@@ -121,17 +122,14 @@ const jobModeration = async (bot: Client) => {
     // that lets people test messages against the rules
     if (
       channel.type === ChannelType.PrivateThread &&
+      channel.ownerId === bot.user?.id &&
       channel.parentId === CHANNELS.jobBoard
     ) {
       validationRepl(message);
       return;
     }
     // If this is a staff member, bail early
-    if (
-      message.channelId !== CHANNELS.jobBoard ||
-      channel.type !== ChannelType.GuildText ||
-      isStaff(message.member)
-    ) {
+    if (channel.type !== ChannelType.GuildText || isStaff(message.member)) {
       return;
     }
     const posts = parseContent(message.content);
