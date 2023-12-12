@@ -17,7 +17,7 @@ export const channelLog =
       const channel = await client.channels.fetch(channelId);
 
       if (channel?.type == ChannelType.GuildText) {
-        channel.send(`[${type}] ${text}`);
+        channel.send({content:`[${type}] ${text}`, allowedMentions: {users: []}});
       }
     } catch (error) {
       console.error(error);
