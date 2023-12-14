@@ -19,6 +19,7 @@ import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import promotionThread from "./features/promotion-threads";
 import autothread, { cleanupThreads } from "./features/autothread";
+import voiceActivity from "./features/voice-activity";
 
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
@@ -27,7 +28,6 @@ import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
-import voiceActivity from "./features/voice-activity";
 
 export const bot = new discord.Client({
   intents: [
@@ -157,27 +157,6 @@ const handleReaction = (
   });
 };
 
-const handleVoiceStateUpdate = (
-  oldState: discord.VoiceState,
-  newState: discord.VoiceState,
-) => {
-  const channel = newState.channel || oldState.channel;
-  if (!channel) return;
-
-  const channelId = channel.id;
-  const handlers = channelHandlersById[channelId];
-
-  if (handlers) {
-    handlers.forEach((channelHandlers) => {
-      channelHandlers.handleVoiceStateChange?.({ oldState, newState, bot });
-    });
-  }
-
-  channelHandlersById["*"].forEach((channelHandlers) => {
-    channelHandlers.handleVoiceStateChange?.({ oldState, newState, bot });
-  });
-};
-
 initCachedChannels(bot);
 logger.add(channelLog(bot, CHANNELS.botLog));
 
@@ -190,7 +169,6 @@ addHandler("*", [
   autoban,
   emojiMod,
   tsPlaygroundLinkShortener,
-  voiceActivity,
 ]);
 
 addHandler(
@@ -210,14 +188,13 @@ addHandler(threadChannels, autothread);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
+  voiceActivity(bot);
   scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });
 });
 
 bot.on("messageReactionAdd", handleReaction);
-
-bot.on("voiceStateUpdate", handleVoiceStateUpdate);
 
 bot.on("threadCreate", (thread) => {
   thread.join();
