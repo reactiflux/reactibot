@@ -1,6 +1,11 @@
-import { VoiceBasedChannel } from "discord.js";
-import { ChannelHandlers } from "../types";
+import {
+  ChannelType,
+  Client,
+  VoiceBasedChannel,
+  VoiceChannel,
+} from "discord.js";
 import { logger } from "./log";
+import { scheduleTask } from "../helpers/schedule";
 
 const voiceChannelJoinTimestamps: Record<string, Record<string, number>> = {};
 
@@ -16,56 +21,61 @@ const getTimeInChannel = (
   return ((Date.now() - joinTimestamp) / 1000 / 60).toFixed(2);
 };
 
-const voiceActivity: ChannelHandlers = {
-  handleVoiceStateChange({ oldState, newState }) {
-    const { member } = newState;
-    if (!member) return;
+const voiceActivity = (bot: Client) => {
+  scheduleTask("voice activity", 3 * 60 * 1000, () => {
+    // Fetch all voice channels
+    const voiceChannels = bot.channels.cache.filter(
+      (channel): channel is VoiceChannel =>
+        channel.type === ChannelType.GuildVoice,
+    );
 
-    const diffInPartipants =
-      (newState.channel?.members?.size ?? 0) -
-      (oldState.channel?.members?.size ?? 0);
+    // For each voice channel, log who is currently connected
+    voiceChannels.forEach((channel) => {
+      const members = channel.members.map(
+        (member) =>
+          `- ${member.user.username} (${getTimeInChannel(
+            channel,
+            member.id,
+          )} minutes)`,
+      );
 
-    const messages = [];
-    let channel: VoiceBasedChannel | null = null;
+      // Only log if there are members in the channel
+      if (members.length > 0) {
+        logger.log(
+          "VOICE",
+          `${members.length} in <#${channel.id}>:\n${members.join("\n")}`,
+        );
+      }
+    });
+  });
 
-    if (diffInPartipants > 0) {
-      channel = newState.channel;
-      if (!channel) return;
+  bot.on("voiceStateUpdate", (oldState, newState) => {
+    const { member, channel } = newState;
+    console.log({ member, channel, oldState });
+    if (!member) {
+      return;
+    }
 
+    if (channel) {
       voiceChannelJoinTimestamps[channel.id] ??= {};
       voiceChannelJoinTimestamps[channel.id][member.id] = Date.now();
 
-      messages.push(`<@${member.id}> joined <#${channel.id}>.`);
-    } else if (diffInPartipants <= 0) {
-      channel = oldState.channel;
-      if (!channel) return;
+      logger.log("VOICE", `<@${member.id}> joined <#${channel.id}>.`);
+    } else if (!channel) {
+      const { channel: cachedChannel } = oldState;
+      if (!cachedChannel) return;
 
-      voiceChannelJoinTimestamps[channel.id] ??= {};
+      voiceChannelJoinTimestamps[cachedChannel.id] ??= {};
 
-      messages.push(
-        `<@${member.id}> was in <#${channel.id}> for ${getTimeInChannel(
-          channel,
+      logger.log(
+        "VOICE",
+        `<@${member.id}> was in <#${cachedChannel.id}> for ${getTimeInChannel(
+          cachedChannel,
           member.id,
         )} minutes.`,
       );
     }
-
-    if (!channel) return;
-
-    if (channel.members.size > 0) {
-      const members = channel.members
-        .map(
-          (member) =>
-            `<@${member.id}> (${getTimeInChannel(channel, member.id)} minutes)`,
-        )
-        .join(", ");
-      messages.push(`Members in <#${channel.id}>: ${members}`);
-    } else {
-      messages.push(`No members in <#${channel.id}>.`);
-    }
-
-    logger.log("VOICE", messages.join("\n"));
-  },
+  });
 };
 
 export default voiceActivity;
