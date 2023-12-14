@@ -164,12 +164,7 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 setupStats(bot);
 
 // common
-addHandler("*", [
-  commands,
-  autoban,
-  emojiMod,
-  tsPlaygroundLinkShortener,
-]);
+addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
 
 addHandler(
   [
