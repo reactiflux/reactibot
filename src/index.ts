@@ -19,6 +19,7 @@ import setupStats from "./features/stats";
 import emojiMod from "./features/emojiMod";
 import promotionThread from "./features/promotion-threads";
 import autothread, { cleanupThreads } from "./features/autothread";
+import voiceActivity from "./features/voice-activity";
 
 import { ChannelHandlers } from "./types";
 import { scheduleMessages } from "./features/scheduled-messages";
@@ -35,6 +36,7 @@ export const bot = new discord.Client({
     IntentsBitField.Flags.GuildEmojisAndStickers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
+    IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
@@ -181,6 +183,7 @@ addHandler(threadChannels, autothread);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
+  voiceActivity(bot);
   scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });
