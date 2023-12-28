@@ -12,7 +12,7 @@ import {
   ThreadChannel,
 } from "discord.js";
 import { CHANNELS } from "../constants/channels";
-import { isStaff, quoteMessageContent } from "../helpers/discord";
+import { isStaff } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
 import { parseContent } from "./jobs-moderation/parse-content";
@@ -323,7 +323,7 @@ If you're seeking work: ${freeflowForHire}`
   }
   await thread.send("Your post:");
   await thread.send({
-    content: quoteMessageContent(message.content),
+    content: message.content,
     allowedMentions: { users: [] },
   });
 };
