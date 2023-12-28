@@ -167,9 +167,12 @@ export const reviewResume = {
 
       console.log({ content });
       const trimmed =
-        content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
-      logger.log("[RESUME]", `Feedback given:`);
-      logger.log("[RESUME]", trimmed);
+        content.at(0)?.slice(0, 1995) ?? "Oops! Something went wrong.";
+      logger.log(
+        "RESUME",
+        `Feedback given to <@${interaction.user.id}> <#${interaction.channelId}>`,
+      );
+      logger.log("", trimmed);
       deferred.edit({
         content: trimmed,
       });
