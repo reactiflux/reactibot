@@ -63,6 +63,10 @@ const autoThread: ChannelHandlers = {
     if (!thread.isThread() || !starter || !guild) {
       return;
     }
+    // Bail out early if the thread is already resolved
+    if (CHECKS.some((c) => thread.name.includes(c))) {
+      return;
+    }
 
     const reactors = await fetchReactionMembers(guild, reaction);
     const roledReactors = reactors.filter((r) => isStaff(r) || isHelpful(r));
