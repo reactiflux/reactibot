@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import { ChannelType, EmbedType, Message, TextChannel } from "discord.js";
+import { APIEmbed, ChannelType, EmbedType, Message, MessageCreateOptions, MessagePayload, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
-import { getReactDocsContent, getReactDocsSearchKey } from "../helpers/react-docs";
+import {
+  getReactDocsContent,
+  getReactDocsSearchKey,
+} from "../helpers/react-docs";
 
 export const EMBED_COLOR = 7506394;
 
@@ -160,11 +163,19 @@ Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](
           {
             title: "State Updates May Be Asynchronous",
             type: EmbedType.Rich,
-            description: `\`useState\` is a React Hook that lets you add a [state variable](https://react.dev/learn/state-a-components-memory) to your component.
-
+            description: `Often times you run into an issue like this
 \`\`\`js
-const [state, setState] = useState(initialState)
-\`\`\``,
+const handleEvent = e => {
+setState(e.target.value);
+console.log(state);
+}
+\`\`\`
+where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
+
+Check out these resources for more information:
+- [React.dev: Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates)
+- [ReactJS.org: State Updates May Be Asynchronous](https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous)
+- [Blogged Answers: Render Batching and Timing](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing)`,
             color: EMBED_COLOR,
           },
         ],
@@ -418,19 +429,21 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const searchKey = getReactDocsSearchKey(search);
 
       if (!searchKey) {
-        msg.channel.send(
-          `Could not find anything on React docs for '${search}'`,
-        );
+        msg.channel.send({
+          embeds: generateReactDocsErrorEmbeds(search),
+        });
         return;
       }
 
       const [fetchMsg, content] = await Promise.all([
-        msg.channel.send(`Looking up documentation for "${search}"...`),
+        msg.channel.send(`Looking up documentation for **'${search}'**...`),
         getReactDocsContent(searchKey),
       ]);
 
       if (!content) {
-        fetchMsg.edit(`Could not find anything on React docs for '${search}'`);
+        fetchMsg.edit({
+          embeds: generateReactDocsErrorEmbeds(search),
+        });
         return;
       }
 
@@ -1155,6 +1168,22 @@ const commands: ChannelHandlers = {
       }
     });
   },
+};
+
+const generateReactDocsErrorEmbeds = (search: string): APIEmbed[] => {
+  return [
+      {
+        type: EmbedType.Rich,
+        description: `Could not find anything on React documentation for **'${search}'**`,
+        color: EMBED_COLOR,
+        author: {
+          name: "React documentation",
+          icon_url:
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1150px-React-icon.svg.png",
+          url: "https://react.dev/",
+        },
+      },
+    ];
 };
 
 export default commands;

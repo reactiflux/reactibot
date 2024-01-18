@@ -30,17 +30,19 @@ export const getReactDocsContent = async (searchPath: string) => {
 };
 
 export const getReactDocsSearchKey = (search: string) => {
-  const searchKey = REACT_AVAILABLE_DOCS.find((key) => {
-    const matches = key.split("/");
-    const name = matches[matches.length - 1];
-    const namespace = matches.length <= 2 ? key : `${matches[0]}/${matches[2]}`;
+  const normalizedSearch = search.toLowerCase();
+
+  return REACT_AVAILABLE_DOCS.find((key) => {
+    const keyParts = key.split("/");
+    const name = keyParts[keyParts.length - 1];
+    const namespace =
+      keyParts.length <= 2 ? key : `${keyParts[0]}/${keyParts[2]}`;
 
     return (
-      namespace.toLowerCase().includes(search.toLowerCase()) ||
-      name.toLowerCase().includes(search.toLowerCase())
+      namespace.toLowerCase() === normalizedSearch ||
+      name.toLowerCase() === normalizedSearch
     );
   });
-  return searchKey;
 };
 
 const processReactDocumentation = (content: string) => {
