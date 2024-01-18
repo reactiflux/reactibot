@@ -4,6 +4,7 @@ import { ChannelType, EmbedType, Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
+import { getReactDocsContent, getReactDocsSearchKey } from "../helpers/react-docs";
 
 export const EMBED_COLOR = 7506394;
 
@@ -159,19 +160,11 @@ Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](
           {
             title: "State Updates May Be Asynchronous",
             type: EmbedType.Rich,
-            description: `Often times you run into an issue like this
-\`\`\`js
-const handleEvent = e => {
-setState(e.target.value);
-console.log(state);
-}
-\`\`\`
-where \`state\` is not the most up to date value when you log it. This is caused by state updates being asynchronous.
+            description: `\`useState\` is a React Hook that lets you add a [state variable](https://react.dev/learn/state-a-components-memory) to your component.
 
-Check out these resources for more information:
-- [React.dev: Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates)
-- [ReactJS.org: State Updates May Be Asynchronous](https://legacy.reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous)
-- [Blogged Answers: Render Batching and Timing](https://blog.isquaredsoftware.com/2020/05/blogged-answers-a-mostly-complete-guide-to-react-rendering-behavior/#render-batching-and-timing)`,
+\`\`\`js
+const [state, setState] = useState(initialState)
+\`\`\``,
             color: EMBED_COLOR,
           },
         ],
@@ -233,7 +226,7 @@ Check out [this article on "Why and how to bind methods in your React component 
           {
             title: "Lifting State Up",
             type: EmbedType.Rich,
-            description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor. 
+            description: `Often, several components need to reflect the same changing data. We recommend lifting the shared state up to their closest common ancestor.
 
 Learn more about lifting state in the [React.dev article about "Sharing State Between Components"](https://react.dev/learn/sharing-state-between-components).`,
             color: EMBED_COLOR,
@@ -408,6 +401,53 @@ Here's an article explaining the difference between the two: https://goshakkk.na
             description,
             color: 0x83d0f2,
             url: `https://developer.mozilla.org${mdnUrl}`,
+          },
+        ],
+      });
+
+      fetchMsg.delete();
+    },
+  },
+  {
+    words: ["!react-docs", "!docs"],
+    help: "Allows you to search the React docs, usage: !docs useState",
+    category: "Web",
+    handleMessage: async (msg) => {
+      const [, search] = msg.content.split(" ");
+
+      const searchKey = getReactDocsSearchKey(search);
+
+      if (!searchKey) {
+        msg.channel.send(
+          `Could not find anything on React docs for '${search}'`,
+        );
+        return;
+      }
+
+      const [fetchMsg, content] = await Promise.all([
+        msg.channel.send(`Looking up documentation for "${search}"...`),
+        getReactDocsContent(searchKey),
+      ]);
+
+      if (!content) {
+        fetchMsg.edit(`Could not find anything on React docs for '${search}'`);
+        return;
+      }
+
+      await msg.channel.send({
+        embeds: [
+          {
+            title: `${searchKey}`,
+            type: EmbedType.Rich,
+            description: content,
+            color: EMBED_COLOR,
+            url: `https://react.dev/reference/${searchKey}`,
+            author: {
+              name: "React documentation",
+              icon_url:
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1150px-React-icon.svg.png",
+              url: "https://react.dev/",
+            },
           },
         ],
       });
@@ -832,7 +872,7 @@ https://exploringjs.com/es6/ch_variables.html#_pitfall-const-does-not-make-the-v
             title: "Acquiring a remote position",
             type: EmbedType.Rich,
             description: `
-Below is a list of resources we commonly point to as an aid in a search for remote jobs. 
+Below is a list of resources we commonly point to as an aid in a search for remote jobs.
 
 NOTE: If you are looking for your first job in the field or are earlier in your career, then getting a remote job at this stage is incredibly rare. We recommend prioritizing getting a job local to the area you are in or possibly moving to an area for work if options are limited where you are.
 
@@ -882,9 +922,9 @@ Remote work has the most competition, and thus is likely to be more difficult to
             title: "The importance of keys when rendering lists in React",
             type: EmbedType.Rich,
             description: `
-React depends on the use of stable and unique keys to identify items in a list so that it can perform correct and performant DOM updates. 
+React depends on the use of stable and unique keys to identify items in a list so that it can perform correct and performant DOM updates.
 
-Keys are particularly important if the list can change over time. React will use the index in the array by default if no key is specified. You can use the index in the array if the list doesn't change and you don't have a stable and unique key available. 
+Keys are particularly important if the list can change over time. React will use the index in the array by default if no key is specified. You can use the index in the array if the list doesn't change and you don't have a stable and unique key available.
 
 Please see these resources for more information:
 
@@ -946,7 +986,7 @@ _ _
                 name: "Meta Frameworks",
                 value: `
 - [Next.js](https://nextjs.org/)
-- [Remix](https://remix.run/)                
+- [Remix](https://remix.run/)
 - [Astro](https://astro.build/)
 - [SvelteKit](https://kit.svelte.dev/)
 - [Nuxt](https://nuxtjs.org/)
