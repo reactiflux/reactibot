@@ -406,7 +406,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
               name: "MDN",
               url: "https://developer.mozilla.org",
               icon_url:
-                "https://developer.mozilla.org/static/img/opengraph-logo.72382e605ce3.png",
+                "https://developer.mozilla.org/favicon-48x48.cbbd161b.png",
             },
             title,
             description,
