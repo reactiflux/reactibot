@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import { APIEmbed, ChannelType, EmbedType, Message, MessageCreateOptions, MessagePayload, TextChannel } from "discord.js";
+import { APIEmbed, ChannelType, EmbedType, Message, TextChannel } from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
