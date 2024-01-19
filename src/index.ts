@@ -12,7 +12,7 @@ import discord, {
 import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
-import { reviewResume } from "./features/resume";
+import { resumeResources, reviewResume } from "./features/resume";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -210,6 +210,7 @@ addHandler(threadChannels, autothread);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
+  resumeResources(bot);
   scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });

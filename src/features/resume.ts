@@ -1,4 +1,4 @@
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { Client, CommandInteraction, SlashCommandBuilder } from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
@@ -187,4 +187,27 @@ export const reviewResume = {
 
     return;
   },
+};
+
+export const resumeResources = (bot: Client) => {
+  // If message is in resume review, post a reply
+  // Reply should have an embed with resources about how to write a good resume
+
+  bot.on("threadCreate", async (thread) => {
+    console.log(thread);
+    if (thread.parentId !== CHANNELS.resumeReview) {
+      return;
+    }
+    const firstMessage = await thread.fetchStarterMessage();
+    if (!firstMessage) return;
+
+    // If _only_ a PDF was posted, it should post a message with png images of the resume for easier reading
+    const pdf = firstMessage.attachments.find(
+      (a) => a.contentType === "application/pdf",
+    );
+    if (!pdf) {
+      await thread.send("Please send your resume as a PDF!");
+      return;
+    }
+  });
 };
