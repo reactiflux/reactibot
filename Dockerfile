@@ -1,6 +1,8 @@
 FROM node:20-alpine as build
 WORKDIR /build/reactibot
 
+RUN apk add --no-cache poppler-utils
+
 COPY package.json package-lock.json ./
 RUN npm install --production=false
 
