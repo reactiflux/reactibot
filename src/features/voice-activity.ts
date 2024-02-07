@@ -51,7 +51,6 @@ const voiceActivity = (bot: Client) => {
 
   bot.on("voiceStateUpdate", (oldState, newState) => {
     const { member, channel } = newState;
-    console.log({ member, channel, oldState });
     if (!member) {
       return;
     }
