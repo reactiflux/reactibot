@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { gitHubToken } from "./env";
+import { gitHubReadToken } from "./env";
 
 const LOOKUP_REGEX = /<Intro>\s*(.*?)\s*<\/Intro>/gs;
 const LINK_REGEX = /\[([^\]]+)\]\((?!https?:\/\/)([^)]+)\)/g;
@@ -13,7 +13,7 @@ export const getReactDocsContent = async (searchPath: string) => {
       method: "GET",
       headers: {
         Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${gitHubToken}`,
+        Authorization: `Bearer ${gitHubReadToken}`,
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });

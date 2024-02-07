@@ -24,7 +24,7 @@ export const applicationKey = getEnv("DISCORD_PUBLIC_KEY");
 export const applicationId = getEnv("DISCORD_APP_ID");
 export const guildId = getEnv("GUILD_ID");
 export const discordToken = getEnv("DISCORD_HASH");
-export const gitHubToken = getEnv("GITHUB_TOKEN", true);
+export const gitHubReadToken = getEnv("GH_READ_TOKEN", true);
 export const amplitudeKey = getEnv("AMPLITUDE_KEY", true);
 export const openAiKey = getEnv("OPENAI_KEY", true);
 
