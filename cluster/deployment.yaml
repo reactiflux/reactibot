@@ -23,11 +23,11 @@ spec:
                 secretKeyRef:
                   name: reactibot-env
                   key: DISCORD_HASH
-            - name: GITHUB_TOKEN
+            - name: GH_READ_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: reactibot-env
-                  key: GITHUB_TOKEN
+                  key: GH_READ_TOKEN
             - name: AMPLITUDE_KEY
               valueFrom:
                 secretKeyRef:
