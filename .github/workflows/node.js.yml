@@ -90,7 +90,7 @@ jobs:
             --from-literal=DISCORD_PUBLIC_KEY=${{ secrets.DISCORD_PUBLIC_KEY }} \
             --from-literal=DISCORD_APP_ID=${{ secrets.DISCORD_APP_ID }} \
             --from-literal=GUILD_ID=${{ secrets.GUILD_ID }} \
-            --from-literal=GITHUB_READ_TOKEN=${{ secrets.GITHUB_READ_TOKEN }} \
+            --from-literal=GH_READ_TOKEN=${{ secrets.GH_READ_TOKEN }} \
             --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} \
             --from-literal=OPENAI_KEY=${{ secrets.OPENAI_KEY }} \
             || echo \n
