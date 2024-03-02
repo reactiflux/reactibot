@@ -1,9 +1,16 @@
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  Client,
+  CommandInteraction,
+  EmbedType,
+  SlashCommandBuilder,
+} from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
 import { sleep } from "../helpers/misc";
 import { logger } from "./log";
+import { EMBED_COLOR } from "./commands";
+import { findResumeAttachment } from "./resume-review";
 
 // export const resumeResources = () => {};
 
@@ -16,7 +23,7 @@ const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
 const configure = async () => {
   await openai.beta.assistants.update(ASSISTANT_ID, {
     instructions: `
-You are a hiring manager reading resumes of engineers and providing feedback. You are part of Reactiflux, the Discord for React professionals, and were created by vcarl. You expect to be provided with a resume as a pdf. 
+You are a hiring manager reading resumes of engineers and providing feedback. You are part of Reactiflux, the Discord for React professionals, and were created by vcarl. You expect to be provided with a resume as a pdf.
 
 Your response MUST be fewer than 1800 characters long.
 Be tactful and kind, but honest and forthright. Be terse, but not rude.
@@ -176,4 +183,53 @@ export const reviewResume = {
 
     return;
   },
+};
+
+export const resumeResources = async (bot: Client) => {
+  bot.on("threadCreate", async (thread) => {
+    if (thread.parentId !== CHANNELS.resumeReview) {
+      return;
+    }
+    const firstMessage = await thread.fetchStarterMessage();
+    if (!firstMessage) {
+      return;
+    }
+
+    await thread.send({
+      embeds: [
+        {
+          title: "Writing a outstanding resume",
+          type: EmbedType.Rich,
+          description: `If you're looking to enhance your resume, consider adopting the practice of maintaining a "brag document." This is a dynamic and detailed compilation of your professional achievements, projects, skills development, and any challenges you've overcome. It's an invaluable tool for developers at any level, not just to track progress but also as a resource when updating your resume or preparing for interviews.
+
+Here's a few reasons why a brag document is beneficial:
+
+- **Comprehensive Achievement Tracking**: Documenting your work helps ensure no project or accomplishment—big or small—is forgotten. This can be especially valuable for highlighting contributions that demonstrate your impact on a project or the team.
+- **Skill Development Overview**: Keeping a record of new technologies you've mastered, courses completed, or certifications earned showcases your commitment to professional development and continuous learning.
+- **Soft Skills and Leadership**: Don't overlook non-technical achievements. Leadership roles, mentorship, effective teamwork, and problem-solving are highly sought after by employers.
+- **Personlized Resume Tailoring**: With a well-maintained brag document, customizing your resume for specific job applications becomes much easier. You can quickly identify and highlight the most relevant experiences and achievements that align with the job description.
+### Recommended Resources
+- [The Engineers Checklist](https://theengineerschecklist.dev/)
+- [Keeping Brag Documents](https://jvns.ca/blog/brag-documents/)
+- [Resume X-Y-Z Writing Guide](https://www.inc.com/bill-murphy-jr/google-recruiters-say-these-5-resume-tips-including-x-y-z-formula-will-improve-your-odds-of-getting-hired-at-google.html)
+`,
+          color: EMBED_COLOR,
+        },
+      ],
+    });
+
+    const attachment = findResumeAttachment(firstMessage);
+    if (!attachment) {
+      await thread.send({
+        embeds: [
+          {
+            title: "Resume not attached",
+            type: EmbedType.Rich,
+            description: `Please upload your resume as a PDF file to receive feedback.`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    }
+  });
 };

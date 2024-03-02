@@ -96,7 +96,7 @@ export const reactionHandlers: ReactionHandlers = {
           title: "Please improve your question",
           type: EmbedType.Rich,
           description: `
-Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer. 
+Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer.
 
 Zell Liew [wrote a great resource](https://zellwk.com/blog/asking-questions/) about asking good programming questions.
 
@@ -157,7 +157,7 @@ const emojiMod: ChannelHandlers = {
 
     if (authorMember.id === bot.user?.id) return;
 
-    reactionHandlers[emoji]?.({
+    reactionHandlers[emoji]({
       guild,
       author: authorMember,
       reactor,
