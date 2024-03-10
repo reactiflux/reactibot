@@ -4,6 +4,8 @@ import { gitHubReadToken } from "./env";
 const LOOKUP_REGEX = /<Intro>\s*(.*?)\s*<\/Intro>/gs;
 const LINK_REGEX = /\[([^\]]+)\]\((?!https?:\/\/)([^)]+)\)/g;
 
+const EXTRACT_SEARCH_KEY_REGEX = /(?<=!(docs|react-docs)\s)[^\s]+/;
+
 const BASE_URL =
   "https://api.github.com/repos/reactjs/react.dev/contents/src/content/reference/";
 
@@ -43,6 +45,11 @@ export const getReactDocsSearchKey = (search: string) => {
       name.toLowerCase() === normalizedSearch
     );
   });
+};
+
+export const extractSearchKey = (search: string) => {
+  const matches = search.match(EXTRACT_SEARCH_KEY_REGEX);
+  return matches ? matches[0] : "";
 };
 
 const processReactDocumentation = (content: string) => {

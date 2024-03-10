@@ -11,6 +11,7 @@ import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 import {
+  extractSearchKey,
   getReactDocsContent,
   getReactDocsSearchKey,
 } from "../helpers/react-docs";
@@ -430,8 +431,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: "Allows you to search the React docs, usage: !docs useState",
     category: "Web",
     handleMessage: async (msg) => {
-      const [, search] = msg.content.split(" ");
-
+      const search = extractSearchKey(msg.content);
       const searchKey = getReactDocsSearchKey(search);
 
       if (!searchKey) {
