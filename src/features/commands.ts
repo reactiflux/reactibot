@@ -1,10 +1,17 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
-import { APIEmbed, ChannelType, EmbedType, Message, TextChannel } from "discord.js";
+import {
+  APIEmbed,
+  ChannelType,
+  EmbedType,
+  Message,
+  TextChannel,
+} from "discord.js";
 import cooldown from "./cooldown";
 import { ChannelHandlers } from "../types";
 import { isStaff } from "../helpers/discord";
 import {
+  extractSearchKey,
   getReactDocsContent,
   getReactDocsSearchKey,
 } from "../helpers/react-docs";
@@ -424,8 +431,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: "Allows you to search the React docs, usage: !docs useState",
     category: "Web",
     handleMessage: async (msg) => {
-      const [, search] = msg.content.split(" ");
-
+      const search = extractSearchKey(msg.content);
       const searchKey = getReactDocsSearchKey(search);
 
       if (!searchKey) {
@@ -1172,18 +1178,18 @@ const commands: ChannelHandlers = {
 
 const generateReactDocsErrorEmbeds = (search: string): APIEmbed[] => {
   return [
-      {
-        type: EmbedType.Rich,
-        description: `Could not find anything on React documentation for **'${search}'**`,
-        color: EMBED_COLOR,
-        author: {
-          name: "React documentation",
-          icon_url:
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1150px-React-icon.svg.png",
-          url: "https://react.dev/",
-        },
+    {
+      type: EmbedType.Rich,
+      description: `Could not find anything on React documentation for **'${search}'**`,
+      color: EMBED_COLOR,
+      author: {
+        name: "React documentation",
+        icon_url:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1150px-React-icon.svg.png",
+        url: "https://react.dev/",
       },
-    ];
+    },
+  ];
 };
 
 export default commands;
