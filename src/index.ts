@@ -12,7 +12,7 @@ import discord, {
 import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
-import { reviewResume } from "./features/resume";
+import { resumeResources, reviewResume } from "./features/resume";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -28,6 +28,7 @@ import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
+import resumeReviewPdf from "./features/resume-review";
 
 export const bot = new discord.Client({
   intents: [
@@ -120,7 +121,10 @@ const handleMessage = async (message: Message) => {
   }
   const msg = message.partial ? await message.fetch() : message;
 
-  const channelId = msg.channel.id;
+  const channel = msg.channel;
+  const channelId = channel.isThread()
+    ? channel.parentId || channel.id
+    : channel.id;
 
   if (channelHandlersById[channelId]) {
     channelHandlersById[channelId].forEach((channelHandlers) => {
@@ -180,9 +184,12 @@ addHandler(
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
+addHandler(CHANNELS.resumeReview, resumeReviewPdf);
+
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
+  resumeResources(bot);
   voiceActivity(bot);
   scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);

@@ -11,6 +11,11 @@ RUN npm run test
 RUN npm run build
 
 FROM node:20-alpine
+
+RUN apk --no-cache add \
+  ghostscript \
+  graphicsmagick
+
 WORKDIR /build/reactibot
 
 ENV NODE_ENV=production
