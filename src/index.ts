@@ -193,7 +193,7 @@ addHandler(CHANNELS.random, [
   imWatchingYou,
   typingStatus,
   americanSpelling,
-  communityTimeoutVote
+  communityTimeoutVote,
 ]);
 
 bot.on("ready", () => {
