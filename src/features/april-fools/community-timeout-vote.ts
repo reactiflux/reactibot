@@ -83,6 +83,10 @@ export default {
         "The AI gods have deemed you unworthy. You will remain timed out.",
       );
 
+      await msg.guild?.members.cache
+        .get(timedOutUserId)
+        ?.timeout(TIMEOUT_DURATION_MINS * 60 * 1000);
+
       sleep(TIMEOUT_DURATION_MINS * 60).then(() => {
         // If the person is still timed out, remove the timeout
         // Otherwise, somebody else has been timed out so we just let it go
