@@ -30,7 +30,6 @@ import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
 import resumeReviewPdf from "./features/resume-review";
 import imWatchingYou from "./features/april-fools/im-watching-you";
-import messageDeletion from "./features/april-fools/message-deletion";
 import typingStatus from "./features/april-fools/typing-status";
 import americanSpelling from "./features/april-fools/american-spelling";
 import communityTimeoutVote from "./features/april-fools/community-timeout-vote";
@@ -192,7 +191,6 @@ addHandler(threadChannels, autothread);
 addHandler(CHANNELS.resumeReview, resumeReviewPdf);
 addHandler(CHANNELS.random, [
   imWatchingYou,
-  messageDeletion,
   typingStatus,
   americanSpelling,
   communityTimeoutVote
