@@ -45,9 +45,7 @@ export default {
       return;
     }
 
-    await msg.delete();
-
-    msg.channel.send(
+    await msg.reply(
       SUPER_SARCASTIC_REPLIES_TO_BRITISH_SPELLING_WORDS[
         Math.floor(
           Math.random() *
@@ -55,5 +53,7 @@ export default {
         )
       ],
     );
+
+    await msg.delete();
   },
 } as ChannelHandlers;
