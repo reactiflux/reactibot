@@ -10,6 +10,10 @@ let isWorthy = true;
 let dissenter: GuildMember | null = null;
 let conformer: GuildMember | null = null;
 
+const TIMEOUT_DURATION_MINS = 10;
+const VOTING_DURATION_MINS = 2;
+const NUM_RECENT_CHATTERS_TO_TRIGGER_CHAOS = 10;
+
 const getRandomReactorId = (
   reactions: MessageReaction,
   botId: string,
@@ -65,7 +69,7 @@ export default {
 
         if (conformer) {
           try {
-            await conformer.timeout(60 * 60 * 1000);
+            await conformer.timeout(TIMEOUT_DURATION_MINS * 60 * 1000);
           } catch (error) {
             console.error(error);
           }
@@ -79,7 +83,7 @@ export default {
         "The AI gods have deemed you unworthy. You will remain timed out.",
       );
 
-      sleep(10 * 60).then(() => {
+      sleep(TIMEOUT_DURATION_MINS * 60).then(() => {
         // If the person is still timed out, remove the timeout
         // Otherwise, somebody else has been timed out so we just let it go
         if (timedOutUserId === msg.author.id) {
@@ -92,7 +96,7 @@ export default {
 
     RECENT_CHATTERS.add(msg.author.id);
 
-    if (RECENT_CHATTERS.size > 10) {
+    if (RECENT_CHATTERS.size >= NUM_RECENT_CHATTERS_TO_TRIGGER_CHAOS) {
       // Get a random user from recent chatters
       const userIds = Array.from(RECENT_CHATTERS);
       const randomUser = userIds[Math.floor(Math.random() * userIds.length)];
@@ -109,7 +113,7 @@ export default {
 
       const collector = message.createReactionCollector({
         filter,
-        time: 1000 * 60, // 1 minute
+        time: 1000 * 60 * VOTING_DURATION_MINS,
       });
 
       await message.react("👍");
@@ -156,7 +160,7 @@ export default {
           );
 
           if (dissenter) {
-            await dissenter.timeout(15 * 60 * 1000);
+            await dissenter.timeout(TIMEOUT_DURATION_MINS * 60 * 1000);
             await channel.send(`Chaos reigns upon <@${dissenter.id}> instead.`);
           }
         }
