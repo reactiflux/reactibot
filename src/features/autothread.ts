@@ -18,6 +18,13 @@ const STAFF_ACCEPT_THRESHOLD = 2;
 
 const autoThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
+    if (
+      maybeMessage.channel.type === ChannelType.PublicThread ||
+      maybeMessage.channel.type === ChannelType.PrivateThread
+    ) {
+      return;
+    }
+
     const msg = maybeMessage.partial
       ? await maybeMessage.fetch()
       : maybeMessage;

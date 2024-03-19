@@ -4,10 +4,17 @@ import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
 import { format } from "date-fns";
 import fetch from "node-fetch";
-import { MessageType } from "discord.js";
+import { ChannelType, MessageType } from "discord.js";
 
 const promotionThread: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
+    if (
+      maybeMessage.channel.type === ChannelType.PublicThread ||
+      maybeMessage.channel.type === ChannelType.PrivateThread
+    ) {
+      return;
+    }
+
     const msg = maybeMessage.partial
       ? await maybeMessage.fetch()
       : maybeMessage;
