@@ -29,6 +29,7 @@ import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
 import resumeReviewPdf from "./features/resume-review";
+import troll from "./features/troll";
 
 export const bot = new discord.Client({
   intents: [
@@ -168,7 +169,13 @@ logger.add(channelLog(bot, CHANNELS.botLog));
 setupStats(bot);
 
 // common
-addHandler("*", [commands, autoban, emojiMod, tsPlaygroundLinkShortener]);
+addHandler("*", [
+  commands,
+  autoban,
+  emojiMod,
+  tsPlaygroundLinkShortener,
+  troll,
+]);
 
 addHandler(
   [
