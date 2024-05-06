@@ -1,4 +1,5 @@
 import { ChannelType, Client } from "discord.js";
+import { CHANNELS } from "../constants/channels";
 
 type Logger = (type: string, text: string) => void;
 
@@ -27,10 +28,30 @@ export const channelLog =
     }
   };
 
-const loggers: Logger[] = [stdoutLog];
+type LoggerKey = keyof typeof CHANNELS | 'stdout';
+type LoggerObj = {id: LoggerKey, logger: Logger}
+type LoggerMap = Map<LoggerKey | 'stdout', Logger>
+
+const loggers: LoggerMap = new Map([['stdout', stdoutLog]]);
 
 export const logger = {
-  add: (logger: Logger) => loggers.push(logger),
-  log: (type: string, text: string) =>
-    loggers.map((logger) => logger(type, text)),
+  add: ({id, logger}: LoggerObj) => loggers.set(id, logger),
+  remove: (loggerId: LoggerObj["id"]) => loggers.delete(loggerId),
+  log: (type: string, text: string, loggerId: LoggerKey = 'botLog', ) => {
+    const defaultLogger = loggers.get('stdout')
+    const logger = loggers.get(loggerId)
+
+    if(!defaultLogger) {
+      console.error(`Default logger not found`)
+      return
+    }
+
+    if(!logger) {
+      console.error(`Logger with id ${loggerId} not found`)
+      return
+    }
+
+    defaultLogger(type, text)
+    logger(type, text)
+  }
 };

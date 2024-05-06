@@ -4,8 +4,9 @@ import {
   VoiceBasedChannel,
   VoiceChannel,
 } from "discord.js";
-import { logger } from "./log";
+import { channelLog, logger } from "./log";
 import { scheduleTask } from "../helpers/schedule";
+import { CHANNELS } from "../constants/channels";
 
 const voiceChannelJoinTimestamps: Record<string, Record<string, number>> = {};
 
@@ -22,6 +23,8 @@ const getTimeInChannel = (
 };
 
 const voiceActivity = (bot: Client) => {
+  logger.add({id: 'vcLog', logger: channelLog(bot, CHANNELS.vcLog)});
+
   scheduleTask("voice activity", 3 * 60 * 1000, () => {
     // Fetch all voice channels
     const voiceChannels = bot.channels.cache.filter(
@@ -44,6 +47,7 @@ const voiceActivity = (bot: Client) => {
         logger.log(
           "VOICE",
           `${members.length} in <#${channel.id}>:\n${members.join("\n")}`,
+          'vcLog',
         );
       }
     });
@@ -59,7 +63,7 @@ const voiceActivity = (bot: Client) => {
       voiceChannelJoinTimestamps[channel.id] ??= {};
       voiceChannelJoinTimestamps[channel.id][member.id] = Date.now();
 
-      logger.log("VOICE", `<@${member.id}> joined <#${channel.id}>.`);
+      logger.log("VOICE", `<@${member.id}> joined <#${channel.id}>.`, 'vcLog');
     } else if (!channel) {
       const { channel: cachedChannel } = oldState;
       if (!cachedChannel) return;
@@ -72,6 +76,7 @@ const voiceActivity = (bot: Client) => {
           cachedChannel,
           member.id,
         )} minutes.`,
+        'vcLog',
       );
     }
   });
