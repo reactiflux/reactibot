@@ -37,9 +37,9 @@ const loggers: LoggerMap = new Map([['stdout', stdoutLog]]);
 export const logger = {
   add: ({id, logger}: LoggerObj) => loggers.set(id, logger),
   remove: (loggerId: LoggerObj["id"]) => loggers.delete(loggerId),
-  log: (type: string, text: string, loggerId: LoggerKey = 'botLog', ) => {
+  log: (type: string, text: string, logName: LoggerKey = 'botLog', ) => {
     const defaultLogger = loggers.get('stdout')
-    const logger = loggers.get(loggerId)
+    const logger = loggers.get(logName)
 
     if(!defaultLogger) {
       console.error(`Default logger not found`)
@@ -47,7 +47,7 @@ export const logger = {
     }
 
     if(!logger) {
-      console.error(`Logger with id ${loggerId} not found`)
+      console.error(`Logger with id ${logName} not found`)
       return
     }
 
