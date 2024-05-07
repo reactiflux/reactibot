@@ -28,6 +28,7 @@
 1. `npm run dev`
 1. Look for the following message in the logs, and open the URL in a browser where you're logged into Discord.
    - `Bot started. If necessary, add it to your test server:`
+   - Make sure to not install this bot directly on Reactiflux but on the Reactiflux Test Server. Ask for the correct role in RF's #reactibot channel
 
 # Implementation notes
 
