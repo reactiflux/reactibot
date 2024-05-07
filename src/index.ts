@@ -176,6 +176,7 @@ const handleReaction = (
 
 initCachedChannels(bot);
 logger.add({ id: "botLog", logger: channelLog(bot, CHANNELS.botLog) });
+logger.add({ id: "modLog", logger: channelLog(bot, CHANNELS.modLog) });
 
 // Amplitude metrics
 setupStats(bot);
