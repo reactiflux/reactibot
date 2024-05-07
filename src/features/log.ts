@@ -28,30 +28,30 @@ export const channelLog =
     }
   };
 
-type LoggerKey = keyof typeof CHANNELS | 'stdout';
-type LoggerObj = {id: LoggerKey, logger: Logger}
-type LoggerMap = Map<LoggerKey | 'stdout', Logger>
+type LoggerKey = keyof typeof CHANNELS | "stdout";
+type LoggerObj = { id: LoggerKey; logger: Logger };
+type LoggerMap = Map<LoggerKey | "stdout", Logger>;
 
-const loggers: LoggerMap = new Map([['stdout', stdoutLog]]);
+const loggers: LoggerMap = new Map([["stdout", stdoutLog]]);
 
 export const logger = {
-  add: ({id, logger}: LoggerObj) => loggers.set(id, logger),
+  add: ({ id, logger }: LoggerObj) => loggers.set(id, logger),
   remove: (loggerId: LoggerObj["id"]) => loggers.delete(loggerId),
-  log: (type: string, text: string, logName: LoggerKey = 'botLog', ) => {
-    const defaultLogger = loggers.get('stdout')
-    const logger = loggers.get(logName)
+  log: (type: string, text: string, logName: LoggerKey = "botLog") => {
+    const defaultLogger = loggers.get("stdout");
+    const logger = loggers.get(logName);
 
-    if(!defaultLogger) {
-      console.error(`Default logger not found`)
-      return
+    if (!defaultLogger) {
+      console.error(`Default logger not found`);
+      return;
     }
 
-    if(!logger) {
-      console.error(`Logger with id ${logName} not found`)
-      return
+    if (!logger) {
+      console.error(`Logger with id ${logName} not found`);
+      return;
     }
 
-    defaultLogger(type, text)
-    logger(type, text)
-  }
+    defaultLogger(type, text);
+    logger(type, text);
+  },
 };
