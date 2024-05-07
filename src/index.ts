@@ -26,15 +26,18 @@ import { scheduleMessages } from "./features/scheduled-messages";
 import tsPlaygroundLinkShortener from "./features/tsplay";
 import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
-import { discordToken } from "./helpers/env";
+import { discordToken, isProd } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
 import resumeReviewPdf from "./features/resume-review";
 import troll from "./features/troll";
+import { modActivity } from "./features/mod-activity";
+import { debugEventButtonHandler, debugEvents } from "./features/debug-events";
 
 export const bot = new discord.Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildPresences,
     IntentsBitField.Flags.GuildEmojisAndStickers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
@@ -43,11 +46,20 @@ export const bot = new discord.Client({
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
   ],
-  partials: [Partials.Channel, Partials.Message, Partials.Reaction],
+  partials: [
+    Partials.Channel,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.GuildMember,
+  ],
 });
 
 registerCommand(resetJobCacheCommand);
 registerCommand(reviewResume);
+
+if (!isProd()) {
+  registerCommand(debugEvents);
+}
 
 logger.log("INI", "Bootstrap starting…");
 bot
@@ -164,6 +176,7 @@ const handleReaction = (
 
 initCachedChannels(bot);
 logger.add({ id: "botLog", logger: channelLog(bot, CHANNELS.botLog) });
+logger.add({ id: "modLog", logger: channelLog(bot, CHANNELS.modLog) });
 
 // Amplitude metrics
 setupStats(bot);
@@ -198,6 +211,8 @@ bot.on("ready", () => {
   jobsMod(bot);
   resumeResources(bot);
   voiceActivity(bot);
+  modActivity(bot);
+  debugEventButtonHandler(bot);
   scheduleTask("help thread cleanup", 1000 * 60 * 30, () => {
     cleanupThreads(threadChannels, bot);
   });
