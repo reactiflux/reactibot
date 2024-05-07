@@ -17,11 +17,13 @@ const guildMemberTimeoutHandler = (
     logger.log(
       "TIMEOUT",
       `${newMember.user.tag} has been timed out in ${newMember.guild.name} until ${newTimeout}.`,
+      "modLog",
     );
   } else if (oldTimeout && !newTimeout) {
     logger.log(
       "TIMEOUT END",
       `${newMember.user.tag}'s timeout has ended in ${newMember.guild.name}.`,
+      "modLog",
     );
   }
 };
