@@ -3,14 +3,18 @@ import {
   CommandInteraction,
   EmbedType,
   SlashCommandBuilder,
+  AttachmentBuilder,
+  Message,
+  Embed,
+  APIEmbed,
 } from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
+import { createAttachmentBuilderFromURL } from "../helpers/generate-pdf";
 import { sleep } from "../helpers/misc";
 import { logger } from "./log";
 import { EMBED_COLOR } from "./commands";
-import { findResumeAttachment } from "./resume-review";
 
 const openai = new OpenAI({
   apiKey: openAiKey,
@@ -193,7 +197,13 @@ export const resumeResources = async (bot: Client) => {
       return;
     }
 
+    const attachment = findResumeAttachment(firstMessage);
+    const resumeImages = await buildResumeImages(firstMessage);
+
     await thread.send({
+      content: !attachment
+        ? `Please upload your resume as a PDF file to receive feedback.`
+        : undefined,
       embeds: [
         {
           title: "Writing a outstanding resume",
@@ -214,20 +224,34 @@ Here's a few reasons why a brag document is beneficial:
           color: EMBED_COLOR,
         },
       ],
+      files: resumeImages,
     });
-
-    const attachment = findResumeAttachment(firstMessage);
-    if (!attachment) {
-      await thread.send({
-        embeds: [
-          {
-            title: "Resume not attached",
-            type: EmbedType.Rich,
-            description: `Please upload your resume as a PDF file to receive feedback.`,
-            color: EMBED_COLOR,
-          },
-        ],
-      });
-    }
   });
+};
+
+const PDF_CONTENT_TYPE = "application/pdf";
+const findResumeAttachment = (msg: Message) => {
+  return msg.attachments.find(
+    (attachment) => attachment.contentType === PDF_CONTENT_TYPE,
+  );
+};
+
+const buildResumeImages = async (
+  msg: Message,
+): Promise<AttachmentBuilder[]> => {
+  const attachment = findResumeAttachment(msg);
+  if (!attachment) {
+    return [];
+  }
+
+  const builder = await createAttachmentBuilderFromURL(
+    attachment.url,
+    `${msg.author.username}-resume`,
+  );
+  if (!builder) {
+    logger.log("[RESUME]", "Failed to generate resume PDF in thread");
+    return [];
+  }
+
+  return builder;
 };
