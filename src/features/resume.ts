@@ -1,12 +1,14 @@
 import {
   Client,
-  CommandInteraction,
   EmbedType,
-  SlashCommandBuilder,
   AttachmentBuilder,
   Message,
-  Embed,
-  APIEmbed,
+  InteractionType,
+  ComponentType,
+  ButtonStyle,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ChannelType,
 } from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
@@ -20,6 +22,7 @@ const openai = new OpenAI({
   apiKey: openAiKey,
 });
 const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
+const COMMAND_ID = "review-resume";
 
 // one-time setup tasks for the assistant, so the functionality is all local
 const configure = async () => {
@@ -42,55 +45,30 @@ If their stated experience doesn't match what you would guess, describe why you 
 };
 configure();
 
-export const reviewResume = {
-  command: new SlashCommandBuilder()
-    .setName("review-resume")
-    .setDescription(
-      "BETA — AI may not be accurate. Use will upload a PDF resume to OpenAI systems temporarily.",
-    ),
-
-  handler: async (interaction: CommandInteraction) => {
-    // look at current thread
-    // if not started by thread author, abort
-    // if no PDF or direct file found, abort
-    if (!interaction.inGuild() || !interaction.channel) {
-      return await interaction.reply({
-        ephemeral: true,
-        content: "This must be performed in a guild!",
-      });
-    }
-    if (!interaction.channel.isThread()) {
-      return await interaction.reply({
-        ephemeral: true,
-        content: "Please use this in reply to a thread!",
-      });
-    }
-    const { channel, user } = interaction;
-    if (channel.parentId !== CHANNELS.resumeReview) {
-      return await interaction.reply({
-        ephemeral: true,
-        content: `This can only be executed in <#${CHANNELS.resumeReview}>!`,
-      });
-    }
-
-    const firstMessage = await channel.fetchStarterMessage();
-    if (!firstMessage) {
-      return await interaction.reply({
-        ephemeral: true,
-        content: "Couldn't fetch first message, please try again.",
-      });
-    }
-
-    if (firstMessage.author.id !== user.id) {
-      return await interaction.reply({
-        ephemeral: true,
-        content: "You may only review your own resume.",
-      });
+export const resumeResources = async (bot: Client) => {
+  bot.on("interactionCreate", async (interaction) => {
+    if (
+      interaction.type !== InteractionType.MessageComponent ||
+      interaction.componentType !== ComponentType.Button ||
+      !interaction.channel ||
+      interaction.channel.type !== ChannelType.PublicThread ||
+      interaction.channel.parentId !== CHANNELS.resumeReview
+    ) {
+      return;
     }
 
     const deferred = await interaction.deferReply({ ephemeral: true });
     deferred.edit("Looking for a resume…");
-    const messages = await channel.messages.fetch();
+    const messages = await interaction.channel.messages.fetch();
+
+    const firstMessage = await interaction.channel.fetchStarterMessage();
+    if (!firstMessage) {
+      await interaction.reply({
+        ephemeral: true,
+        content: "Couldn't fetch first message, please try again.",
+      });
+      return;
+    }
     // grab the first available PDF
     const attachedPdfs = messages.flatMap((m) =>
       m.attachments.filter((a) => a.contentType === "application/pdf"),
@@ -98,9 +76,10 @@ export const reviewResume = {
     const resume = attachedPdfs.first();
 
     if (!resume) {
-      return await deferred.edit({
+      await deferred.edit({
         content: "No PDFs found, please upload your resume and try again.",
       });
+      return;
     }
 
     // defer: notify that data will be sent, request permissions
@@ -113,9 +92,10 @@ export const reviewResume = {
       purpose: "assistants",
     });
     if (!response.ok || file.status === "error") {
-      return await deferred.edit({
+      await deferred.edit({
         content: "Failed to upload resume, sorry! Please try again later.",
       });
+      return;
     }
 
     try {
@@ -184,10 +164,7 @@ export const reviewResume = {
     // defer: offer fixed interaction buttons to send more prompts
 
     return;
-  },
-};
-
-export const resumeResources = async (bot: Client) => {
+  });
   bot.on("threadCreate", async (thread) => {
     if (thread.parentId !== CHANNELS.resumeReview) {
       return;
@@ -223,6 +200,15 @@ Here's a few reasons why a brag document is beneficial:
 `,
           color: EMBED_COLOR,
         },
+      ],
+      components: [
+        // @ts-expect-error Discord.js types appear to be wrong
+        new ActionRowBuilder().addComponents(
+          new ButtonBuilder()
+            .setCustomId(COMMAND_ID)
+            .setLabel("AI Review")
+            .setStyle(ButtonStyle.Secondary),
+        ),
       ],
       files: resumeImages,
     });
