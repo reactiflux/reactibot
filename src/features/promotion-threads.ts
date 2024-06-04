@@ -39,7 +39,7 @@ const promotionThread: ChannelHandlers = {
     const title = await (async () => {
       let maybeTitle = msg.author.username;
       if (firstLink) {
-        if (firstLink.startsWith("https://twitter.com/")) {
+        if (/^https:\/\/twitter.com|^https:\/\/x.com/.test(firstLink)) {
           try {
             const res = await fetch(
               `https://publish.twitter.com/oembed?url=${firstLink}`,
