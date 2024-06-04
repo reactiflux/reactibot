@@ -22,7 +22,8 @@ const openai = new OpenAI({
   apiKey: openAiKey,
 });
 const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
-const COMMAND_ID = "review-resume";
+const REVIEW_COMMAND = "review-resume";
+const DELETE_COMMAND = "delete-post";
 
 // one-time setup tasks for the assistant, so the functionality is all local
 const configure = async () => {
@@ -57,112 +58,131 @@ export const resumeResources = async (bot: Client) => {
       return;
     }
 
-    const deferred = await interaction.deferReply({ ephemeral: true });
-    deferred.edit("Looking for a resume…");
-    const messages = await interaction.channel.messages.fetch();
-
-    const firstMessage = await interaction.channel.fetchStarterMessage();
-    if (!firstMessage) {
-      await interaction.reply({
-        ephemeral: true,
-        content: "Couldn't fetch first message, please try again.",
-      });
-      return;
-    }
-    // grab the first available PDF
-    const attachedPdfs = messages.flatMap((m) =>
-      m.attachments.filter((a) => a.contentType === "application/pdf"),
-    );
-    const resume = attachedPdfs.first();
-
-    if (!resume) {
-      await deferred.edit({
-        content: "No PDFs found, please upload your resume and try again.",
-      });
-      return;
-    }
-
-    // defer: notify that data will be sent, request permissions
-
-    // upload file to GPT
-    deferred.edit("Found a resume! Uploading…");
-    const response = await fetch(resume.url);
-    const file = await openai.files.create({
-      file: response,
-      purpose: "assistants",
-    });
-    if (!response.ok || file.status === "error") {
-      await deferred.edit({
-        content: "Failed to upload resume, sorry! Please try again later.",
-      });
-      return;
-    }
-
-    try {
-      deferred.edit("Uploaded! Reviewing…");
-      const [assistant, thread] = await Promise.all([
-        openai.beta.assistants.retrieve(ASSISTANT_ID),
-        openai.beta.threads.create({
-          messages: [
-            {
-              role: "user",
-              content:
-                "This user has requested help with their resume. Here is their message and resume:",
-            },
-            {
-              role: "user",
-              content: firstMessage.content,
-              file_ids: [file.id],
-            },
-          ],
-        }),
-      ]);
-
-      let run = await openai.beta.threads.runs.create(
-        thread.id,
-        { assistant_id: assistant.id },
-        // { stream: true },
-      );
-
-      // TODO: stream responses. OpenAI hasn't released streaming responses for
-      // assistant runs as of 2023-11
-      // let content = "";
-      // for await (const chunk of stream) {
-      //   content += chunk.choices[0]?.delta?.content;
-      //   sleep(1.5);
-      // }
-      while (run.status === "queued" || run.status === "in_progress") {
-        await sleep(0.5);
-        run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-        console.log(run.started_at, run.status);
+    if (interaction.customId === DELETE_COMMAND) {
+      if (interaction.user.id === interaction.channel.ownerId) {
+        await interaction.channel.delete();
+      } else {
+        interaction.reply({
+          ephemeral: true,
+          content:
+            "This is not your thread! Posts can only be deleted by the original poster.",
+        });
       }
-      console.log("run finished:", run.status, JSON.stringify(run, null, 2));
+      return;
+    }
 
-      const messages = await openai.beta.threads.messages.list(thread.id);
-      console.log(JSON.stringify(messages.data, null, 2));
-      const content: string[] = messages.data
-        .filter((d) => d.role === "assistant")
-        .flatMap((d) =>
-          d.content.map((c) => (c.type === "text" ? c.text.value : "\n\n")),
+    if (interaction.customId === REVIEW_COMMAND) {
+      const deferred = await interaction.deferReply({ ephemeral: true });
+      deferred.edit("Looking for a resume…");
+      const messages = await interaction.channel.messages.fetch();
+
+      const firstMessage = await interaction.channel.fetchStarterMessage();
+      if (!firstMessage) {
+        await interaction.reply({
+          ephemeral: true,
+          content: "Couldn't fetch first message, please try again.",
+        });
+        return;
+      }
+      // grab the first available PDF
+      const attachedPdfs = messages.flatMap((m) =>
+        m.attachments.filter((a) => a.contentType === "application/pdf"),
+      );
+      const resume = attachedPdfs.first();
+
+      if (!resume) {
+        await deferred.edit({
+          content: "No PDFs found, please upload your resume and try again.",
+        });
+        return;
+      }
+
+      // defer: notify that data will be sent, request permissions
+
+      // upload file to GPT
+      deferred.edit("Found a resume! Uploading…");
+      const response = await fetch(resume.url);
+      const file = await openai.files.create({
+        file: response,
+        purpose: "assistants",
+      });
+      if (!response.ok || file.status === "error") {
+        await deferred.edit({
+          content: "Failed to upload resume, sorry! Please try again later.",
+        });
+        return;
+      }
+
+      try {
+        deferred.edit("Uploaded! Reviewing…");
+        const [assistant, thread] = await Promise.all([
+          openai.beta.assistants.retrieve(ASSISTANT_ID),
+          openai.beta.threads.create({
+            messages: [
+              {
+                role: "user",
+                content:
+                  "This user has requested help with their resume. Here is their message and resume:",
+              },
+              {
+                role: "user",
+                content: firstMessage.content,
+                file_ids: [file.id],
+              },
+            ],
+          }),
+        ]);
+
+        let run = await openai.beta.threads.runs.create(
+          thread.id,
+          { assistant_id: assistant.id },
+          // { stream: true },
         );
 
-      console.log({ content });
-      const trimmed =
-        content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
-      logger.log("[RESUME]", `Feedback given:`);
-      logger.log("[RESUME]", trimmed);
-      deferred.edit({
-        content: trimmed,
-      });
-    } catch (e) {
-      // recover
-      console.log(e);
+        // TODO: stream responses. OpenAI hasn't released streaming responses for
+        // assistant runs as of 2023-11
+        // let content = "";
+        // for await (const chunk of stream) {
+        //   content += chunk.choices[0]?.delta?.content;
+        //   sleep(1.5);
+        // }
+        while (run.status === "queued" || run.status === "in_progress") {
+          await sleep(0.5);
+          run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+          console.log(run.started_at, run.status);
+        }
+        console.log("run finished:", run.status, JSON.stringify(run, null, 2));
+
+        const messages = await openai.beta.threads.messages.list(thread.id);
+        console.log(JSON.stringify(messages.data, null, 2));
+        const content: string[] = messages.data
+          .filter((d) => d.role === "assistant")
+          .flatMap((d) =>
+            d.content.map((c) => (c.type === "text" ? c.text.value : "\n\n")),
+          );
+
+        console.log({ content });
+        const trimmed =
+          content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
+        logger.log("[RESUME]", `Feedback given:`);
+        logger.log("[RESUME]", trimmed);
+        deferred.edit({
+          content: trimmed,
+        });
+      } catch (e) {
+        // recover
+        console.log(e);
+      }
+      // Ensure files are cleaned up
+      await openai.files.del(file.id);
+
+      // defer: offer fixed interaction buttons to send more prompts
+      return;
     }
-    // Ensure files are cleaned up
-    await openai.files.del(file.id);
-
-    // defer: offer fixed interaction buttons to send more prompts
-
+    logger.log(
+      "unexpected command passed through resume codepath:",
+      interaction.customId,
+    );
     return;
   });
   bot.on("threadCreate", async (thread) => {
@@ -205,9 +225,13 @@ Here's a few reasons why a brag document is beneficial:
         // @ts-expect-error Discord.js types appear to be wrong
         new ActionRowBuilder().addComponents(
           new ButtonBuilder()
-            .setCustomId(COMMAND_ID)
+            .setCustomId(REVIEW_COMMAND)
             .setLabel("AI Review")
             .setStyle(ButtonStyle.Secondary),
+          new ButtonBuilder()
+            .setCustomId(DELETE_COMMAND)
+            .setLabel("Delete post")
+            .setStyle(ButtonStyle.Danger),
         ),
       ],
       files: resumeImages,
