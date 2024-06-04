@@ -12,8 +12,6 @@ import { logger } from "./log";
 import { EMBED_COLOR } from "./commands";
 import { findResumeAttachment } from "./resume-review";
 
-// export const resumeResources = () => {};
-
 const openai = new OpenAI({
   apiKey: openAiKey,
 });
