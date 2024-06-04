@@ -17,17 +17,13 @@ const IDLE_TIMEOUT = 36;
 const STAFF_ACCEPT_THRESHOLD = 2;
 
 const autoThread: ChannelHandlers = {
-  handleMessage: async ({ msg: maybeMessage }) => {
+  handleMessage: async ({ msg }) => {
     if (
-      maybeMessage.channel.type === ChannelType.PublicThread ||
-      maybeMessage.channel.type === ChannelType.PrivateThread
+      msg.channel.type === ChannelType.PublicThread ||
+      msg.channel.type === ChannelType.PrivateThread
     ) {
       return;
     }
-
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
 
     // Delete top-level replies
     if (msg.type === MessageType.Reply) {

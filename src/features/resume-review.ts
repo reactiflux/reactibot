@@ -36,10 +36,8 @@ const sendResumeMessage = async (msg: Message): Promise<true | void> => {
 };
 
 const resumeReviewPdf: ChannelHandlers = {
-  handleMessage: async ({ msg }) => {
-    // NOTE: This cast is safe as we are fetching the actual message in the index.ts/handleMessage
-    const message = msg as Message;
-    const cooldownKey = `resume-${msg.channelId}`;
+  handleMessage: async ({ msg: message }) => {
+    const cooldownKey = `resume-${message.channelId}`;
 
     if (cooldown.hasCooldown(message.author.id, cooldownKey)) {
       return;

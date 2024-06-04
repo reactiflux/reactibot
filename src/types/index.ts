@@ -5,7 +5,6 @@ import {
   MessageReaction,
   PartialMessageReaction,
   PartialUser,
-  PartialMessage,
   VoiceState,
 } from "discord.js";
 
@@ -14,7 +13,7 @@ type CommonArgs = {
 };
 
 export type HandleMessageArgs = CommonArgs & {
-  msg: Message | PartialMessage;
+  msg: Message;
 };
 
 export type HandleReactionArgs = CommonArgs & {

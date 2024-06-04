@@ -3,11 +3,7 @@ import { isStaff } from "../helpers/discord";
 import { ChannelHandlers } from "../types";
 
 const troll: ChannelHandlers = {
-  handleMessage: async ({ msg: maybeMessage, bot }) => {
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
-
+  handleMessage: async ({ msg, bot }) => {
     if (msg.guild || !msg.content.startsWith("skillissue")) return;
 
     const [, messageLink] = msg.content.split(" ");

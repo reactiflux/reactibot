@@ -8,11 +8,7 @@ const tags = [
 ];
 
 const autoban: ChannelHandlers = {
-  handleMessage: async ({ msg: maybeMessage }) => {
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
-
+  handleMessage: async ({ msg }) => {
     const content = msg.content.toLowerCase();
     const hasToken = tags.some((token) => content.includes(token));
 

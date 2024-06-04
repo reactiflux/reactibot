@@ -7,17 +7,13 @@ import fetch from "node-fetch";
 import { ChannelType, MessageType } from "discord.js";
 
 const promotionThread: ChannelHandlers = {
-  handleMessage: async ({ msg: maybeMessage }) => {
+  handleMessage: async ({ msg }) => {
     if (
-      maybeMessage.channel.type === ChannelType.PublicThread ||
-      maybeMessage.channel.type === ChannelType.PrivateThread
+      msg.channel.type === ChannelType.PublicThread ||
+      msg.channel.type === ChannelType.PrivateThread
     ) {
       return;
     }
-
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
 
     // Delete top-level replies
     if (msg.type === MessageType.Reply) {
