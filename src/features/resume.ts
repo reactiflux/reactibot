@@ -1,29 +1,26 @@
 import {
   Client,
   EmbedType,
-  AttachmentBuilder,
-  Message,
   InteractionType,
   ComponentType,
-  ButtonStyle,
-  ActionRowBuilder,
-  ButtonBuilder,
   ChannelType,
 } from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
-import { createAttachmentBuilderFromURL } from "../helpers/generate-pdf";
 import { sleep } from "../helpers/misc";
 import { logger } from "./log";
 import { EMBED_COLOR } from "./commands";
+import {
+  DELETE_COMMAND,
+  findResumeAttachment,
+  REVIEW_COMMAND,
+} from "./resume-review";
 
 const openai = new OpenAI({
   apiKey: openAiKey,
 });
 const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
-const REVIEW_COMMAND = "review-resume";
-const DELETE_COMMAND = "delete-post";
 
 // one-time setup tasks for the assistant, so the functionality is all local
 const configure = async () => {
@@ -60,7 +57,7 @@ export const resumeResources = async (bot: Client) => {
 
     if (interaction.customId === DELETE_COMMAND) {
       if (interaction.user.id === interaction.channel.ownerId) {
-        await interaction.channel.delete();
+        await interaction.message.delete();
       } else {
         interaction.reply({
           ephemeral: true,
@@ -195,7 +192,6 @@ export const resumeResources = async (bot: Client) => {
     }
 
     const attachment = findResumeAttachment(firstMessage);
-    const resumeImages = await buildResumeImages(firstMessage);
 
     await thread.send({
       content: !attachment
@@ -221,47 +217,6 @@ Here's a few reasons why a brag document is beneficial:
           color: EMBED_COLOR,
         },
       ],
-      components: [
-        // @ts-expect-error Discord.js types appear to be wrong
-        new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId(REVIEW_COMMAND)
-            .setLabel("AI Review")
-            .setStyle(ButtonStyle.Secondary),
-          new ButtonBuilder()
-            .setCustomId(DELETE_COMMAND)
-            .setLabel("Delete post")
-            .setStyle(ButtonStyle.Danger),
-        ),
-      ],
-      files: resumeImages,
     });
   });
-};
-
-const PDF_CONTENT_TYPE = "application/pdf";
-const findResumeAttachment = (msg: Message) => {
-  return msg.attachments.find(
-    (attachment) => attachment.contentType === PDF_CONTENT_TYPE,
-  );
-};
-
-const buildResumeImages = async (
-  msg: Message,
-): Promise<AttachmentBuilder[]> => {
-  const attachment = findResumeAttachment(msg);
-  if (!attachment) {
-    return [];
-  }
-
-  const builder = await createAttachmentBuilderFromURL(
-    attachment.url,
-    `${msg.author.username}-resume`,
-  );
-  if (!builder) {
-    logger.log("[RESUME]", "Failed to generate resume PDF in thread");
-    return [];
-  }
-
-  return builder;
 };

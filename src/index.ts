@@ -28,6 +28,7 @@ import { CHANNELS, initCachedChannels } from "./constants/channels";
 import { scheduleTask } from "./helpers/schedule";
 import { discordToken } from "./helpers/env";
 import { registerCommand, deployCommands } from "./helpers/deploy-commands";
+import resumeReviewPdf from "./features/resume-review";
 import troll from "./features/troll";
 
 export const bot = new discord.Client({
@@ -188,6 +189,8 @@ addHandler(
 
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
+
+addHandler(CHANNELS.resumeReview, resumeReviewPdf);
 
 bot.on("ready", () => {
   deployCommands(bot);
