@@ -61,6 +61,7 @@ export const resumeResources = async (bot: Client) => {
         content:
           "This is not your thread! These interactions can only be used by the original poster.",
       });
+      return;
     }
 
     if (interaction.customId === DELETE_COMMAND) {
