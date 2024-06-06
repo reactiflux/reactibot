@@ -55,16 +55,17 @@ export const resumeResources = async (bot: Client) => {
       return;
     }
 
+    if (interaction.user.id !== interaction.channel.ownerId) {
+      interaction.reply({
+        ephemeral: true,
+        content:
+          "This is not your thread! These interactions can only be used by the original poster.",
+      });
+      return;
+    }
+
     if (interaction.customId === DELETE_COMMAND) {
-      if (interaction.user.id === interaction.channel.ownerId) {
-        await interaction.message.delete();
-      } else {
-        interaction.reply({
-          ephemeral: true,
-          content:
-            "This is not your thread! Posts can only be deleted by the original poster.",
-        });
-      }
+      await interaction.message.delete();
       return;
     }
 
