@@ -62,13 +62,15 @@ const resumeReviewPdf: ChannelHandlers = {
     await message.channel.sendTyping();
 
     const images = await buildResumeImages(message);
-    if (images.length > 0) {
-      cooldown.addCooldown(
-        message.author.id,
-        cooldownKey,
-        FIVE_MINUTES_IN_SECONDS,
-      );
+    if (images.length === 0) {
+      return;
     }
+
+    cooldown.addCooldown(
+      message.author.id,
+      cooldownKey,
+      FIVE_MINUTES_IN_SECONDS,
+    );
     await message.channel.send({
       files: images,
       components: [
