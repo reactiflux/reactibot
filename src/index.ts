@@ -12,7 +12,7 @@ import discord, {
 import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
-import { resumeResources, reviewResume } from "./features/resume";
+import { resumeResources } from "./features/resume";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -54,7 +54,6 @@ export const bot = new discord.Client({
 });
 
 registerCommand(resetJobCacheCommand);
-registerCommand(reviewResume);
 
 if (!isProd()) {
   registerCommand(debugEvents);

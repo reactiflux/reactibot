@@ -34,6 +34,8 @@
 
 There are subtle issues when making some chaings. These are notes for steps to take to make sure it's done correctly when needed.
 
+Generating images for #resume-review requires GraphicsMagick installed. [Brew](https://formulae.brew.sh/formula/graphicsmagick), [Linux](http://www.graphicsmagick.org/)
+
 ## Environment variables
 
 Adding a new environment variable needs to be done in several places to work corectly and be predictable for new developers:

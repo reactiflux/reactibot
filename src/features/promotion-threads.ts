@@ -7,17 +7,13 @@ import fetch from "node-fetch";
 import { ChannelType, MessageType } from "discord.js";
 
 const promotionThread: ChannelHandlers = {
-  handleMessage: async ({ msg: maybeMessage }) => {
+  handleMessage: async ({ msg }) => {
     if (
-      maybeMessage.channel.type === ChannelType.PublicThread ||
-      maybeMessage.channel.type === ChannelType.PrivateThread
+      msg.channel.type === ChannelType.PublicThread ||
+      msg.channel.type === ChannelType.PrivateThread
     ) {
       return;
     }
-
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
 
     // Delete top-level replies
     if (msg.type === MessageType.Reply) {
@@ -39,7 +35,7 @@ const promotionThread: ChannelHandlers = {
     const title = await (async () => {
       let maybeTitle = msg.author.username;
       if (firstLink) {
-        if (firstLink.startsWith("https://twitter.com/")) {
+        if (/^https:\/\/twitter.com|^https:\/\/x.com/.test(firstLink)) {
           try {
             const res = await fetch(
               `https://publish.twitter.com/oembed?url=${firstLink}`,
