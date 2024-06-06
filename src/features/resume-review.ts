@@ -54,7 +54,7 @@ const resumeReviewPdf: ChannelHandlers = {
 
     if (cooldown.hasCooldown(message.author.id, cooldownKey)) {
       message.channel.send(
-        "You posted < 5 minutes ago, not creating a new preview",
+        "You posted just a few minutes ago. Please wait a bit before creating a new preview.",
       );
       return;
     }
