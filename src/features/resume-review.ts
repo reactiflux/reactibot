@@ -59,13 +59,12 @@ const resumeReviewPdf: ChannelHandlers = {
       return;
     }
 
-    await message.channel.sendTyping();
-
     const images = await buildResumeImages(message);
     if (images.length === 0) {
       return;
     }
 
+    await message.channel.sendTyping();
     cooldown.addCooldown(
       message.author.id,
       cooldownKey,
