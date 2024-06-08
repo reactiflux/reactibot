@@ -17,7 +17,6 @@ import {
   ChannelType,
   GuildTextThreadCreateOptions,
 } from "discord.js";
-import prettyBytes from "pretty-bytes";
 
 export const difference = <T>(a: Set<T>, b: Set<T>) =>
   new Set(Array.from(a).filter((x) => !b.has(x)));
@@ -95,26 +94,6 @@ export const quoteMessageContent = (content: string) => {
     return quoted.slice(0, 2000);
   }
   return quoted;
-};
-
-/*
- * Create a message embed that
- */
-export const describeAttachments = (attachments: Message["attachments"]) => {
-  return attachments.size === 0
-    ? ""
-    : "Attachments:\n" +
-        attachments
-          .map(
-            ({ size, name, contentType, url }) =>
-              // Include size of the file and the filename
-              `${prettyBytes(size)}: ${
-                // If it's a video or image, include a link.
-                // Renders as `1.12mb: [some-image.jpg](<original image url>)`
-                contentType?.match(/(image|video)/) ? `[${name}](${url})` : name
-              }`,
-          )
-          .join("\n");
 };
 
 /*

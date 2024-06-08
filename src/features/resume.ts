@@ -125,7 +125,7 @@ export const resumeResources = async (bot: Client) => {
               {
                 role: "user",
                 content: firstMessage.content,
-                file_ids: [file.id],
+                attachments: [{ file_id: file.id }],
               },
             ],
           }),

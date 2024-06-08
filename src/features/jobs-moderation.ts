@@ -48,8 +48,11 @@ export const resetJobCacheCommand = {
         .setDescription("User to clear post history for")
         .setRequired(true),
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-
+    .setDefaultMemberPermissions(
+      PermissionFlagsBits.ManageMessages,
+      // NOTE: 'addUserOption' forces the type to be SlashCommandOptionsOnlyBuilder
+      //  which would require to have 'addSubcommand' and 'addSubcommandGroup' methods when registering the command
+    ) as SlashCommandBuilder,
   handler: async (interaction: CommandInteraction) => {
     const { options } = interaction;
 
@@ -317,8 +320,8 @@ More details & apply: https://example.com/apply
         ? `If you're hiring: ${freeflowHiring}
 If you're seeking work: ${freeflowForHire}`
         : hiring
-        ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
-        : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
+          ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
+          : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
     );
   }
   await thread.send("Your post:");

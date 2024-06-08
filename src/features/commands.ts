@@ -396,7 +396,12 @@ Here's an article explaining the difference between the two: https://goshakkk.na
         ),
       ]);
 
-      const { documents } = await res.json();
+      const { documents } = (await res.json()) as {
+        documents: (
+          | { title: string; excerpt: string; mdn_url: string }
+          | undefined
+        )[];
+      };
       const [topResult] = documents;
 
       if (!topResult) {
