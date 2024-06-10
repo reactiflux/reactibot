@@ -113,6 +113,7 @@ const jobModeration = async (bot: Client) => {
     if (
       message.author.bot ||
       message.channelId !== CHANNELS.jobBoard ||
+      (channel.isThread() && channel.parentId !== CHANNELS.jobBoard) ||
       // Don't treat newly fetched old messages as new posts
       differenceInHours(new Date(), message.createdAt) >= 1
     ) {
