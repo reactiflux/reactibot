@@ -163,8 +163,8 @@ const emojiMod: ChannelHandlers = {
       reactor,
       message: fullMessage,
       reaction: fullReaction,
-      usersWhoReacted: usersWhoReacted.filter((x): x is GuildMember =>
-        Boolean(x),
+      usersWhoReacted: usersWhoReacted.filter(
+        (x): x is GuildMember => Boolean(x) && authorMember.id !== reactor.id,
       ),
     });
   },
