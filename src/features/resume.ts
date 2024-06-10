@@ -17,6 +17,7 @@ import {
   REVIEW_COMMAND,
 } from "./resume-review";
 import { constructDiscordLink } from "../helpers/discord";
+import { retry } from "./retry";
 
 const openai = new OpenAI({
   apiKey: openAiKey,
@@ -75,7 +76,8 @@ export const resumeResources = async (bot: Client) => {
       deferred.edit("Looking for a resume…");
       const messages = await interaction.channel.messages.fetch();
 
-      const firstMessage = await interaction.channel.fetchStarterMessage();
+      const { fetchStarterMessage } = interaction.channel;
+      const firstMessage = await retry(() => fetchStarterMessage(), 5, 10);
       if (!firstMessage) {
         await interaction.reply({
           ephemeral: true,
