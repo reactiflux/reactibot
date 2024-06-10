@@ -19,7 +19,7 @@ export const channelLog =
 
       if (channel?.type == ChannelType.GuildText) {
         channel.send({
-          content: `[${type}] ${text}`,
+          content: `[${type}] ${text}`.slice(0, 2000),
           allowedMentions: { users: [] },
         });
       }
