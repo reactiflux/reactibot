@@ -53,9 +53,11 @@ const resumeReviewPdf: ChannelHandlers = {
     const cooldownKey = `resume-${message.channelId}`;
 
     if (cooldown.hasCooldown(message.author.id, cooldownKey)) {
-      message.channel.send(
-        "You posted just a few minutes ago. Please wait a bit before creating a new preview.",
-      );
+      if (findResumeAttachment(message)) {
+        message.channel.send(
+          "You posted just a few minutes ago. Please wait a bit before creating a new preview.",
+        );
+      }
       return;
     }
 
