@@ -16,6 +16,8 @@ import {
   findResumeAttachment,
   REVIEW_COMMAND,
 } from "./resume-review";
+import { constructDiscordLink } from "../helpers/discord";
+import { retry } from "./retry";
 
 const openai = new OpenAI({
   apiKey: openAiKey,
@@ -74,7 +76,8 @@ export const resumeResources = async (bot: Client) => {
       deferred.edit("Looking for a resume…");
       const messages = await interaction.channel.messages.fetch();
 
-      const firstMessage = await interaction.channel.fetchStarterMessage();
+      const { fetchStarterMessage } = interaction.channel;
+      const firstMessage = await retry(() => fetchStarterMessage(), 5, 10);
       if (!firstMessage) {
         await interaction.reply({
           ephemeral: true,
@@ -162,8 +165,11 @@ export const resumeResources = async (bot: Client) => {
         console.log({ content });
         const trimmed =
           content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
-        logger.log("[RESUME]", `Feedback given:`);
-        logger.log("[RESUME]", trimmed);
+        logger.log(
+          "RESUME",
+          `Feedback given: ${constructDiscordLink(firstMessage)}`,
+        );
+        logger.log("RESUME", trimmed);
         deferred.edit({
           content: trimmed,
         });

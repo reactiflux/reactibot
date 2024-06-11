@@ -94,17 +94,17 @@ How do I ask a good question <https://stackoverflow.com/help/how-to-ask>
     message: {
       content: `Check our the other channels too! This is our highest-traffic channel, which may mean your question gets missed as other discussions happen.
 
-#help-js For questions about pure Javscript problems.
-#help-styling For questions about CSS or other visual problems.
-#help-backend For questions about issues with your server code.
-#code-review Get deeper review of a snippet of code.
-#jobs-advice If you have a question about your job or career, ask it in here.
-#general-tech Discussion of non-JS code, or that new laptop you're deciding on.
-#tooling for questions about building, linting, generating, or otherwise processing your code.
+<#565213527673929729> For questions about pure Javscript problems.
+<#105765765117935616> For questions about CSS or other visual problems.
+<#145170347921113088> For questions about issues with your server code.
+<#105765859191975936> Get deeper review of a snippet of code.
+<#287623405946011648> If you have a question about your job or career, ask it in here.
+<#547620660482932737> Discussion of non-JS code, or that new laptop you're deciding on.
+<#108428584783220736> for questions about building, linting, generating, or otherwise processing your code.
 
-Looking for work? Trying to hire? Check out #job-board, or <https://reactiflux.com/jobs>
+Looking for work? Trying to hire? Check out <#103882387330457600>, or <https://reactiflux.com/jobs>
 
-Has someone been really helpful? Shoutout who and what in #thanks! We keep an eye in there as one way to find new MVPs. Give us all the reactions in there too!
+Has someone been really helpful? Shoutout who and what in <#798567961468076072>! We keep an eye in there as one way to find new MVPs. Give us all the reactions in there too!
 
 Please remember our Code of Conduct: <https://reactiflux.com/conduct>
 and our guidelines for promotion: <https://reactiflux.com/promotion>
