@@ -6,7 +6,7 @@ console.log(retryCount, {
   retryCount,
 });
 ```
-as the first line of the `attempt` function produced: 
+as the first line of the `attempt` function produced:
 ```
 > 5 { backoff: 20, retryCount: 5 }
 > 4 { backoff: 40, retryCount: 4 }
@@ -37,9 +37,12 @@ export function retry<T>(
           if (retryCount <= 0) {
             reject(error);
           } else {
-            setTimeout(() => {
-              attempt(retryCount - 1);
-            }, delayMs * Math.pow(2, retries - retryCount));
+            setTimeout(
+              () => {
+                attempt(retryCount - 1);
+              },
+              delayMs * Math.pow(2, retries - retryCount),
+            );
           }
         });
     };
