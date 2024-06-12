@@ -76,8 +76,12 @@ export const resumeResources = async (bot: Client) => {
       deferred.edit("Looking for a resume…");
       const messages = await interaction.channel.messages.fetch();
 
-      const { fetchStarterMessage } = interaction.channel;
-      const firstMessage = await retry(() => fetchStarterMessage(), 5, 10);
+      const channel = interaction.channel;
+      const firstMessage = await retry(
+        () => channel.fetchStarterMessage(),
+        5,
+        10,
+      );
       if (!firstMessage) {
         await interaction.reply({
           ephemeral: true,
