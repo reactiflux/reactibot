@@ -19,7 +19,7 @@ export const getReactDocsContent = async (searchPath: string) => {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
-    const json = await response.json();
+    const json = (await response.json()) as { content: string };
     const contentBase64 = json.content;
     const decodedContent = Buffer.from(contentBase64, "base64").toString(
       "utf8",

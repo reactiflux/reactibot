@@ -40,7 +40,9 @@ const promotionThread: ChannelHandlers = {
             const res = await fetch(
               `https://publish.twitter.com/oembed?url=${firstLink}`,
             );
-            const { author_name } = await res.json();
+            const { author_name } = (await res.json()) as {
+              author_name: string;
+            };
             maybeTitle = `${author_name} on Twitter `;
           } catch (e) {
             // do nothing
@@ -56,7 +58,7 @@ const promotionThread: ChannelHandlers = {
                 maybeTitle = `${msg.author.username} tweet`;
               } else if (result.ogSiteName === "GitHub") {
                 maybeTitle =
-                  result.ogDescription || result.title || result.ogSiteName;
+                  result.ogDescription || result.ogTitle || result.ogSiteName;
               } else {
                 maybeTitle = `${result.twitterTitle || result.ogTitle}`;
               }
