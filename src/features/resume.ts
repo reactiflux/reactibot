@@ -131,8 +131,13 @@ export const resumeResources = async (bot: Client) => {
               },
               {
                 role: "user",
-                content: firstMessage.content,
-                attachments: [{ file_id: file.id }],
+                content: firstMessage.content || "Here is my resume",
+                attachments: [
+                  {
+                    file_id: file.id,
+                    tools: [{ type: "file_search" }],
+                  },
+                ],
               },
             ],
           }),
