@@ -37,7 +37,7 @@ const loggers: LoggerMap = new Map([["stdout", stdoutLog]]);
 export const logger = {
   add: ({ id, logger }: LoggerObj) => loggers.set(id, logger),
   remove: (loggerId: LoggerObj["id"]) => loggers.delete(loggerId),
-  log: (type: string, text: string, logName: LoggerKey = "botLog") => {
+  log: (type: string, log: string | Error, logName: LoggerKey = "botLog") => {
     const defaultLogger = loggers.get("stdout");
     const logger = loggers.get(logName);
 
@@ -51,6 +51,7 @@ export const logger = {
       return;
     }
 
+    const text = log instanceof Error ? `${log.message} ${log.stack}` : log;
     defaultLogger(type, text);
     logger(type, text);
   },
