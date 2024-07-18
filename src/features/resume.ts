@@ -131,8 +131,13 @@ export const resumeResources = async (bot: Client) => {
               },
               {
                 role: "user",
-                content: firstMessage.content,
-                attachments: [{ file_id: file.id }],
+                content: firstMessage.content || "Here is my resume",
+                attachments: [
+                  {
+                    file_id: file.id,
+                    tools: [{ type: "file_search" }],
+                  },
+                ],
               },
             ],
           }),
@@ -179,10 +184,15 @@ export const resumeResources = async (bot: Client) => {
         });
       } catch (e) {
         // recover
-        console.log(e);
+        deferred.edit("Oops, something went wrong talking to the AI.");
+        if (e instanceof Error) {
+          logger.log("RESUME", e);
+        }
+        return;
+      } finally {
+        // Ensure files are cleaned up
+        await openai.files.del(file.id);
       }
-      // Ensure files are cleaned up
-      await openai.files.del(file.id);
 
       // defer: offer fixed interaction buttons to send more prompts
       return;
