@@ -15,6 +15,7 @@ import {
   getReactDocsContent,
   getReactDocsSearchKey,
 } from "../helpers/react-docs";
+import dedent from "dedent";
 
 export const EMBED_COLOR = 7506394;
 
@@ -1108,6 +1109,32 @@ _ _
                 inline: true,
               },
             ],
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
+    words: ["!apply"],
+    help: "a quick list of 'good to know' items for job applications",
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "A quick list of 'good to know' items for job applications",
+            type: EmbedType.Rich,
+            description: dedent`
+              - Your resume and interview performance are more important than your projects.
+              - If you struggle to get interviews, polish your resume. You may submit your resume in #resume-review for review.
+              - If you get invited to interviews reliably but constantly get rejected/ghosted afterward, practice interviewing.
+              - Job descriptions are like a wishlist. It is common for a candidate to not tick every checkbox but still get the job. Just apply for the position regardless.
+              - Junior remote jobs are very rare. For more, see \`!remote\`.
+              - Depending on where you are, it is not uncommon for a junior to apply for 30+ jobs a week. See \`!junior\` for more details.
+              - Working in large companies and smaller companies/start-ups has its advantages and disadvantages.
+              - Freelancing and starting a start-up is not for newbies. It requires more than just your technical skills. e.g. acquiring customers, marketing, etc.
+            `,
             color: EMBED_COLOR,
           },
         ],
