@@ -1133,7 +1133,7 @@ _ _
               - Junior remote jobs are very rare. For more, see \`!remote\`.
               - Depending on where you are, it is not uncommon for a junior to apply for 30+ jobs a week. See \`!junior\` for more details.
               - Working in large companies and smaller companies/start-ups has its advantages and disadvantages.
-              - Freelancing and starting a start-up is not for newbies. It requires more than just your technical skills. e.g. acquiring customers, marketing, etc.
+              - Freelancing and starting a start-up is very challenging compared to being an employee. It requires more than just your technical skills. e.g. acquiring customers, marketing, etc.
             `,
             color: EMBED_COLOR,
           },
