@@ -4,6 +4,7 @@ import {
   InteractionType,
   ComponentType,
   ChannelType,
+  Message,
 } from "discord.js";
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
@@ -75,13 +76,18 @@ export const resumeResources = async (bot: Client) => {
       const deferred = await interaction.deferReply({ ephemeral: true });
       deferred.edit("Looking for a resume…");
       const messages = await interaction.channel.messages.fetch();
-
       const channel = interaction.channel;
-      const firstMessage = await retry(
-        () => channel.fetchStarterMessage(),
-        5,
-        10,
-      );
+
+      let firstMessage: Message<true> | null = null;
+      try {
+        firstMessage = await retry(() => channel.fetchStarterMessage(), {
+          retries: 5,
+          delayMs: 10,
+        });
+      } catch {
+        logger.log("RESUME", "Failed to fetch interaction first message");
+      }
+
       if (!firstMessage) {
         await interaction.reply({
           ephemeral: true,
@@ -207,7 +213,17 @@ export const resumeResources = async (bot: Client) => {
     if (thread.parentId !== CHANNELS.resumeReview) {
       return;
     }
-    const firstMessage = await thread.fetchStarterMessage();
+
+    let firstMessage: Message<true> | null = null;
+    try {
+      firstMessage = await retry(() => thread.fetchStarterMessage(), {
+        retries: 5,
+        delayMs: 10,
+      });
+    } catch {
+      logger.log("RESUME", "Failed to fetch thread first message");
+    }
+
     if (!firstMessage) {
       return;
     }
