@@ -25,6 +25,7 @@
     "discord.js": "14.15.3",
     "dotenv": "16.4.5",
     "gists": "2.0.0",
+    "html-entities": "^2.5.2",
     "lru-cache": "10.2.2",
     "node-cron": "3.0.3",
     "node-fetch": "2.6.12",
