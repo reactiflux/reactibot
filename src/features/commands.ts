@@ -1152,7 +1152,9 @@ _ _
         title: "",
         type: EmbedType.Rich,
         description: `
-Authentication is a critical part of most web applications. Below are some resources to help you get started with authentication:
+Authentication is a critical part of most web applications. Here are some resources to help you get started.
+- [JSON Web Tokens (JWT) are Dangerous for User Sessions](https://redis.io/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions/)
+- [JWT should not be your default for sessions](https://evertpot.com/jwt-is-a-bad-default/)
         `,
         fields: [
           {
