@@ -131,49 +131,61 @@ Let us know if anything crosses a line: give it a 👎, or if you'd prefer to re
       },
     ],
     message: async (channel) => {
-      const res = await fetch(
-        "https://old.reddit.com/r/reactjs/top.json?sort=top&t=day&limit=10",
-      );
-      const feed = await res.json();
+      try {
+        const res = await fetch(
+          "https://old.reddit.com/r/reactjs/top.json?sort=top&t=day&limit=10",
+        );
+        if (
+          !res.ok ||
+          !(res.headers.get("Content-Type") || "").includes("application/json")
+        ) {
+          console.log(await res.text());
+          throw new Error("Got back garbage from reddit");
+        }
+        const feed = await res.json();
 
-      const top = (feed.data.children as any[])
-        .filter(
-          ({ data: post }: any) =>
-            post.ups - post.downs >= 10 &&
-            countLines(post.selftext) <= 15 &&
-            post.selftext.length < 2000 &&
-            post.upvote_ratio > 0.65,
-        )
-        .slice(0, 3)
-        .map(({ data: post }) => ({
-          url: `https://old.reddit.com${post.permalink}`,
-          title: post.title,
-          author: post.author,
-          body: decode(post.selftext).trim().slice(0, 2000),
-          subreddit: post.subreddit_name_prefixed,
-          votes: {
-            score: post.ups,
-            up: Math.round(post.upvote_ratio * post.ups),
-            down: Math.round((1 - post.upvote_ratio) * post.ups),
-          },
-        }));
+        const top = (feed.data.children as any[])
+          .filter(
+            ({ data: post }: any) =>
+              post.ups - post.downs >= 10 &&
+              countLines(post.selftext) <= 15 &&
+              post.selftext.length < 2000 &&
+              post.upvote_ratio > 0.65,
+          )
+          .slice(0, 3)
+          .map(({ data: post }) => ({
+            url: `https://old.reddit.com${post.permalink}`,
+            title: post.title,
+            author: post.author,
+            body: decode(post.selftext).trim().slice(0, 2000),
+            subreddit: post.subreddit_name_prefixed,
+            votes: {
+              score: post.ups,
+              up: Math.round(post.upvote_ratio * post.ups),
+              down: Math.round((1 - post.upvote_ratio) * post.ups),
+            },
+          }));
 
-      top.forEach((post) => {
-        channel.send({
-          embeds: [
-            {
-              description: `${post.votes.up - post.votes.down} 🔼 in ${post.subreddit} 
+        top.forEach((post) => {
+          channel.send({
+            embeds: [
+              {
+                description: `${post.votes.up - post.votes.down} 🔼 in ${post.subreddit} 
 -# (${post.votes.up} | ${post.votes.down}) 
 ### [${post.title}](${post.url}) 
-by [/u/${post.author}](https://old.reddit.com/u/${post.author})
-
-${post.body}
+by [/u/${post.author}](https://old.reddit.com/u/${post.author})${post.body ? `\n\n${post.body}` : ""}
 
 -# This is a once-daily summary of top posts from reddit`,
-            },
-          ],
+              },
+            ],
+          });
         });
-      });
+      } catch (e) {
+        if (e instanceof Error) {
+          logger.log("REDDIT", e);
+          return;
+        }
+      }
     },
   },
 ];
