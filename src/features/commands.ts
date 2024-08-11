@@ -1141,6 +1141,62 @@ _ _
       });
     },
   },
+  {
+    words: ["!auth", "!authentication"],
+    help: "Provides a list of popular backend- and meta-frameworks",
+    category: "Web",
+    handleMessage: (msg) => {
+      const firstMention = msg.mentions.users.first();
+
+      const embed = {
+        title: "",
+        type: EmbedType.Rich,
+        description: `
+Authentication is a critical part of most web applications. Here are some resources to help you get started.
+- [JSON Web Tokens (JWT) are Dangerous for User Sessions](https://redis.io/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions/)
+- [JWT should not be your default for sessions](https://evertpot.com/jwt-is-a-bad-default/)
+        `,
+        fields: [
+          {
+            name: "Authentication Resources",
+            value: `
+- [TheCopenhagenBook](https://thecopenhagenbook.com/)
+- [OWASP Auth Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- [OWASP Session Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
+`,
+            inline: true,
+          },
+          {
+            name: "Authentication Libraries",
+            value: `
+- [Lucia](https://lucia-auth.com/)
+- [Auth.js](https://authjs.dev/)
+- [Passport](http://www.passportjs.org/)
+`,
+            inline: true,
+          },
+          {
+            name: "Auth as a service",
+            value: `
+- [Supabase](https://supabase.io/)
+- [Clerk](https://clerk.com/)
+- [Auth0](https://auth0.com/)
+`,
+            inline: true,
+          },
+        ],
+        color: EMBED_COLOR,
+      };
+
+      if (firstMention) {
+        embed.description = `Hey ${firstMention}, ${embed.description}`;
+      }
+
+      msg.channel.send({
+        embeds: [embed],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
