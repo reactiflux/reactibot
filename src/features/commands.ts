@@ -1147,7 +1147,6 @@ _ _
     category: "Web",
     handleMessage: (msg) => {
       const firstMention = msg.mentions.users.first();
-
       const embed = {
         title: "",
         type: EmbedType.Rich,
@@ -1188,7 +1187,7 @@ Authentication is a critical part of most web applications. Here are some resour
         color: EMBED_COLOR,
       };
 
-      if (firstMention) {
+      if (firstMention && firstMention.id !== msg.mentions.repliedUser?.id) {
         embed.description = `Hey ${firstMention}, ${embed.description}`;
       }
 
@@ -1219,7 +1218,8 @@ const createCommandsMessage = () => {
     // Mutating in map(), but whatever
     commands.sort((a, b) => {
       // Assume there's at least one trigger word per command
-      return a.words[0].localeCompare(b.words[0]);
+      // Only check the first line of the message
+      return a.words[0].split("\n", 1)[0].localeCompare(b.words[0]);
     });
 
     const boldTitle = `**${category}**`;
