@@ -9,7 +9,6 @@ import {
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
-import { sleep } from "../helpers/misc";
 import { logger } from "./log";
 import { EMBED_COLOR } from "./commands";
 import {
@@ -167,44 +166,30 @@ export const resumeResources = async (bot: Client) => {
           }),
         ]);
 
-        let run = await openai.beta.threads.runs.create(
+        const run = await openai.beta.threads.runs.stream(
           thread.id,
           { assistant_id: assistant.id },
-          // { stream: true },
+          { stream: true },
         );
 
-        // TODO: stream responses. OpenAI hasn't released streaming responses for
-        // assistant runs as of 2023-11
-        // let content = "";
-        // for await (const chunk of stream) {
-        //   content += chunk.choices[0]?.delta?.content;
-        //   sleep(1.5);
-        // }
-        while (run.status === "queued" || run.status === "in_progress") {
-          await sleep(0.5);
-          run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-          console.log(run.started_at, run.status);
-        }
-        console.log("run finished:", run.status, JSON.stringify(run, null, 2));
+        run.on("textCreated", () => {
+          interaction.channel?.sendTyping();
+        });
 
-        const messages = await openai.beta.threads.messages.list(thread.id);
-        console.log(JSON.stringify(messages.data, null, 2));
-        const content: string[] = messages.data
-          .filter((d) => d.role === "assistant")
-          .flatMap((d) =>
-            d.content.map((c) => (c.type === "text" ? c.text.value : "\n\n")),
+        run.on("textDone", (content) => {
+          interaction.channel?.type;
+          const trimmed =
+            content.value.slice(0, 2000) ?? "Oops! Something went wrong.";
+          logger.log(
+            "RESUME",
+            `Feedback given: ${constructDiscordLink(firstMessage)}`,
           );
+          logger.log("RESUME", trimmed);
+          deferred.edit({
+            content: "Done!",
+          });
 
-        console.log({ content });
-        const trimmed =
-          content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
-        logger.log(
-          "RESUME",
-          `Feedback given: ${constructDiscordLink(firstMessage)}`,
-        );
-        logger.log("RESUME", trimmed);
-        deferred.edit({
-          content: trimmed,
+          interaction.channel?.send(content.value);
         });
       } catch (e) {
         // recover
