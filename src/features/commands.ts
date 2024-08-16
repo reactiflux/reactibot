@@ -1196,6 +1196,27 @@ Authentication is a critical part of most web applications. Here are some resour
       });
     },
   },
+  {
+    words: ["!cra", "!create-react-app"],
+    help: "Provides a list of popular backend- and meta-frameworks",
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "create-react-app is deprecated",
+            type: EmbedType.Rich,
+            description: `
+create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use Vite or Next.js instead.
+Vite: https://vitejs.dev/
+Next.js: https://nextjs.org/
+            `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
