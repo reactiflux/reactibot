@@ -1147,12 +1147,13 @@ _ _
     category: "Web",
     handleMessage: (msg) => {
       const firstMention = msg.mentions.users.first();
-
       const embed = {
         title: "",
         type: EmbedType.Rich,
         description: `
-Authentication is a critical part of most web applications. Below are some resources to help you get started with authentication:
+Authentication is a critical part of most web applications. Here are some resources to help you get started.
+- [JSON Web Tokens (JWT) are Dangerous for User Sessions](https://redis.io/blog/json-web-tokens-jwt-are-dangerous-for-user-sessions/)
+- [JWT should not be your default for sessions](https://evertpot.com/jwt-is-a-bad-default/)
         `,
         fields: [
           {
@@ -1186,7 +1187,7 @@ Authentication is a critical part of most web applications. Below are some resou
         color: EMBED_COLOR,
       };
 
-      if (firstMention) {
+      if (firstMention && firstMention.id !== msg.mentions.repliedUser?.id) {
         embed.description = `Hey ${firstMention}, ${embed.description}`;
       }
 
@@ -1239,7 +1240,8 @@ const createCommandsMessage = () => {
     // Mutating in map(), but whatever
     commands.sort((a, b) => {
       // Assume there's at least one trigger word per command
-      return a.words[0].localeCompare(b.words[0]);
+      // Only check the first line of the message
+      return a.words[0].split("\n", 1)[0].localeCompare(b.words[0]);
     });
 
     const boldTitle = `**${category}**`;

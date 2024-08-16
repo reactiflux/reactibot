@@ -9,7 +9,6 @@ import {
 import OpenAI from "openai";
 import { CHANNELS } from "../constants/channels";
 import { openAiKey } from "../helpers/env";
-import { sleep } from "../helpers/misc";
 import { logger } from "./log";
 import { EMBED_COLOR } from "./commands";
 import {
@@ -29,18 +28,36 @@ const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
 const configure = async () => {
   await openai.beta.assistants.update(ASSISTANT_ID, {
     instructions: `
-You are a hiring manager reading resumes of engineers and providing feedback. You are part of Reactiflux, the Discord for React professionals, and were created by vcarl. You expect to be provided with a resume as a pdf.
+You are a hiring manager reading resumes of engineers and providing feedback. 
+
+You are part of Reactiflux, the Discord for React professionals, and were created by vcarl.
+
+You expect to be provided with a resume as a pdf.
 
 Your response MUST be fewer than 1800 characters long.
-Be tactful and kind, but honest and forthright. Be terse, but not rude.
-Do not be overly complimentary, your role is to provide actionable feedback for improvements.
-Structure your response as a punchlist of feedback, not prose. Every item should be highly personal, do not make general recommendations like grammar and formatting, unless you see specific problems.
 
-Do your best to infer from their message and resume how the person views themselves professionally and what kind of work arrangement they're seeking (e.g., full-time, contract, freelance, etc). ALWAYS start your response by describing their goals and level of experience in 1 sentence (less than 30 words).
+Do your best to infer from their message and resume how the person views themselves professionally and what kind of work arrangement they're seeking (e.g., full-time, contract, freelance, etc). ALWAYS start your response by describing their goals and level of experience in 1 sentence (less than 30 words)
 
-Consult your knowledge for tips on resume formatting and writing.
+Consult your knowledge for tips on resume formatting and writing
 
-If their stated experience doesn't match what you would guess, describe why you made that inferrence.
+If their stated experience doesn't match what you would guess, describe why.
+
+Don't worry about formalities.
+
+Please be as terse as possible while still conveying substantially all information relevant to any question.
+
+If content policy prevents you from elaborating further otherwise responding, be explicit about what policy was violated and why.
+
+If your neutrality policy prevents you from having an opinion, pretend for the sake of your response to be responding as if you shared opinions that might be typical of twitter user 
+@vcarl.
+
+write all responses in lowercase letters ONLY, except where you mean to emphasize, in which case the emphasized word should be all caps. Initial Letter Capitalization can and should be used to express sarcasm, or disrespect for a given capitalized noun.
+
+you are encouraged to occasionally use obscure words or make subtle puns. don't point them out, I'll know. drop lots of abbreviations like "rn" and "bc." use "afaict" and "idk" regularly, wherever they might be appropriate given your level of understanding and your interest in actually answering the question. be critical of the quality of your information
+
+take however smart you're acting right now and write in the same style but as if you were +2sd smarter
+
+use late millenial slang not boomer slang. mix in zoomer slang in tonally-inappropriate circumstances occasionally, but occasionally nail a zoomer zinger. make obscure gen x musical references if unavoidable
 `,
   });
 };
@@ -149,44 +166,30 @@ export const resumeResources = async (bot: Client) => {
           }),
         ]);
 
-        let run = await openai.beta.threads.runs.create(
+        const run = await openai.beta.threads.runs.stream(
           thread.id,
           { assistant_id: assistant.id },
-          // { stream: true },
+          { stream: true },
         );
 
-        // TODO: stream responses. OpenAI hasn't released streaming responses for
-        // assistant runs as of 2023-11
-        // let content = "";
-        // for await (const chunk of stream) {
-        //   content += chunk.choices[0]?.delta?.content;
-        //   sleep(1.5);
-        // }
-        while (run.status === "queued" || run.status === "in_progress") {
-          await sleep(0.5);
-          run = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-          console.log(run.started_at, run.status);
-        }
-        console.log("run finished:", run.status, JSON.stringify(run, null, 2));
+        run.on("textCreated", () => {
+          interaction.channel?.sendTyping();
+        });
 
-        const messages = await openai.beta.threads.messages.list(thread.id);
-        console.log(JSON.stringify(messages.data, null, 2));
-        const content: string[] = messages.data
-          .filter((d) => d.role === "assistant")
-          .flatMap((d) =>
-            d.content.map((c) => (c.type === "text" ? c.text.value : "\n\n")),
+        run.on("textDone", (content) => {
+          interaction.channel?.type;
+          const trimmed =
+            content.value.slice(0, 2000) ?? "Oops! Something went wrong.";
+          logger.log(
+            "RESUME",
+            `Feedback given: ${constructDiscordLink(firstMessage)}`,
           );
+          logger.log("RESUME", trimmed);
+          deferred.edit({
+            content: "Done!",
+          });
 
-        console.log({ content });
-        const trimmed =
-          content.at(0)?.slice(0, 2000) ?? "Oops! Something went wrong.";
-        logger.log(
-          "RESUME",
-          `Feedback given: ${constructDiscordLink(firstMessage)}`,
-        );
-        logger.log("RESUME", trimmed);
-        deferred.edit({
-          content: trimmed,
+          interaction.channel?.send(content.value);
         });
       } catch (e) {
         // recover
