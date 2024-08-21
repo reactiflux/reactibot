@@ -1196,6 +1196,25 @@ Authentication is a critical part of most web applications. Here are some resour
       });
     },
   },
+  {
+    words: ["!cra", "!create-react-app"],
+    help: "Provides alternatives to Create React App, which is no longer recommended.",
+    category: "Web",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "create-react-app is deprecated",
+            type: EmbedType.Rich,
+            description: `
+create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use [Vite](https://vitejs.dev/) or [Next.js](https://nextjs.org/) instead. The [React docs](https://react.dev/learn/start-a-new-react-project#can-i-use-react-without-a-framework) has more to say about using React without the use of a framework like Next or Remix.
+            `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
 ];
 
 const createCommandsMessage = () => {
