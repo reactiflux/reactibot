@@ -1198,7 +1198,7 @@ Authentication is a critical part of most web applications. Here are some resour
   },
   {
     words: ["!cra", "!create-react-app"],
-    help: "Provides a list of popular backend- and meta-frameworks",
+    help: "Provides alternatives to Create React App, which is no longer recommended.",
     category: "Web",
     handleMessage: (msg) => {
       msg.channel.send({
