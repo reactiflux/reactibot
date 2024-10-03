@@ -13,6 +13,7 @@ import { logger, channelLog } from "./features/log";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
 import { resumeResources } from "./features/resume";
+import { lookingForGroup } from "./features/looking-for-group";
 import autoban from "./features/autoban";
 import commands from "./features/commands";
 import setupStats from "./features/stats";
@@ -208,6 +209,7 @@ bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
   resumeResources(bot);
+  lookingForGroup(bot);
   voiceActivity(bot);
   modActivity(bot);
   debugEventButtonHandler(bot);
