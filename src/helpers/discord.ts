@@ -16,6 +16,7 @@ import {
   ForumChannel,
   ChannelType,
   GuildTextThreadCreateOptions,
+  AutocompleteInteraction,
 } from "discord.js";
 
 export const difference = <T>(a: Set<T>, b: Set<T>) =>
@@ -140,6 +141,7 @@ export type UserContextCommand = {
 export type SlashCommand = {
   command: SlashCommandBuilder;
   handler: (interaction: ChatInputCommandInteraction) => void;
+  autocomplete?: (interaction: AutocompleteInteraction) => void;
 };
 
 // ********* Discord Command Helpers
