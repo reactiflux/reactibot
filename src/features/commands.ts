@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
-import fetch from "node-fetch";
 import {
   APIEmbed,
   ChannelType,
@@ -388,48 +386,9 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     help: `allows you to search something on MDN, usage: !mdn Array.prototype.map`,
     category: "Web",
     handleMessage: async (msg) => {
-      const [, ...args] = msg.content.split(" ");
-      const query = args.join(" ");
-      const [fetchMsg, res] = await Promise.all([
-        msg.channel.send(`Fetching "${query}"...`),
-        fetch(
-          `https://developer.mozilla.org/api/v1/search?highlight=false&locale=en-us&q=${query}`,
-        ),
-      ]);
-
-      const { documents } = (await res.json()) as {
-        documents: (
-          | { title: string; excerpt: string; mdn_url: string }
-          | undefined
-        )[];
-      };
-      const [topResult] = documents;
-
-      if (!topResult) {
-        fetchMsg.edit(`Could not find anything on MDN for '${query}'`);
-        return;
-      }
-
-      const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
-
-      await msg.channel.send({
-        embeds: [
-          {
-            author: {
-              name: "MDN",
-              url: "https://developer.mozilla.org",
-              icon_url:
-                "https://developer.mozilla.org/favicon-48x48.cbbd161b.png",
-            },
-            title,
-            description,
-            color: 0x83d0f2,
-            url: `https://developer.mozilla.org${mdnUrl}`,
-          },
-        ],
-      });
-
-      fetchMsg.delete();
+      await msg.channel.send(
+        "The !mdn command has been replaced with a slash command! Try out /mdn",
+      );
     },
   },
   {
