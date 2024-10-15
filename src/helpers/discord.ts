@@ -16,6 +16,7 @@ import {
   ForumChannel,
   ChannelType,
   GuildTextThreadCreateOptions,
+  AutocompleteInteraction,
 } from "discord.js";
 
 export const difference = <T>(a: Set<T>, b: Set<T>) =>
@@ -131,29 +132,17 @@ export type MessageContextCommand = {
   command: ContextMenuCommandBuilder;
   handler: (interaction: MessageContextMenuCommandInteraction) => void;
 };
-export const isMessageContextCommand = (
-  config: MessageContextCommand | UserContextCommand | SlashCommand,
-): config is MessageContextCommand =>
-  config.command instanceof ContextMenuCommandBuilder &&
-  config.command.type === ApplicationCommandType.Message;
 
 export type UserContextCommand = {
   command: ContextMenuCommandBuilder;
   handler: (interaction: UserContextMenuCommandInteraction) => void;
 };
-export const isUserContextCommand = (
-  config: MessageContextCommand | UserContextCommand | SlashCommand,
-): config is UserContextCommand =>
-  config.command instanceof ContextMenuCommandBuilder &&
-  config.command.type === ApplicationCommandType.User;
 
 export type SlashCommand = {
   command: SlashCommandBuilder;
   handler: (interaction: ChatInputCommandInteraction) => void;
+  autocomplete?: (interaction: AutocompleteInteraction) => void;
 };
-export const isSlashCommand = (
-  config: MessageContextCommand | UserContextCommand | SlashCommand,
-): config is SlashCommand => config.command instanceof SlashCommandBuilder;
 
 // ********* Discord Command Helpers
 

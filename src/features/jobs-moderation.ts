@@ -4,7 +4,6 @@ import { LRUCache } from "lru-cache";
 import {
   PermissionFlagsBits,
   SlashCommandBuilder,
-  CommandInteraction,
   Client,
   ChannelType,
   Message,
@@ -12,7 +11,7 @@ import {
   ThreadChannel,
 } from "discord.js";
 import { CHANNELS } from "../constants/channels";
-import { isStaff } from "../helpers/discord";
+import { SlashCommand, isStaff } from "../helpers/discord";
 import { ReportReasons, reportUser } from "../helpers/modLog";
 import validate from "./jobs-moderation/validate";
 import { parseContent } from "./jobs-moderation/parse-content";
@@ -38,7 +37,7 @@ import {
 
 const REPOST_THRESHOLD = 10; // minutes
 
-export const resetJobCacheCommand = {
+export const resetJobCacheCommand: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName("reset-job-cache")
     .setDescription("Reset cached posts for the time-based job moderation")
@@ -53,7 +52,7 @@ export const resetJobCacheCommand = {
       // NOTE: 'addUserOption' forces the type to be SlashCommandOptionsOnlyBuilder
       //  which would require to have 'addSubcommand' and 'addSubcommandGroup' methods when registering the command
     ) as SlashCommandBuilder,
-  handler: async (interaction: CommandInteraction) => {
+  handler: async (interaction) => {
     const { options } = interaction;
 
     const { user } = options.get("user") || {};

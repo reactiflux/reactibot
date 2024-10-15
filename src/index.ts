@@ -33,6 +33,7 @@ import resumeReviewPdf from "./features/resume-review";
 import troll from "./features/troll";
 import { modActivity } from "./features/mod-activity";
 import { debugEventButtonHandler, debugEvents } from "./features/debug-events";
+import { recommendBookCommand } from "./features/book-list";
 
 export const bot = new discord.Client({
   intents: [
@@ -55,6 +56,7 @@ export const bot = new discord.Client({
 });
 
 registerCommand(resetJobCacheCommand);
+registerCommand(recommendBookCommand);
 
 if (!isProd()) {
   registerCommand(debugEvents);

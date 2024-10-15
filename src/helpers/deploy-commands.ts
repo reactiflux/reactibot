@@ -2,19 +2,15 @@ import type {
   APIApplicationCommand,
   Client,
   ContextMenuCommandBuilder,
-  SlashCommandBuilder,
 } from "discord.js";
 import { InteractionType, Routes } from "discord.js";
 
-import { REST } from "discord.js";
+import { REST, SlashCommandBuilder } from "discord.js";
 
 import {
   MessageContextCommand,
   SlashCommand,
   UserContextCommand,
-  isMessageContextCommand,
-  isSlashCommand,
-  isUserContextCommand,
   calculateChangedCommands,
 } from "./discord";
 import { applicationId, isProd, discordToken } from "./env";
@@ -34,10 +30,14 @@ export const deployCommands = async (client: Client) => {
     : deployTestCommands(client, localCommands));
 
   client.on("interactionCreate", (interaction) => {
+    if (!interaction) {
+      return;
+    }
     if (
-      !interaction ||
-      interaction.type !== InteractionType.ApplicationCommand
+      interaction.type === InteractionType.MessageComponent ||
+      interaction.type === InteractionType.ModalSubmit
     ) {
+      // Not currently needed
       return;
     }
     const config = commands.get(
@@ -47,22 +47,20 @@ export const deployCommands = async (client: Client) => {
       throw new Error(`No command found for ${interaction.commandName}`);
     }
     if (
-      isMessageContextCommand(config) &&
-      interaction.isMessageContextMenuCommand()
+      isSlashCommand(config) &&
+      interaction.isAutocomplete() &&
+      config.autocomplete
     ) {
-      config.handler(interaction);
-    } else if (
-      isUserContextCommand(config) &&
-      interaction.isUserContextMenuCommand()
-    ) {
-      config.handler(interaction);
-    } else if (isSlashCommand(config) && interaction.isChatInputCommand()) {
-      config.handler(interaction);
-    } else {
-      throw new Error("Didn't find a handler for an interaction");
+      config.autocomplete(interaction);
+      return;
     }
+    config.handler(interaction as any);
+    return;
   });
 };
+
+const isSlashCommand = (config: Command): config is SlashCommand =>
+  config.command instanceof SlashCommandBuilder;
 
 type ChangedCommands = ReturnType<typeof calculateChangedCommands>;
 

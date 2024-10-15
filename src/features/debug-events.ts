@@ -4,10 +4,10 @@ import {
   ButtonStyle,
   Client,
   ClientEvents,
-  CommandInteraction,
   SlashCommandBuilder,
 } from "discord.js";
 import { isProd } from "../helpers/env";
+import { SlashCommand } from "../helpers/discord";
 
 type DebugEvent = {
   eventId: keyof ClientEvents;
@@ -40,13 +40,13 @@ export const debugEventArr: DebugEvent[] = [
 
 export const debugEventMap = new Map(debugEventArr.map((x) => [x.eventId, x]));
 
-export const debugEvents = {
+export const debugEvents: SlashCommand = {
   command: new SlashCommandBuilder()
     .setName("debug-event-buttons")
     .setDescription(
       "These buttons help us debug Discord moderation events in the bot.",
     ),
-  handler: async (interaction: CommandInteraction) => {
+  handler: async (interaction) => {
     if (isProd()) {
       return await interaction.reply({
         content: "Not allowed in production environments",
