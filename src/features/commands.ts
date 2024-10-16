@@ -413,6 +413,7 @@ Here's an article explaining the difference between the two: https://goshakkk.na
       const { title, excerpt: description, mdn_url: mdnUrl } = topResult;
 
       await msg.channel.send({
+        content: "-# also did you know there's `/mdn` too",
         embeds: [
           {
             author: {
