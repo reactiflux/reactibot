@@ -1,10 +1,9 @@
 import ogs from "open-graph-scraper";
-import { sleep } from "../helpers/misc";
 import { ChannelHandlers } from "../types";
 import { threadStats } from "../features/stats";
 import { format } from "date-fns";
 import fetch from "node-fetch";
-import { ChannelType, MessageType } from "discord.js";
+import { ChannelType } from "discord.js";
 
 const promotionThread: ChannelHandlers = {
   handleMessage: async ({ msg }) => {
@@ -12,18 +11,6 @@ const promotionThread: ChannelHandlers = {
       msg.channel.type === ChannelType.PublicThread ||
       msg.channel.type === ChannelType.PrivateThread
     ) {
-      return;
-    }
-
-    // Delete top-level replies
-    if (msg.type === MessageType.Reply) {
-      msg.author.send(msg.content);
-      const reply = await msg.reply(
-        "This is a thread-only channel! Please reply in that message’s thread. Your message has been DM’d to you.",
-      );
-      msg.delete();
-      threadStats.threadReplyRemoved(msg.channelId);
-      sleep(5).then(() => reply.delete());
       return;
     }
 
