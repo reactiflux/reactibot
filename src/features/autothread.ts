@@ -13,7 +13,7 @@ import { threadStats } from "../features/stats";
 import { createNewThreadName } from "../helpers/threads";
 
 const CHECKS = ["☑️", "✔️", "✅"];
-const IDLE_TIMEOUT = 36;
+const IDLE_TIMEOUT = 72;
 const STAFF_ACCEPT_THRESHOLD = 2;
 
 const autoThread: ChannelHandlers = {
