@@ -1,11 +1,9 @@
 import { Message, MessageType } from "discord.js";
-import { differenceInHours } from "date-fns";
 
 import { getLastPostAge } from "./job-mod-helpers";
 
-import { countLines, simplifyString } from "../../helpers/string";
+import { countLines } from "../../helpers/string";
 import { extractEmoji } from "../../helpers/string";
-import { getCryptoCache, setCryptoCache } from "./job-mod-helpers";
 import { parseContent } from "./parse-content";
 import {
   JobPostValidator,
@@ -17,7 +15,6 @@ import {
 const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   const errors: PostFailures[] = [];
   errors.push(...participation(posts, message));
-  errors.push(...web3(posts, message));
   errors.push(...formatting(posts, message));
   errors.push(...links(posts, message));
   return errors;
@@ -80,52 +77,6 @@ export const formatting: JobPostValidator = (posts, message) => {
   });
 
   return errors;
-};
-
-const CRYPTO_COOLDOWN = 6; // hours
-const bannedWords = /(blockchain|nft|cryptocurrency|token|web3|web 3)/;
-
-export const web3: JobPostValidator = (posts, message) => {
-  const now = new Date();
-  const lastCryptoPost = getCryptoCache(message.author.id);
-  // Fail posts that are sent by someone who was already blocked for posting
-  // web3 jobs
-  if (
-    lastCryptoPost &&
-    // extend duration for each repeated post
-    differenceInHours(now, lastCryptoPost.last) <
-      CRYPTO_COOLDOWN * lastCryptoPost.count
-  ) {
-    const newCount = lastCryptoPost.count + 1;
-    setCryptoCache(message.author.id, {
-      ...lastCryptoPost,
-      count: newCount,
-    });
-    return [
-      {
-        type: POST_FAILURE_REASONS.web3Poster,
-        count: newCount,
-        hiring: posts.some((p) => p.tags.includes(PostType.hiring)),
-        forHire: posts.some((p) => p.tags.includes(PostType.forHire)),
-      },
-    ];
-  }
-
-  // Block posts that trigger our web3 detection
-  if (
-    posts.some((post) => bannedWords.test(simplifyString(post.description)))
-  ) {
-    setCryptoCache(message.author.id, { count: 1, last: new Date() });
-    return [
-      {
-        type: POST_FAILURE_REASONS.web3Content,
-        count: 1,
-        hiring: posts.some((p) => p.tags.includes(PostType.hiring)),
-        forHire: posts.some((p) => p.tags.includes(PostType.forHire)),
-      },
-    ];
-  }
-  return [];
 };
 
 export const participation: JobPostValidator = (posts, message) => {

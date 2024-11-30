@@ -11,8 +11,6 @@ import {
   failedTooManyLines,
   failedTooManyEmojis,
   failedTooFrequent,
-  failedWeb3Content,
-  failedWeb3Poster,
   failedInconsistentType,
   failedTooLong,
   failedTooManyGaps,
@@ -36,10 +34,6 @@ const ValidationMessages = {
     `You’re posting too frequently. You last posted ${e.lastSent} days ago, please wait at least 7 days.`,
   [POST_FAILURE_REASONS.replyOrMention]:
     "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",
-  [POST_FAILURE_REASONS.web3Content]:
-    "We do not allow web3 positions to be advertised here. If you continue posting, you’ll be timed out overnight.",
-  [POST_FAILURE_REASONS.web3Poster]:
-    "We do not allow posers who arrived to post web3 positions to create posts. If you continue posting, you’ll be timed out overnight.",
 };
 
 export const getValidationMessage = (reason: PostFailures): string => {
@@ -68,12 +62,6 @@ export const getValidationMessage = (reason: PostFailures): string => {
     return ValidationMessages[reason.type];
   }
   if (failedTooManyEmojis(reason)) {
-    return ValidationMessages[reason.type];
-  }
-  if (failedWeb3Content(reason)) {
-    return ValidationMessages[reason.type];
-  }
-  if (failedWeb3Poster(reason)) {
     return ValidationMessages[reason.type];
   }
   return "";

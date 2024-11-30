@@ -23,8 +23,6 @@ import {
   updateJobs,
   trackModeratedMessage,
   failedTooFrequent,
-  failedWeb3Content,
-  failedWeb3Poster,
   deleteAgedPosts,
 } from "./jobs-moderation/job-mod-helpers";
 import { getValidationMessage } from "./jobs-moderation/validation-messages";
@@ -78,9 +76,6 @@ const rulesThreadCache = new LRUCache<string, ThreadChannel>({
     value.delete();
   },
 });
-
-const freeflowHiring = "<https://discord.gg/gTWTwZPDYT>";
-const freeflowForHire = "<https://vjlup8tch3g.typeform.com/to/T8w8qWzl>";
 
 const jobModeration = async (bot: Client) => {
   const jobBoard = await bot.channels.fetch(CHANNELS.jobBoard);
@@ -195,8 +190,6 @@ const jobModeration = async (bot: Client) => {
    * There's a 10 minute grace period where people are allowed to re-post if they
    * delete their own message.
    * After 10 minutes, they must wait 6.75 days before reposting
-   * If it's been removed by this bot for being a web3 related post, they are
-   * warned twice and timed out after a third post.
    */
   bot.on("messageDelete", async (message) => {
     // TODO: look up audit log, early return if member was banned
@@ -301,29 +294,11 @@ More details & apply: https://example.com/apply
   }
 
   // Handle missing post type
-  let error: PostFailures | undefined = errors.find(failedTooFrequent);
+  const error: PostFailures | undefined = errors.find(failedTooFrequent);
   if (error) {
     reportUser({ reason: ReportReasons.jobFrequency, message });
   }
 
-  // Handle posts that contain web3 content and posters who have been blocked
-  // for posting web3 roles
-  error = errors.find(failedWeb3Poster) || errors.find(failedWeb3Content);
-  if (error) {
-    reportUser({ reason: ReportReasons.jobCrypto, message });
-    if (error.count >= 3) {
-      await message.member?.timeout(20 * 60 * 60 * 1000);
-    }
-    const { hiring, forHire } = error;
-    await thread.send(
-      !hiring && !forHire
-        ? `If you're hiring: ${freeflowHiring}
-If you're seeking work: ${freeflowForHire}`
-        : hiring
-          ? `Join FreeFlow's server to start hiring for web3: ${freeflowHiring}`
-          : `Apply to join FreeFlow's talent pool for web3: ${freeflowForHire}`,
-    );
-  }
   await thread.send("Your post:");
   await thread.send({
     content: message.content,
