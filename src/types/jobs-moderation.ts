@@ -28,8 +28,6 @@ export const enum POST_FAILURE_REASONS {
   tooManyGaps = "tooManyGaps",
   tooFrequent = "tooFrequent",
   replyOrMention = "replyOrMention",
-  web3Content = "web3Content",
-  web3Poster = "web3Poster",
   // invalidContact = 'invalidContact',
   // unknownLocation = 'unknownLocation',
   // invalidPostType = 'invalidPostType',
@@ -65,18 +63,6 @@ export interface PostFailureTooFrequent {
 export interface PostFailureReplyOrMention {
   type: POST_FAILURE_REASONS.replyOrMention;
 }
-export interface PostFailureWeb3Content {
-  type: POST_FAILURE_REASONS.web3Content;
-  count: number;
-  hiring: boolean;
-  forHire: boolean;
-}
-export interface PostFailureWeb3Poster {
-  type: POST_FAILURE_REASONS.web3Poster;
-  count: number;
-  hiring: boolean;
-  forHire: boolean;
-}
 export type PostFailures =
   | PostFailureMissingType
   | PostFailureInconsistentType
@@ -86,6 +72,4 @@ export type PostFailures =
   | PostFailureTooLong
   | PostFailureTooManyLines
   | PostFailureTooManyGaps
-  | PostFailureTooManyEmojis
-  | PostFailureWeb3Content
-  | PostFailureWeb3Poster;
+  | PostFailureTooManyEmojis;

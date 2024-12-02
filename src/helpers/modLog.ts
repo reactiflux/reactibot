@@ -32,7 +32,6 @@ export const enum ReportReasons {
   jobAge = "jobAge",
   jobFrequency = "jobFrequency",
   jobRemoved = "jobRemoved",
-  jobCrypto = "jobCrypto",
   lowEffortQuestionRemoved = "lowEffortQuestionRemoved",
 }
 
@@ -167,8 +166,6 @@ ${reportedMessage}`;
       return `${preface}, for hire post expired.`;
     case ReportReasons.jobFrequency:
       return `${preface}, posting too frequently.`;
-    case ReportReasons.jobCrypto:
-      return `<@${message.author.id}> posted a crypto job.`;
 
     case ReportReasons.lowEffortQuestionRemoved:
       return `

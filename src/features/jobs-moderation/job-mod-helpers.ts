@@ -26,8 +26,6 @@ import {
   PostFailureTooManyEmojis,
   PostFailureTooManyGaps,
   PostFailureTooManyLines,
-  PostFailureWeb3Content,
-  PostFailureWeb3Poster,
   PostFailures,
   PostType,
   PostFailureLinkRequired,
@@ -70,11 +68,6 @@ export const failedTooManyEmojis = (
   e: PostFailures,
 ): e is PostFailureTooManyEmojis =>
   e.type === POST_FAILURE_REASONS.tooManyEmojis;
-export const failedWeb3Content = (
-  e: PostFailures,
-): e is PostFailureWeb3Content => e.type === POST_FAILURE_REASONS.web3Content;
-export const failedWeb3Poster = (e: PostFailures): e is PostFailureWeb3Poster =>
-  e.type === POST_FAILURE_REASONS.web3Poster;
 
 interface StoredMessage {
   message: Message;
@@ -286,8 +279,7 @@ export const removeSpecificJob = (message: Message) => {
 };
 
 export const purgeMember = (idToRemove: string) => {
-  let removed = removeFromCryptoCache(idToRemove);
-
+  let removed = 0;
   let index = jobBoardMessageCache.hiring.findIndex(
     (x) => x.authorId === idToRemove,
   );
@@ -322,14 +314,3 @@ export const untrackModeratedMessage = (message: Message | PartialMessage) => {
   }
   return false;
 };
-
-const cryptoPosters: Map<string, { count: number; last: Date }> = new Map();
-export const removeFromCryptoCache = (idToClear: string) => {
-  if (cryptoPosters.has(idToClear)) {
-    cryptoPosters.delete(idToClear);
-    return 1;
-  }
-  return 0;
-};
-export const getCryptoCache = cryptoPosters.get.bind(cryptoPosters);
-export const setCryptoCache = cryptoPosters.set.bind(cryptoPosters);
