@@ -4,7 +4,7 @@ import { gitHubReadToken } from "./env";
 const LOOKUP_REGEX = /<Intro>\s*(.*?)\s*<\/Intro>/gs;
 const LINK_REGEX = /\[([^\]]+)\]\((?!https?:\/\/)([^)]+)\)/g;
 
-const EXTRACT_SEARCH_KEY_REGEX = /(?<=!(docs|react-docs)\s)[^\s]+/;
+const EXTRACT_SEARCH_KEY_REGEX = /(?<=!(docs|react-docs)\s)[^\s.]+/;
 
 const BASE_URL =
   "https://api.github.com/repos/reactjs/react.dev/contents/src/content/reference/";
@@ -60,7 +60,9 @@ const processReactDocumentation = (content: string) => {
   const matches = [...patchedContentLinks.matchAll(LOOKUP_REGEX)];
 
   if (matches.length > 0) {
-    const [introContent] = matches.map(([, match]) => match.trim());
+    const [introContent] = matches.map(([, match]) =>
+      match.trim().replace(/\n\n/g, "\n"),
+    );
     return introContent;
   }
 
@@ -68,13 +70,13 @@ const processReactDocumentation = (content: string) => {
 };
 
 const REACT_AVAILABLE_DOCS = [
+  "react/act",
   "react/cache",
   "react/Children",
   "react/cloneElement",
   "react/Component",
   "react/createContext",
   "react/createElement",
-  "react/createFactory",
   "react/createRef",
   "react/experimental_taintObjectReference",
   "react/experimental_taintUniqueValue",
@@ -90,9 +92,8 @@ const REACT_AVAILABLE_DOCS = [
   "react/startTransition",
   "react/StrictMode",
   "react/Suspense",
-  "react/use-client",
-  "react/use-server",
   "react/use",
+  "react/useActionState",
   "react/useCallback",
   "react/useContext",
   "react/useDebugValue",
@@ -111,18 +112,19 @@ const REACT_AVAILABLE_DOCS = [
   "react/useTransition",
   "react-dom/client/createRoot",
   "react-dom/client/hydrateRoot",
-  "react-dom/hooks/useFormState",
+  "react-dom/createPortal",
+  "react-dom/flushSync",
   "react-dom/hooks/useFormStatus",
-  "react-dom/server/renderToNodeStream",
+  "react-dom/preconnect",
+  "react-dom/prefetchDNS",
+  "react-dom/preinit",
+  "react-dom/preinitModule",
+  "react-dom/preload",
+  "react-dom/preloadModule",
   "react-dom/server/renderToPipeableStream",
   "react-dom/server/renderToReadableStream",
   "react-dom/server/renderToStaticMarkup",
-  "react-dom/server/renderToStaticNodeStream",
   "react-dom/server/renderToString",
-  "react-dom/unmountComponentAtNode",
-  "react-dom/hydrate",
-  "react-dom/render",
-  "react-dom/createPortal",
-  "react-dom/findDOMNode",
-  "react-dom/flushSync",
+  "react-dom/static/prerender",
+  "react-dom/static/prerenderToNodeStream",
 ];
