@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Source code of Reactibot, utilized at Reactiflux server",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "node dist/index.js",
     "dev": "npm-run-all --parallel 'dev:*'",
-    "dev:bot": "nodemon -r dotenv/config ./src/index.ts",
+    "dev:bot": "tsx --watch ./src/index.ts",
     "dev:test": "vitest",
     "build": "tsc",
     "test": "npm-run-all -c --parallel 'test:*'",
@@ -54,6 +55,7 @@
     "npm-run-all": "4.1.5",
     "prettier": "3.3.1",
     "ts-node": "10.9.2",
+    "tsx": "^4.19.2",
     "typescript": "5.4.5",
     "vitest": "1.6.0"
   },
@@ -61,6 +63,6 @@
     "trailingComma": "all"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   }
 }
