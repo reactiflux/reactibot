@@ -1,88 +1,106 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
-import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
+import { getJobPosts } from "./features/jobs-moderation/job-mod-helpers";
 
-const fastify = Fastify({
-  logger: {
-    transport: {
-      target: "pino-pretty",
-    },
+const fastify = Fastify({ logger: true });
+
+const openApiConfig = {
+  openapi: "3.0.0",
+  info: {
+    title: "Job Board API",
+    version: "1.0.0",
   },
-});
-
-// Swagger documentation
-const swaggerConfig = {
-  swagger: {
-    info: {
-      title: "API Documentation",
-      version: "1.0.0",
-    },
-  },
-};
-
-// Register plugins
-await fastify.register(cors);
-await fastify.register(helmet);
-await fastify.register(rateLimit, {
-  max: 100,
-  timeWindow: "1 minute",
-});
-await fastify.register(swagger, swaggerConfig);
-
-// Example route with schema validation
-// fastify.get(
-//   "/items",
-//   {
-//     schema: {
-//       response: {
-//         200: {
-//           type: "array",
-//           items: {
-//             type: "object",
-//             properties: {
-//               id: { type: "string" },
-//               name: { type: "string" },
-//             },
-//           },
-//         },
-//       },
-//     },
-//   },
-//   async (request, reply) => {
-//     return [{ id: "1", name: "Item 1" }];
-//   },
-// );
-
-fastify.get(
-  "/",
-  {
-    schema: {
-      response: {
-        200: {
-          type: "object",
-          properties: {
-            hello: { type: "string" },
+  components: {
+    schemas: {
+      JobPost: {
+        type: "object",
+        required: ["tags", "description", "authorId", "message", "createdAt"],
+        properties: {
+          tags: {
+            type: "array",
+            items: { type: "string" },
+          },
+          description: { type: "string" },
+          authorId: {
+            type: "string",
+            format: "snowflake",
+          },
+          message: {
+            type: "object",
+            description: "Discord Message object",
+          },
+          createdAt: {
+            type: "string",
+            format: "date-time",
+          },
+        },
+      },
+      JobBoardCache: {
+        type: "object",
+        required: ["forHire", "hiring"],
+        properties: {
+          forHire: {
+            type: "array",
+            items: { $ref: "JobPost" },
+          },
+          hiring: {
+            type: "array",
+            items: { $ref: "JobPost" },
           },
         },
       },
     },
   },
+  paths: {
+    "/jobs": {
+      get: {
+        tags: ["jobs"],
+        summary: "Get all job posts",
+        responses: {
+          "200": {
+            description: "Successful response",
+            content: {
+              "application/json": {
+                schema: {
+                  $ref: "JobBoardCache",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+try {
+  Object.entries(openApiConfig.components.schemas).forEach(([k, schema]) => {
+    fastify.addSchema({ ...schema, $id: k });
+  });
+  // @ts-expect-error something's busted but it works
+  await fastify.register(swagger, openApiConfig);
+  await fastify.register(cors);
+  await fastify.register(helmet);
+} catch (e) {
+  console.log(e);
+}
+
+fastify.get(
+  "/jobs",
+  {
+    schema: {
+      response: {
+        200: {
+          $ref: "JobBoardCache",
+        },
+      },
+    },
+  },
   async () => {
-    return { hello: "world" };
+    return getJobPosts();
   },
 );
 
-// Error handler
-fastify.setErrorHandler((error, request, reply) => {
-  fastify.log.error(error);
-  reply.status(500).send({ error: "Internal Server Error" });
-});
-
-try {
-  await fastify.listen({ port: 3000 });
-} catch (err) {
-  fastify.log.error(err);
-  process.exit(1);
-}
+await fastify.listen({ port: 3000 });

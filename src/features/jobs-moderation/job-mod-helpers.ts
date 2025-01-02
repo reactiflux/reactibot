@@ -69,12 +69,21 @@ interface StoredMessage {
   message: Message;
   authorId: Snowflake;
   createdAt: Date;
+  description: string;
+  tags: string[];
   type: PostType;
 }
 let jobBoardMessageCache: {
   forHire: StoredMessage[];
   hiring: StoredMessage[];
 } = { forHire: [], hiring: [] };
+
+export const getJobPosts = () => {
+  return {
+    hiring: jobBoardMessageCache.hiring,
+    forHire: jobBoardMessageCache.forHire,
+  };
+};
 
 const DAYS_OF_POSTS = 30;
 
@@ -96,18 +105,21 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       })
     )
       // Convert fetched messages to be stored in the cache
-      .map((message) => ({
-        message,
-        authorId: message.author.id,
-        createdAt: message.createdAt,
-        // By searching for "hiring", we treat posts without tags as "forhire",
-        // which makes the subject to deletion after aging out. This will only be
-        // relevant when this change is first shipped, because afterwards all
-        // un-tagged posts will be removed.
-        type: parseContent(message.content)[0].tags.includes("hiring")
-          ? PostType.hiring
-          : PostType.forHire,
-      }));
+      .map((message) => {
+        const { tags, description } = parseContent(message.content)[0];
+        return {
+          message,
+          authorId: message.author.id,
+          createdAt: message.createdAt,
+          description,
+          tags,
+          // By searching for "hiring", we treat posts without tags as "forhire",
+          // which makes the subject to deletion after aging out. This will only be
+          // relevant when this change is first shipped, because afterwards all
+          // un-tagged posts will be removed.
+          type: tags.includes("hiring") ? PostType.hiring : PostType.forHire,
+        };
+      });
     if (newMessages.length === 0) {
       break;
     }
@@ -226,6 +238,8 @@ export const updateJobs = (message: Message) => {
     message,
     authorId: message.author.id,
     createdAt: message.createdAt,
+    description: parsed.description,
+    tags: parsed.tags,
     type,
   });
 
