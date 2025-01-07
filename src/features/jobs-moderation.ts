@@ -123,7 +123,7 @@ const jobModeration = async (bot: Client) => {
       channel.ownerId === bot.user?.id &&
       channel.parentId === CHANNELS.jobBoard
     ) {
-      validationRepl(message);
+      await validationRepl(message);
       return;
     }
     // If this is a staff member, bail early
