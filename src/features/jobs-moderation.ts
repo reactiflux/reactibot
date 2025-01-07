@@ -109,8 +109,9 @@ const jobModeration = async (bot: Client) => {
     const { channel } = message;
     if (
       message.author.bot ||
-      message.channelId !== CHANNELS.jobBoard ||
-      (channel.isThread() && channel.parentId !== CHANNELS.jobBoard) ||
+      (message.channelId !== CHANNELS.jobBoard &&
+        channel.isThread() &&
+        channel.parentId !== CHANNELS.jobBoard) ||
       // Don't treat newly fetched old messages as new posts
       differenceInHours(new Date(), message.createdAt) >= 1
     ) {
@@ -123,7 +124,7 @@ const jobModeration = async (bot: Client) => {
       channel.ownerId === bot.user?.id &&
       channel.parentId === CHANNELS.jobBoard
     ) {
-      validationRepl(message);
+      await validationRepl(message);
       return;
     }
     // If this is a staff member, bail early
