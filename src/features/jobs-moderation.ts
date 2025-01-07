@@ -147,10 +147,6 @@ const jobModeration = async (bot: Client) => {
     if (newMessage.author?.bot) {
       return;
     }
-    if (channel.type === ChannelType.PrivateThread) {
-      validationRepl(await newMessage.fetch());
-      return;
-    }
     if (
       newMessage.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
