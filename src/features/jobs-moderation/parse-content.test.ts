@@ -108,28 +108,6 @@ many long lines of text`,
     expect(parsed[0]).toMatchObject({ tags: ["hiring"], description: "" });
   });
 
-  it("correctly pulls description off tags line", () => {
-    let parsed = parseContent(`[hiring]Lorem ipsum dolor sit amet`);
-    expect(parsed[0]).toMatchObject({
-      tags: ["hiring"],
-      description: "Lorem ipsum dolor sit amet",
-    });
-
-    parsed = parseContent(`[hiring][remote][visa]Lorem ipsum dolor sit amet`);
-    expect(parsed[0]).toMatchObject({
-      tags: ["hiring", "remote", "visa"],
-      description: "Lorem ipsum dolor sit amet",
-    });
-
-    parsed = parseContent(
-      `[hiring] [remote]  [visa]   Lorem ipsum dolor sit amet`,
-    );
-    expect(parsed[0]).toMatchObject({
-      tags: ["hiring", "remote", "visa"],
-      description: "Lorem ipsum dolor sit amet",
-    });
-  });
-
   // Disable this, not relevant right now. Also broken as of May '23
   it.skip("parses contact", () => {
     const makePost = (contact: string) => `|

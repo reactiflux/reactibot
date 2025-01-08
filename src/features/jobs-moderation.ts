@@ -109,9 +109,8 @@ const jobModeration = async (bot: Client) => {
     const { channel } = message;
     if (
       message.author.bot ||
-      (message.channelId !== CHANNELS.jobBoard &&
-        channel.isThread() &&
-        channel.parentId !== CHANNELS.jobBoard) ||
+      message.channelId !== CHANNELS.jobBoard ||
+      (channel.isThread() && channel.parentId !== CHANNELS.jobBoard) ||
       // Don't treat newly fetched old messages as new posts
       differenceInHours(new Date(), message.createdAt) >= 1
     ) {
@@ -124,7 +123,7 @@ const jobModeration = async (bot: Client) => {
       channel.ownerId === bot.user?.id &&
       channel.parentId === CHANNELS.jobBoard
     ) {
-      await validationRepl(message);
+      validationRepl(message);
       return;
     }
     // If this is a staff member, bail early
@@ -136,50 +135,46 @@ const jobModeration = async (bot: Client) => {
     console.log(
       `[DEBUG] validating new job post from @${
         message.author.username
-      }, errors: ${JSON.stringify(errors)}`,
+      }, errors: [${JSON.stringify(errors)}]`,
     );
     if (errors) {
       await handleErrors(channel, message, errors);
     }
   });
 
-  bot.on("messageUpdate", async (_, message) => {
-    const { channel } = message;
-    if (message.author?.bot) {
+  bot.on("messageUpdate", async (_, newMessage) => {
+    const { channel } = newMessage;
+    if (newMessage.author?.bot) {
+      return;
+    }
+    if (channel.type === ChannelType.PrivateThread) {
+      validationRepl(await newMessage.fetch());
       return;
     }
     if (
-      message.channelId !== CHANNELS.jobBoard ||
+      newMessage.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
-      isStaff(message.member)
+      isStaff(newMessage.member)
     ) {
       return;
     }
-    if (message.partial) {
-      message = await message.fetch();
-    }
+    const message = await newMessage.fetch();
     const posts = parseContent(message.content);
+    // Don't validate hiring posts
+    if (posts.every((p) => p.tags.includes(PostType.hiring))) {
+      return;
+    }
     // You can't post too frequently when editing a message, so filter those out
     const errors = validate(posts, message).filter(
       (e) => e.type !== POST_FAILURE_REASONS.tooFrequent,
     );
 
     if (errors) {
-      const isRecentEdit =
-        differenceInMinutes(new Date(), message.createdAt) < REPOST_THRESHOLD;
-      errors.unshift({
-        type: POST_FAILURE_REASONS.circumventedRules,
-        recentEdit: isRecentEdit,
-      });
-      if (isRecentEdit) {
-        removeSpecificJob(message);
-        console.log(
-          `[INFO] Deleting a recently edited post from ${message.author.username}`,
-        );
-      }
-      await handleErrors(channel, message, errors);
       if (posts.some((p) => p.tags.includes(PostType.forHire))) {
         reportUser({ reason: ReportReasons.jobCircumvent, message });
+        // await newMessage.delete();
+      } else {
+        await handleErrors(channel, message, errors);
       }
     }
   });

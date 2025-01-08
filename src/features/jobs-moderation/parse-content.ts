@@ -25,31 +25,12 @@ export const parseTags = (tags: string) => {
     .filter((tag) => tag !== "");
 };
 
-const splitTagsFromDescription = (
-  inputString: string,
-): { heading: string; body: string[] } => {
-  const [tagsLine, ...lines] = inputString.trim().split("\n");
-
-  if (tagsLine.includes("[")) {
-    const cleanedTags = tagsLine.replace(/\]\w+\[/, "][");
-    const match = cleanedTags.match(/(.*)\](.*)/);
-    const trailingText = match?.[2] || "";
-    lines.unshift(trailingText.trim());
-    return { heading: match?.[1] || "", body: lines };
-  }
-  return { heading: tagsLine, body: lines };
-};
-
 export const parseContent = (inputString: string): Post[] => {
-  const { heading, body } = splitTagsFromDescription(inputString);
-  // TODO: Replace above .split() with some more logic around detecting tags
-  // If |, treat the complete line as tags
-  // if [], check for trailing text with no wrapper and add it to the description
-
+  const [tagsLine, ...lines] = inputString.trim().split("\n");
   return [
     {
-      tags: parseTags(heading),
-      description: body.reduce((description, line) => {
+      tags: parseTags(tagsLine),
+      description: lines.reduce((description, line) => {
         if (line === "") {
           return description;
         }
