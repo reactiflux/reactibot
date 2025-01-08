@@ -136,7 +136,7 @@ const jobModeration = async (bot: Client) => {
     console.log(
       `[DEBUG] validating new job post from @${
         message.author.username
-      }, errors: [${JSON.stringify(errors)}]`,
+      }, errors: ${JSON.stringify(errors)}`,
     );
     if (errors) {
       await handleErrors(channel, message, errors);
@@ -165,11 +165,21 @@ const jobModeration = async (bot: Client) => {
     );
 
     if (errors) {
+      const isRecentEdit =
+        differenceInMinutes(new Date(), message.createdAt) < REPOST_THRESHOLD;
+      errors.unshift({
+        type: POST_FAILURE_REASONS.circumventedRules,
+        recentEdit: isRecentEdit,
+      });
+      if (isRecentEdit) {
+        removeSpecificJob(message);
+        console.log(
+          `[INFO] Deleting a recently edited post from ${message.author.username}`,
+        );
+      }
+      await handleErrors(channel, message, errors);
       if (posts.some((p) => p.tags.includes(PostType.forHire))) {
         reportUser({ reason: ReportReasons.jobCircumvent, message });
-        // await newMessage.delete();
-      } else {
-        await handleErrors(channel, message, errors);
       }
     }
   });
