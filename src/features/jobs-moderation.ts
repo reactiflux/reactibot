@@ -106,30 +106,29 @@ const jobModeration = async (bot: Client) => {
   await deleteAgedPosts();
 
   bot.on("messageCreate", async (message) => {
-    const { channel } = message;
-    if (
-      message.author.bot ||
-      message.channelId !== CHANNELS.jobBoard ||
-      (channel.isThread() && channel.parentId !== CHANNELS.jobBoard) ||
-      // Don't treat newly fetched old messages as new posts
-      differenceInHours(new Date(), message.createdAt) >= 1
-    ) {
+    // Bail if it's a bot or staff message
+    if (message.author.bot || isStaff(message.member)) {
       return;
     }
+    const { channel } = message;
     // If this is an existing enforcement thread, process the through a "REPL"
     // that lets people test messages against the rules
     if (
       channel.type === ChannelType.PrivateThread &&
-      channel.ownerId === bot.user?.id &&
-      channel.parentId === CHANNELS.jobBoard
+      channel.parentId === CHANNELS.jobBoard &&
+      channel.ownerId === bot.user?.id
     ) {
       await validationRepl(message);
       return;
     }
-    // If this is a staff member, bail early
-    if (channel.type !== ChannelType.GuildText || isStaff(message.member)) {
+    // Bail if this isn't #job-board
+    if (
+      channel.type !== ChannelType.GuildText ||
+      message.channelId !== CHANNELS.jobBoard
+    ) {
       return;
     }
+
     const posts = parseContent(message.content);
     const errors = validate(posts, message);
     console.log(
@@ -144,10 +143,8 @@ const jobModeration = async (bot: Client) => {
 
   bot.on("messageUpdate", async (_, message) => {
     const { channel } = message;
-    if (message.author?.bot) {
-      return;
-    }
     if (
+      message.author?.bot ||
       message.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
       isStaff(message.member)
