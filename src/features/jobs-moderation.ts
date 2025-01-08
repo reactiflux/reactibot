@@ -142,24 +142,22 @@ const jobModeration = async (bot: Client) => {
     }
   });
 
-  bot.on("messageUpdate", async (_, newMessage) => {
-    const { channel } = newMessage;
-    if (newMessage.author?.bot) {
+  bot.on("messageUpdate", async (_, message) => {
+    const { channel } = message;
+    if (message.author?.bot) {
       return;
     }
     if (
-      newMessage.channelId !== CHANNELS.jobBoard ||
+      message.channelId !== CHANNELS.jobBoard ||
       channel.type !== ChannelType.GuildText ||
-      isStaff(newMessage.member)
+      isStaff(message.member)
     ) {
       return;
     }
-    const message = await newMessage.fetch();
-    const posts = parseContent(message.content);
-    // Don't validate hiring posts
-    if (posts.every((p) => p.tags.includes(PostType.hiring))) {
-      return;
+    if (message.partial) {
+      message = await message.fetch();
     }
+    const posts = parseContent(message.content);
     // You can't post too frequently when editing a message, so filter those out
     const errors = validate(posts, message).filter(
       (e) => e.type !== POST_FAILURE_REASONS.tooFrequent,
