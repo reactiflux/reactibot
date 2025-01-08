@@ -1,4 +1,5 @@
 import {
+  CircumventedRules,
   POST_FAILURE_REASONS,
   PostFailures,
   PostFailureTooFrequent,
@@ -6,6 +7,7 @@ import {
   PostFailureTooManyLines,
 } from "../../types/jobs-moderation";
 import {
+  failedCircumventedRules,
   failedMissingType,
   failedReplyOrMention,
   failedTooManyLines,
@@ -18,6 +20,8 @@ import {
 } from "./job-mod-helpers";
 
 const ValidationMessages = {
+  [POST_FAILURE_REASONS.circumventedRules]: (e: CircumventedRules) =>
+    `Your message was removed after you edited it so that it no longer complies with our formatting rules. ${e.recentEdit ? "Please re-post." : ""}`,
   [POST_FAILURE_REASONS.missingType]:
     "Your post does not include our required `[HIRING]` or `[FOR HIRE]` tag. Make sure the first line of your post includes `[HIRING]` if you’re looking to pay someone for their work, and `[FOR HIRE]` if you’re offering your services.",
   [POST_FAILURE_REASONS.inconsistentType]:
@@ -33,10 +37,13 @@ const ValidationMessages = {
   [POST_FAILURE_REASONS.tooFrequent]: (e: PostFailureTooFrequent) =>
     `You’re posting too frequently. You last posted ${e.lastSent} days ago, please wait at least 7 days.`,
   [POST_FAILURE_REASONS.replyOrMention]:
-    "Messages in this channel may not be replies or include @-mentions of users, to ensure the channel isn’t being used to discuss postings.",
+    "Messages in this channel may not be replies or include @-mentions of users due to a history of posters incorrectly attempting to 'apply' by replying within a thread or reply.",
 };
 
 export const getValidationMessage = (reason: PostFailures): string => {
+  if (failedCircumventedRules(reason)) {
+    return ValidationMessages[reason.type](reason);
+  }
   if (failedMissingType(reason)) {
     return ValidationMessages[reason.type];
   }

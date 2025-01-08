@@ -29,16 +29,12 @@ import {
   PostFailures,
   PostType,
   PostFailureLinkRequired,
+  CircumventedRules,
 } from "../../types/jobs-moderation";
 
-export class RuleViolation extends Error {
-  reasons: POST_FAILURE_REASONS[];
-  constructor(reasons: POST_FAILURE_REASONS[]) {
-    super("Job Mod Rule violation");
-    this.reasons = reasons;
-  }
-}
-
+export const failedCircumventedRules = (
+  e: PostFailures,
+): e is CircumventedRules => e.type === POST_FAILURE_REASONS.circumventedRules;
 export const failedMissingType = (
   e: PostFailures,
 ): e is PostFailureMissingType => e.type === POST_FAILURE_REASONS.missingType;
@@ -268,7 +264,7 @@ export const removeSpecificJob = (message: Message) => {
   const index = jobBoardMessageCache.hiring.findIndex(
     (m) => m.message.id === message.id,
   );
-  if (index) {
+  if (index !== -1) {
     jobBoardMessageCache.hiring.splice(index);
   } else
     jobBoardMessageCache.forHire.splice(
