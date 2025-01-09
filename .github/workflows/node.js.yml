@@ -20,7 +20,7 @@ jobs:
       # TODO: see if we need to do anything special to cache docker images
       - uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
 
       - name: Login to GitHub Container Registry

@@ -1,4 +1,3 @@
-import "dotenv/config";
 import discord, {
   Message,
   MessageReaction,
@@ -37,8 +36,6 @@ import { debugEventButtonHandler, debugEvents } from "./features/debug-events";
 import { recommendBookCommand } from "./features/book-list";
 import { mdnSearch } from "./features/mdn";
 
-import "./server";
-
 export const bot = new discord.Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -51,12 +48,7 @@ export const bot = new discord.Client({
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
   ],
-  partials: [
-    Partials.Channel,
-    Partials.Message,
-    Partials.Reaction,
-    Partials.GuildMember,
-  ],
+  partials: [Partials.Channel, Partials.Reaction, Partials.GuildMember],
 });
 
 registerCommand(resetJobCacheCommand);

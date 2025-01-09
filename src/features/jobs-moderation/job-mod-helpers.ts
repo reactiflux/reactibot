@@ -29,16 +29,12 @@ import {
   PostFailures,
   PostType,
   PostFailureLinkRequired,
+  CircumventedRules,
 } from "../../types/jobs-moderation";
 
-export class RuleViolation extends Error {
-  reasons: POST_FAILURE_REASONS[];
-  constructor(reasons: POST_FAILURE_REASONS[]) {
-    super("Job Mod Rule violation");
-    this.reasons = reasons;
-  }
-}
-
+export const failedCircumventedRules = (
+  e: PostFailures,
+): e is CircumventedRules => e.type === POST_FAILURE_REASONS.circumventedRules;
 export const failedMissingType = (
   e: PostFailures,
 ): e is PostFailureMissingType => e.type === POST_FAILURE_REASONS.missingType;
@@ -73,21 +69,12 @@ interface StoredMessage {
   message: Message;
   authorId: Snowflake;
   createdAt: Date;
-  description: string;
-  tags: string[];
   type: PostType;
 }
 let jobBoardMessageCache: {
   forHire: StoredMessage[];
   hiring: StoredMessage[];
 } = { forHire: [], hiring: [] };
-
-export const getJobPosts = () => {
-  return {
-    hiring: jobBoardMessageCache.hiring,
-    forHire: jobBoardMessageCache.forHire,
-  };
-};
 
 const DAYS_OF_POSTS = 30;
 
@@ -109,21 +96,18 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       })
     )
       // Convert fetched messages to be stored in the cache
-      .map((message) => {
-        const { tags, description } = parseContent(message.content)[0];
-        return {
-          message,
-          authorId: message.author.id,
-          createdAt: message.createdAt,
-          description,
-          tags,
-          // By searching for "hiring", we treat posts without tags as "forhire",
-          // which makes the subject to deletion after aging out. This will only be
-          // relevant when this change is first shipped, because afterwards all
-          // un-tagged posts will be removed.
-          type: tags.includes("hiring") ? PostType.hiring : PostType.forHire,
-        };
-      });
+      .map((message) => ({
+        message,
+        authorId: message.author.id,
+        createdAt: message.createdAt,
+        // By searching for "hiring", we treat posts without tags as "forhire",
+        // which makes the subject to deletion after aging out. This will only be
+        // relevant when this change is first shipped, because afterwards all
+        // un-tagged posts will be removed.
+        type: parseContent(message.content)[0].tags.includes("hiring")
+          ? PostType.hiring
+          : PostType.forHire,
+      }));
     if (newMessages.length === 0) {
       break;
     }
@@ -242,8 +226,6 @@ export const updateJobs = (message: Message) => {
     message,
     authorId: message.author.id,
     createdAt: message.createdAt,
-    description: parsed.description,
-    tags: parsed.tags,
     type,
   });
 
@@ -282,7 +264,7 @@ export const removeSpecificJob = (message: Message) => {
   const index = jobBoardMessageCache.hiring.findIndex(
     (m) => m.message.id === message.id,
   );
-  if (index) {
+  if (index !== -1) {
     jobBoardMessageCache.hiring.splice(index);
   } else
     jobBoardMessageCache.forHire.splice(
