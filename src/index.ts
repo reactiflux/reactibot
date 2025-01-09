@@ -1,3 +1,4 @@
+import "dotenv/config";
 import discord, {
   Message,
   MessageReaction,
@@ -35,6 +36,8 @@ import { modActivity } from "./features/mod-activity";
 import { debugEventButtonHandler, debugEvents } from "./features/debug-events";
 import { recommendBookCommand } from "./features/book-list";
 import { mdnSearch } from "./features/mdn";
+
+import "./server";
 
 export const bot = new discord.Client({
   intents: [
