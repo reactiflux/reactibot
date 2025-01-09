@@ -51,7 +51,12 @@ export const bot = new discord.Client({
     IntentsBitField.Flags.DirectMessageReactions,
     IntentsBitField.Flags.MessageContent,
   ],
-  partials: [Partials.Channel, Partials.Reaction, Partials.GuildMember],
+  partials: [
+    Partials.Channel,
+    Partials.Message,
+    Partials.Reaction,
+    Partials.GuildMember,
+  ],
 });
 
 registerCommand(resetJobCacheCommand);

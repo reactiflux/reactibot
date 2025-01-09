@@ -28,16 +28,11 @@ export const enum POST_FAILURE_REASONS {
   tooManyGaps = "tooManyGaps",
   tooFrequent = "tooFrequent",
   replyOrMention = "replyOrMention",
-  circumventedRules = "circumventedRules",
   // invalidContact = 'invalidContact',
   // unknownLocation = 'unknownLocation',
   // invalidPostType = 'invalidPostType',
 }
 
-export interface CircumventedRules {
-  type: POST_FAILURE_REASONS.circumventedRules;
-  recentEdit: boolean;
-}
 export interface PostFailureMissingType {
   type: POST_FAILURE_REASONS.missingType;
 }
@@ -69,7 +64,6 @@ export interface PostFailureReplyOrMention {
   type: POST_FAILURE_REASONS.replyOrMention;
 }
 export type PostFailures =
-  | CircumventedRules
   | PostFailureMissingType
   | PostFailureInconsistentType
   | PostFailureTooFrequent

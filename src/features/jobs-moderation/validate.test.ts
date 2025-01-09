@@ -1,45 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { PostType, POST_FAILURE_REASONS } from "../../types/jobs-moderation";
-import { links, formatting } from "./validate";
+import { links } from "./validate";
 
 const makePost = (type: PostType, description: string) => [
   { tags: [type], description },
 ];
 
-describe("emoji", () => {
-  it("isn't too crazy about emoji", () => {
-    const noFailure = [
-      "for some role and stuff\nDM me to apply ✨",
-      "for some role and stuff\nDM me to apply ✨",
-      "👉 stuff: some more details afterwards and whatever shenanigans\n👉 stuff: some more details afterwards and whatever shenanigans\n👉 stuff: some more details afterwards and whatever shenanigans\n👉 stuff: some more details afterwards and whatever shenanigans\n👉 stuff: some more details afterwards and whatever shenanigans\n",
-    ];
-    for (const content of noFailure) {
-      expect(
-        formatting(
-          makePost(PostType.forHire, content),
-          // @ts-expect-error testing override
-          { content: `[forhire]\n${content}` },
-        ),
-      ).not.toContainEqual({ type: POST_FAILURE_REASONS.tooManyEmojis });
-    }
-  });
-  it("stops obnoxious emoji usage", () => {
-    const noFailure = [
-      "for ✨ some role and stuff\nDM ✨ me ✨ to ✨ apply ✨",
-      "for some role and stuff\nDM me to apply ✨✨✨✨✨✨",
-      "👉 stuff: some more ✨✨ details afterwards and whatever shenanigans\n👉 stuff: some more ✨✨ details afterwards and whatever shenanigans\n👉 stuff: some more ✨✨ details afterwards and whatever shenanigans\n👉 stuff: some more ✨✨ details afterwards and whatever shenanigans\n👉 stuff: some more ✨✨ details afterwards and whatever shenanigans\n",
-    ];
-    for (const content of noFailure) {
-      expect(
-        formatting(
-          makePost(PostType.forHire, content),
-          // @ts-expect-error testing override
-          { content: `[forhire]\n${content}` },
-        ),
-      ).toContainEqual({ type: POST_FAILURE_REASONS.tooManyEmojis });
-    }
-  });
-});
 describe("links", () => {
   it("requires links", () => {
     expect(
