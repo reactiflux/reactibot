@@ -226,6 +226,10 @@ bot.on("threadCreate", (thread) => {
 bot.on("messageCreate", async (msg) => {
   if (msg.author?.id === bot.user?.id) return;
 
+  if (msg.content.includes("🙂👍👍")) {
+    msg.channel.send("heya!");
+  }
+
   handleMessage(msg);
 });
 
