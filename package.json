@@ -9,7 +9,7 @@
     "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "tsx --watch ./src/index.ts",
     "dev:test": "vitest",
-    "build": "tsc",
+    "build": "tsc -b",
     "test": "npm-run-all -c --parallel 'test:*'",
     "test:vitest": "vitest --run",
     "test:lint": "eslint --ext js,ts . && prettier --check .",
