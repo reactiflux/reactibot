@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countLines, extractEmoji } from "./string";
+import { countLines, extractEmoji } from "./string.js";
 
 describe("extractEmoji", () => {
   it("matches regular emoji", () => {
@@ -24,7 +24,8 @@ describe("extractEmoji", () => {
   });
   it("doesn’t match funky invisible Unicode characters", () => {
     // eslint-disable-next-line no-irregular-whitespace
-    expect(extractEmoji(`    `)).toEqual([]);
+    expect(extractEmoji(`   
+`)).toEqual([]);
   });
 });
 

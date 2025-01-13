@@ -5,7 +5,7 @@ import {
   PostFailureTooFrequent,
   PostFailureTooLong,
   PostFailureTooManyLines,
-} from "../../types/jobs-moderation";
+} from "../../types/jobs-moderation.js";
 import {
   failedCircumventedRules,
   failedMissingType,
@@ -17,7 +17,7 @@ import {
   failedTooLong,
   failedTooManyGaps,
   failedLinkRequired,
-} from "./job-mod-helpers";
+} from "./job-mod-helpers.js";
 
 const ValidationMessages = {
   [POST_FAILURE_REASONS.circumventedRules]: (e: CircumventedRules) =>

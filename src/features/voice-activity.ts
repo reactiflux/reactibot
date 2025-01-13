@@ -4,9 +4,9 @@ import {
   VoiceBasedChannel,
   VoiceChannel,
 } from "discord.js";
-import { channelLog, logger } from "./log";
-import { scheduleTask } from "../helpers/schedule";
-import { CHANNELS } from "../constants/channels";
+import { channelLog, logger } from "./log.js";
+import { scheduleTask } from "../helpers/schedule.js";
+import { CHANNELS } from "../constants/channels.js";
 
 const voiceChannelJoinTimestamps: Record<string, Record<string, number>> = {};
 

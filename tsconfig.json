@@ -4,6 +4,7 @@
     "module": "Node16",
     "sourceMap": true,
     "outDir": "dist",
+    "skipLibCheck": true,
     "strict": true,
     "allowJs": false,
     "moduleResolution": "node16",

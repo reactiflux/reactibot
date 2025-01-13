@@ -1,16 +1,16 @@
 import { Message, MessageType } from "discord.js";
 
-import { getLastPostAge } from "./job-mod-helpers";
+import { getLastPostAge } from "./job-mod-helpers.js";
 
-import { countLines } from "../../helpers/string";
-import { extractEmoji } from "../../helpers/string";
-import { parseContent } from "./parse-content";
+import { countLines } from "../../helpers/string.js";
+import { extractEmoji } from "../../helpers/string.js";
+import { parseContent } from "./parse-content.js";
 import {
   JobPostValidator,
   POST_FAILURE_REASONS,
   PostFailures,
   PostType,
-} from "../../types/jobs-moderation";
+} from "../../types/jobs-moderation.js";
 
 const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   const errors: PostFailures[] = [];

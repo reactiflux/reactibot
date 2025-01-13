@@ -7,17 +7,17 @@ import {
   Message,
 } from "discord.js";
 import OpenAI from "openai";
-import { CHANNELS } from "../constants/channels";
-import { openAiKey } from "../helpers/env";
-import { logger } from "./log";
-import { EMBED_COLOR } from "./commands";
+import { CHANNELS } from "../constants/channels.js";
+import { openAiKey } from "../helpers/env.js";
+import { logger } from "./log.js";
+import { EMBED_COLOR } from "./commands.js";
 import {
   DELETE_COMMAND,
   findResumeAttachment,
   REVIEW_COMMAND,
-} from "./resume-review";
-import { constructDiscordLink } from "../helpers/discord";
-import { retry } from "./retry";
+} from "./resume-review.js";
+import { constructDiscordLink } from "../helpers/discord.js";
+import { retry } from "./retry.js";
 
 const openai = new OpenAI({
   apiKey: openAiKey,

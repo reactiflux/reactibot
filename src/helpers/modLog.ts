@@ -4,14 +4,14 @@ import {
   MessageCreateOptions,
   MessagePayload,
 } from "discord.js";
-import { modRoleId } from "../constants";
+import { modRoleId } from "../constants.js";
 import {
   constructDiscordLink,
   escapeDisruptiveContent,
   quoteMessageContent,
-} from "./discord";
-import { simplifyString } from "../helpers/string";
-import { CHANNELS, getChannel } from "../constants/channels";
+} from "./discord.js";
+import { simplifyString } from "../helpers/string.js";
+import { CHANNELS, getChannel } from "../constants/channels.js";
 
 export const modLog = async (
   message: string | MessagePayload | MessageCreateOptions,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PostType, POST_FAILURE_REASONS } from "../../types/jobs-moderation";
-import { links, formatting } from "./validate";
+import { PostType, POST_FAILURE_REASONS } from "../../types/jobs-moderation.js";
+import { links, formatting } from "./validate.js";
 
 const makePost = (type: PostType, description: string) => [
   { tags: [type], description },

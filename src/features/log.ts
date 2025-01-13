@@ -1,5 +1,5 @@
 import { ChannelType, Client } from "discord.js";
-import { CHANNELS } from "../constants/channels";
+import { CHANNELS } from "../constants/channels.js";
 
 type Logger = (type: string, text: string) => void;
 

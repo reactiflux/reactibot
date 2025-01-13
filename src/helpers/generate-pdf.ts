@@ -1,7 +1,7 @@
 import { AttachmentBuilder } from "discord.js";
 import fetch from "node-fetch";
 import { fromBase64 } from "pdf2pic";
-import { Options } from "pdf2pic/dist/types/options";
+import type { Options } from "pdf2pic/dist/types/options.js";
 
 const defaultOptions = {
   density: 200,

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { extractSearchKey, getReactDocsSearchKey } from "./react-docs";
+import { extractSearchKey, getReactDocsSearchKey } from "./react-docs.js";
 
 describe("React documentation command", () => {
   test.each([

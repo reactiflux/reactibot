@@ -4,7 +4,7 @@ import {
   GuildMember,
   PartialGuildMember,
 } from "discord.js";
-import { logger } from "./log";
+import { logger } from "./log.js";
 
 const guildMemberTimeoutHandler = (
   oldMember: GuildMember | PartialGuildMember,

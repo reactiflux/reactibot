@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
 import queryString from "query-string";
 import { ChannelType, Client } from "discord.js";
-import { amplitudeKey } from "../helpers/env";
-import { difference } from "../helpers/sets";
-import { mapAppliedTagsToTagNames } from "../helpers/discord";
+import { amplitudeKey } from "../helpers/env.js";
+import { difference } from "../helpers/sets.js";
+import { mapAppliedTagsToTagNames } from "../helpers/discord.js";
 
 type AmplitudeValue = string | number | boolean;
 type EmitEventData = Record<string, AmplitudeValue | AmplitudeValue[]>;

@@ -6,8 +6,8 @@ import {
   ClientEvents,
   SlashCommandBuilder,
 } from "discord.js";
-import { isProd } from "../helpers/env";
-import { SlashCommand } from "../helpers/discord";
+import { isProd } from "../helpers/env.js";
+import { SlashCommand } from "../helpers/discord.js";
 
 type DebugEvent = {
   eventId: keyof ClientEvents;

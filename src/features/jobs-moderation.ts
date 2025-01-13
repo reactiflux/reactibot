@@ -10,11 +10,11 @@ import {
   TextChannel,
   ThreadChannel,
 } from "discord.js";
-import { CHANNELS } from "../constants/channels";
-import { SlashCommand, isStaff } from "../helpers/discord";
-import { ReportReasons, reportUser } from "../helpers/modLog";
-import validate from "./jobs-moderation/validate";
-import { parseContent } from "./jobs-moderation/parse-content";
+import { CHANNELS } from "../constants/channels.js";
+import { SlashCommand, isStaff } from "../helpers/discord.js";
+import { ReportReasons, reportUser } from "../helpers/modLog.js";
+import validate from "./jobs-moderation/validate.js";
+import { parseContent } from "./jobs-moderation/parse-content.js";
 import {
   loadJobs,
   purgeMember,
@@ -24,14 +24,14 @@ import {
   trackModeratedMessage,
   failedTooFrequent,
   deleteAgedPosts,
-} from "./jobs-moderation/job-mod-helpers";
-import { getValidationMessage } from "./jobs-moderation/validation-messages";
-import { FREQUENCY, scheduleTask } from "../helpers/schedule";
+} from "./jobs-moderation/job-mod-helpers.js";
+import { getValidationMessage } from "./jobs-moderation/validation-messages.js";
+import { FREQUENCY, scheduleTask } from "../helpers/schedule.js";
 import {
   POST_FAILURE_REASONS,
   PostFailures,
   PostType,
-} from "../types/jobs-moderation";
+} from "../types/jobs-moderation.js";
 
 const REPOST_THRESHOLD = 10; // minutes
 

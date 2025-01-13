@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { partition } from "./array";
+import { partition } from "./array.js";
 
 describe("partition", () => {
   it("matches regular emoji", () => {

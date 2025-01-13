@@ -1,6 +1,6 @@
-import { bot } from "..";
-import { ChannelHandlers } from "../types";
-import { EMBED_COLOR } from "./commands";
+import { bot } from "../index.js";
+import type { ChannelHandlers } from "../types/index.js";
+import { EMBED_COLOR } from "./commands.js";
 
 const DELETE_EMOJI = "🗑️";
 

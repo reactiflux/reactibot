@@ -5,11 +5,11 @@ import {
   ButtonStyle,
   Message,
 } from "discord.js";
-import { CHANNELS } from "../constants/channels";
-import { createAttachmentBuilderFromURL } from "../helpers/generate-pdf";
-import { ChannelHandlers } from "../types";
-import cooldown from "./cooldown";
-import { logger } from "./log";
+import { CHANNELS } from "../constants/channels.js";
+import { createAttachmentBuilderFromURL } from "../helpers/generate-pdf.js";
+import type { ChannelHandlers } from "../types/index.d.ts";
+import cooldown from "./cooldown.js";
+import { logger } from "./log.js";
 
 const PDF_CONTENT_TYPE = "application/pdf";
 const FIVE_MINUTES_IN_SECONDS = 60 * 5;

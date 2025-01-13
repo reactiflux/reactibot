@@ -1,6 +1,6 @@
 import { ChannelType } from "discord.js";
-import { isStaff } from "../helpers/discord";
-import { ChannelHandlers } from "../types";
+import { isStaff } from "../helpers/discord.js";
+import type { ChannelHandlers } from "../types/index.d.ts";
 
 const troll: ChannelHandlers = {
   handleMessage: async ({ msg, bot }) => {

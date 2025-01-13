@@ -1,5 +1,5 @@
-import { simplifyString } from "../../helpers/string";
-import { Post, PostType } from "../../types/jobs-moderation";
+import { simplifyString } from "../../helpers/string.js";
+import { Post, PostType } from "../../types/jobs-moderation.js";
 
 type SimplifiedTag = string;
 type StandardTag = string;
