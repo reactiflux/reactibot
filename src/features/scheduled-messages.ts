@@ -2,7 +2,11 @@ import type * as discord from "discord.js";
 import { guildId as defaultGuildId } from "../helpers/env.js";
 import { CHANNELS } from "../constants/channels.js";
 import { logger } from "./log.js";
-import { FREQUENCY, scheduleTask, SPECIFIED_TIMES } from "../helpers/schedule.js";
+import {
+  FREQUENCY,
+  scheduleTask,
+  SPECIFIED_TIMES,
+} from "../helpers/schedule.js";
 import { ChannelType } from "discord.js";
 
 type MessageConfig = {
