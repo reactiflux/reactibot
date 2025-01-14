@@ -62,6 +62,12 @@ If it doesn't deploy correctly (e.g. `kubectl get pods` shows a status other tha
 
 I actually couldn't get a local registry working so I fell back on using ghcr.io, GitHub container registry.
 
+[Create a Personal Access Token (Classic)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) and log in to ghcr.io. Use the PAT(C) as your password.
+
+```sh
+docker login ghcr.io
+```
+
 Create a file, `k8s-context`, in the project root, alongside the Dockerfile, with an IMAGE variable for kubectl to use.
 
 ```sh
