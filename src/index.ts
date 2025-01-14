@@ -40,7 +40,7 @@ import {
 } from "./features/debug-events.js";
 import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
-import "./server";
+import "./server.js";
 
 export const bot = new Client({
   intents: [
