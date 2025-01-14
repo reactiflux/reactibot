@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
-import { SlashCommand } from "../helpers/discord";
-import { og } from "../helpers/og-tags";
+import { SlashCommand } from "../helpers/discord.js";
+import { og } from "../helpers/og-tags.js";
 
 const fetchMetadata = async ({
   title,

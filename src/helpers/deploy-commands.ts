@@ -12,8 +12,8 @@ import {
   SlashCommand,
   UserContextCommand,
   calculateChangedCommands,
-} from "./discord";
-import { applicationId, isProd, discordToken } from "./env";
+} from "./discord.js";
+import { applicationId, isProd, discordToken } from "./env.js";
 
 export const rest = new REST({ version: "10" }).setToken(discordToken);
 

@@ -1,6 +1,6 @@
 import ogs from "open-graph-scraper";
-import { ChannelHandlers } from "../types";
-import { threadStats } from "../features/stats";
+import type { ChannelHandlers } from "../types/index.d.ts";
+import { threadStats } from "../features/stats.js";
 import { format } from "date-fns";
 import fetch from "node-fetch";
 import { ChannelType } from "discord.js";
@@ -36,6 +36,7 @@ const promotionThread: ChannelHandlers = {
           }
         } else {
           try {
+            // @ts-expect-error OGS types suck
             const { result, error } = await ogs({ url: firstLink });
             if (error) {
               console.log("[DEBUG] Erorr when fetching og tags: ", error);

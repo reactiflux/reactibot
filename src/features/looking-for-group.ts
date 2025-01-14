@@ -8,8 +8,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
 } from "discord.js";
-import { CHANNELS } from "../constants/channels";
-import { EMBED_COLOR } from "./commands";
+import { CHANNELS } from "../constants/channels.js";
+import { EMBED_COLOR } from "./commands.js";
 
 const LOCK_POST = "lock-post";
 

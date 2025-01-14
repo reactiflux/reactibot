@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { parseContent } from "./parse-content";
-import { PostType } from "../../types/jobs-moderation";
+import { parseContent } from "./parse-content.js";
+import { PostType } from "../../types/jobs-moderation.js";
 
 describe("parseContent", () => {
   describe("tags", () => {

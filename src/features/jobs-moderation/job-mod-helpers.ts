@@ -12,10 +12,10 @@ import {
   Snowflake,
   TextChannel,
 } from "discord.js";
-import { constructDiscordLink, isStaff } from "../../helpers/discord";
-import { partition } from "../../helpers/array";
-import { ReportReasons, reportUser } from "../../helpers/modLog";
-import { parseContent } from "./parse-content";
+import { constructDiscordLink, isStaff } from "../../helpers/discord.js";
+import { partition } from "../../helpers/array.js";
+import { ReportReasons, reportUser } from "../../helpers/modLog.js";
+import { parseContent } from "./parse-content.js";
 import {
   POST_FAILURE_REASONS,
   PostFailureInconsistentType,
@@ -30,7 +30,7 @@ import {
   PostType,
   PostFailureLinkRequired,
   CircumventedRules,
-} from "../../types/jobs-moderation";
+} from "../../types/jobs-moderation.js";
 
 export const failedCircumventedRules = (
   e: PostFailures,

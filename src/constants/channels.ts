@@ -1,5 +1,5 @@
 import { ChannelType, Client, TextChannel } from "discord.js";
-import { guildId, isProd } from "../helpers/env";
+import { guildId, isProd } from "../helpers/env.js";
 
 const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
   helpReact: "926931785219207301",

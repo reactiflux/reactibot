@@ -7,14 +7,14 @@ import {
   Message,
   TextChannel,
 } from "discord.js";
-import cooldown from "./cooldown";
-import { ChannelHandlers } from "../types";
-import { isStaff } from "../helpers/discord";
+import cooldown from "./cooldown.js";
+import type { ChannelHandlers } from "../types/index.d.ts";
+import { isStaff } from "../helpers/discord.js";
 import {
   extractSearchKey,
   getReactDocsContent,
   getReactDocsSearchKey,
-} from "../helpers/react-docs";
+} from "../helpers/react-docs.js";
 import dedent from "dedent";
 
 export const EMBED_COLOR = 7506394;

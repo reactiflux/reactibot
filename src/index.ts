@@ -1,4 +1,6 @@
-import discord, {
+import "dotenv/config";
+import {
+  Client,
   Message,
   MessageReaction,
   User,
@@ -9,34 +11,37 @@ import discord, {
   IntentsBitField,
 } from "discord.js";
 
-import { logger, channelLog } from "./features/log";
+import { logger, channelLog } from "./features/log.js";
 // import codeblock from './features/codeblock';
-import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation";
-import { resumeResources } from "./features/resume";
-import { lookingForGroup } from "./features/looking-for-group";
-import autoban from "./features/autoban";
-import commands from "./features/commands";
-import setupStats from "./features/stats";
-import emojiMod from "./features/emojiMod";
-import promotionThread from "./features/promotion-threads";
-import autothread, { cleanupThreads } from "./features/autothread";
-import voiceActivity from "./features/voice-activity";
+import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation.js";
+import { resumeResources } from "./features/resume.js";
+import { lookingForGroup } from "./features/looking-for-group.js";
+import autoban from "./features/autoban.js";
+import commands from "./features/commands.js";
+import setupStats from "./features/stats.js";
+import emojiMod from "./features/emojiMod.js";
+import promotionThread from "./features/promotion-threads.js";
+import autothread, { cleanupThreads } from "./features/autothread.js";
+import voiceActivity from "./features/voice-activity.js";
 
-import { ChannelHandlers } from "./types";
-import { scheduleMessages } from "./features/scheduled-messages";
-import tsPlaygroundLinkShortener from "./features/tsplay";
-import { CHANNELS, initCachedChannels } from "./constants/channels";
-import { scheduleTask } from "./helpers/schedule";
-import { discordToken, isProd } from "./helpers/env";
-import { registerCommand, deployCommands } from "./helpers/deploy-commands";
-import resumeReviewPdf from "./features/resume-review";
-import troll from "./features/troll";
-import { modActivity } from "./features/mod-activity";
-import { debugEventButtonHandler, debugEvents } from "./features/debug-events";
-import { recommendBookCommand } from "./features/book-list";
-import { mdnSearch } from "./features/mdn";
+import type { ChannelHandlers } from "./types/index.js";
+import { scheduleMessages } from "./features/scheduled-messages.js";
+import tsPlaygroundLinkShortener from "./features/tsplay.js";
+import { CHANNELS, initCachedChannels } from "./constants/channels.js";
+import { scheduleTask } from "./helpers/schedule.js";
+import { discordToken, isProd } from "./helpers/env.js";
+import { registerCommand, deployCommands } from "./helpers/deploy-commands.js";
+import resumeReviewPdf from "./features/resume-review.js";
+import troll from "./features/troll.js";
+import { modActivity } from "./features/mod-activity.js";
+import {
+  debugEventButtonHandler,
+  debugEvents,
+} from "./features/debug-events.js";
+import { recommendBookCommand } from "./features/book-list.js";
+import { mdnSearch } from "./features/mdn.js";
 
-export const bot = new discord.Client({
+export const bot = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMembers,

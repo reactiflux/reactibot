@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { gitHubReadToken } from "./env";
+import { gitHubReadToken } from "./env.js";
 
 const LOOKUP_REGEX = /<Intro>\s*(.*?)\s*<\/Intro>/gs;
 const LINK_REGEX = /\[([^\]]+)\]\((?!https?:\/\/)([^)]+)\)/g;

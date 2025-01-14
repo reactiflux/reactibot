@@ -1,16 +1,16 @@
 import { differenceInHours } from "date-fns";
 import { ChannelType, Client, MessageType } from "discord.js";
-import { CHANNELS } from "../constants/channels";
+import { CHANNELS } from "../constants/channels.js";
 import {
   constructDiscordLink,
   fetchReactionMembers,
   isHelpful,
   isStaff,
-} from "../helpers/discord";
-import { sleep } from "../helpers/misc";
-import { ChannelHandlers } from "../types";
-import { threadStats } from "../features/stats";
-import { createNewThreadName } from "../helpers/threads";
+} from "../helpers/discord.js";
+import { sleep } from "../helpers/misc.js";
+import type { ChannelHandlers } from "../types/index.d.ts";
+import { threadStats } from "../features/stats.js";
+import { createNewThreadName } from "../helpers/threads.js";
 
 const CHECKS = ["☑️", "✔️", "✅"];
 const IDLE_TIMEOUT = 72;

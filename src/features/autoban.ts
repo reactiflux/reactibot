@@ -1,4 +1,4 @@
-import { ChannelHandlers } from "../types";
+import type { ChannelHandlers } from "../types/index.d.ts";
 
 const tags = [
   "http://discord.amazingsexdating.com",

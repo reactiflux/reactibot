@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { SlashCommand } from "../helpers/discord";
+import { SlashCommand } from "../helpers/discord.js";
 
 const SOURCE_LINK =
   "-# [source](<https://github.com/reactiflux/reactibot/blob/main/src/features/mdn.ts>)";

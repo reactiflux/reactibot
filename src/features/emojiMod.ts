@@ -6,17 +6,21 @@ import {
   EmbedType,
   ChannelType,
 } from "discord.js";
-import cooldown from "./cooldown";
-import { ChannelHandlers } from "../types";
-import { ReportReasons, reportUser, truncateMessage } from "../helpers/modLog";
+import cooldown from "./cooldown.js";
+import type { ChannelHandlers } from "../types/index.d.ts";
+import {
+  ReportReasons,
+  reportUser,
+  truncateMessage,
+} from "../helpers/modLog.js";
 import {
   createPrivateThreadFromMessage,
   fetchReactionMembers,
   isStaff,
   isStaffOrHelpful,
-} from "../helpers/discord";
-import { partition } from "../helpers/array";
-import { EMBED_COLOR } from "./commands";
+} from "../helpers/discord.js";
+import { partition } from "../helpers/array.js";
+import { EMBED_COLOR } from "./commands.js";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
