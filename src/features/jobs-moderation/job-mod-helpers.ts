@@ -97,9 +97,9 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const messages = await channel.messages.fetch({
-      ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
-    });
+    const messages = await channel.messages.fetch(
+      oldestMessage ? { before: oldestMessage.message.id } : {},
+    );
     console.log(
       "[DEBUG] loadJobs()",
       `Oldest message: ${oldestMessage ? oldestMessage.createdAt : "none"}.`,
@@ -135,7 +135,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     }
     oldestMessage = newMessages
       .sort((a, b) => compareAsc(a.createdAt, b.createdAt))
-      .at(-1);
+      .at(0);
     if (!oldestMessage) break;
 
     const humanNonStaffMessages = newMessages.filter(
