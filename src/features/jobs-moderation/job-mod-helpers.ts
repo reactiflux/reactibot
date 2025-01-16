@@ -85,7 +85,7 @@ export const getJobPosts = () => {
   };
 };
 
-const DAYS_OF_POSTS = 30;
+const DAYS_OF_POSTS = 90;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
@@ -93,17 +93,27 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
   let oldestMessage: StoredMessage | undefined;
 
   // Iteratively add all messages that are less than DAYS_OF_POSTS days old.
-  // Fetch by 10 messages at a time, paging through the channel history.
   while (
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const newMessages: StoredMessage[] = (
-      await channel.messages.fetch({
-        limit: 10,
-        ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
-      })
-    )
+    const messages = await channel.messages.fetch({
+      ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
+    });
+    console.log(
+      "[DEBUG] loadJobs()",
+      `Oldest message: ${oldestMessage ? oldestMessage.createdAt : "none"}.`,
+      "Just fetched",
+      messages.size,
+      "messages",
+      messages
+        .map(
+          (m) =>
+            `${m.author.username}, ${differenceInDays(now, m.createdAt)} days old`,
+        )
+        .join("; "),
+    );
+    const newMessages: StoredMessage[] = messages
       // Convert fetched messages to be stored in the cache
       .map((message) => {
         const { tags, description } = parseContent(message.content)[0];
@@ -151,7 +161,7 @@ export const deleteAgedPosts = async () => {
   console.log(
     `[INFO] deleteAgedPosts() ${
       jobBoardMessageCache.forHire.length
-    } forhire posts. max age is ${FORHIRE_AGE_LIMIT} JSON: \`${JSON.stringify(
+    } forhire posts. max age is ${FORHIRE_AGE_LIMIT} hours JSON: \`${JSON.stringify(
       jobBoardMessageCache.forHire.map(({ message, ...p }) => ({
         ...p,
         hoursOld: differenceInHours(new Date(), p.createdAt),
