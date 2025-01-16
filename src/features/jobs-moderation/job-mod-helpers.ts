@@ -93,14 +93,12 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
   let oldestMessage: StoredMessage | undefined;
 
   // Iteratively add all messages that are less than DAYS_OF_POSTS days old.
-  // Fetch by 10 messages at a time, paging through the channel history.
   while (
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
     const newMessages: StoredMessage[] = (
       await channel.messages.fetch({
-        limit: 10,
         ...(oldestMessage ? { after: oldestMessage.message.id } : {}),
       })
     )
