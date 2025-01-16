@@ -22,7 +22,7 @@ import {
 export const difference = <T>(a: Set<T>, b: Set<T>) =>
   new Set(Array.from(a).filter((x) => !b.has(x)));
 
-const staffRoles = ["mvp", "moderator", "admin", "admins"];
+const staffRoles = ["moderator", "admin", "admins"];
 const helpfulRoles = ["mvp", "star helper"];
 
 const hasRole = (member: GuildMember, roles: string | string[]) =>
