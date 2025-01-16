@@ -3,9 +3,14 @@ kind: Ingress
 metadata:
   name: reactibot-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    cert-manager.io/cluster-issuer: letsencrypt-prod # Optional, for TLS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/hsts: "true"
+    nginx.ingress.kubernetes.io/hsts-max-age: "31536000"
+    nginx.ingress.kubernetes.io/hsts-include-subdomains: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  ingressClassName: nginx
   rules:
     - host: api.reactiflux.com
       http:
@@ -14,10 +19,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: reactibot
+                name: reactibot-service
                 port:
                   number: 80
   tls:
     - hosts:
         - api.reactiflux.com
-      secretName: my-tls-secret # Used for HTTPS
+      secretName: reactibot-tls-cert
