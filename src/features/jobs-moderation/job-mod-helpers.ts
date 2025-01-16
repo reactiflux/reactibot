@@ -85,7 +85,7 @@ export const getJobPosts = () => {
   };
 };
 
-const DAYS_OF_POSTS = 30;
+const DAYS_OF_POSTS = 90;
 
 export const loadJobs = async (bot: Client, channel: TextChannel) => {
   const now = new Date();
