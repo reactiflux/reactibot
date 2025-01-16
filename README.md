@@ -79,6 +79,7 @@ Run a docker build, tag it, and push to the registry. We need to retrieve the im
 ```sh
 docker build . -t <your gh>/reactibot:test
 docker tag $(docker images <your gh>/reactibot:test | tr -s ' ' | cut -f3 -d' ' | tail -n 1) ghcr.io/<your gh>/reactibot:test
+docker push ghcr.io/<your gh>/reactibot:test
 ```
 
 Run a local deploy.
