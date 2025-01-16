@@ -138,15 +138,16 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       .at(-1);
     if (!oldestMessage) break;
 
-    const humanMessages = newMessages.filter(
+    const humanNonStaffMessages = newMessages.filter(
       (m) =>
         differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
         !m.message.system &&
+        !isStaff(m.message.member) &&
         m.authorId !== bot.user?.id,
     );
     const [hiring, forHire] = partition(
       (m) => m.type === PostType.hiring,
-      humanMessages,
+      humanNonStaffMessages,
     );
 
     jobBoardMessageCache = { hiring, forHire };
