@@ -39,8 +39,8 @@ const openApiConfig = {
             },
           },
           reactions: {
-            type: "array",
-            items: { type: "string" },
+            type: "object",
+            additionalProperties: { type: "number" },
           },
           createdAt: {
             type: "string",
@@ -117,7 +117,7 @@ fastify.get(
 );
 
 interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
-  reactions: string[];
+  reactions: Record<string, number>;
   author: {
     username: string;
     displayName: string;
@@ -127,7 +127,10 @@ interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
 
 const renderPost = (post: StoredMessage): RenderedPost => {
   console.log({
-    reactions: post.message.reactions.cache.map((r) => r.emoji.name),
+    reactions: post.message.reactions.cache.map((r) => [
+      r.emoji.name ?? "☐",
+      r.count,
+    ]),
   });
   return {
     ...post,
@@ -141,7 +144,9 @@ const renderPost = (post: StoredMessage): RenderedPost => {
         forceStatic: true,
       }),
     },
-    reactions: post.message.reactions.cache.map((r) => r.emoji.name ?? "☐"),
+    reactions: Object.fromEntries(
+      post.message.reactions.cache.map((r) => [r.emoji.name ?? "☐", r.count]),
+    ),
   };
 };
 
