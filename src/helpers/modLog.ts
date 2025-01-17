@@ -163,7 +163,7 @@ ${reportedMessage}
 
 ${reportedMessage}`;
     case ReportReasons.jobAge:
-      return `${preface}, for hire post expired.`;
+      return `${preface}, for hire post expired. ${extra}`;
     case ReportReasons.jobFrequency:
       return `${preface}, posting too frequently.`;
 
