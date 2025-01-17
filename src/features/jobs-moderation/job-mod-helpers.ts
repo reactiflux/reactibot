@@ -73,7 +73,7 @@ export interface StoredMessage {
   tags: string[];
   type: PostType;
 }
-let jobBoardMessageCache: {
+const jobBoardMessageCache: {
   forHire: StoredMessage[];
   hiring: StoredMessage[];
 } = { forHire: [], hiring: [] };
@@ -97,8 +97,16 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const messages = await channel.messages.fetch(
-      oldestMessage ? { before: oldestMessage.message.id } : {},
+    const messages = (
+      await channel.messages.fetch(
+        oldestMessage ? { before: oldestMessage.message.id } : {},
+      )
+    ).filter(
+      (m) =>
+        differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
+        !m.system &&
+        !isStaff(m.member) &&
+        m.author.id !== bot.user?.id,
     );
     console.log(
       "[DEBUG] loadJobs()",
@@ -134,23 +142,17 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       break;
     }
     oldestMessage = newMessages
-      .sort((a, b) => compareAsc(a.createdAt, b.createdAt))
-      .at(0);
+      .sort((a, b) => compareAsc(b.createdAt, a.createdAt))
+      .at(-0);
     if (!oldestMessage) break;
 
-    const humanNonStaffMessages = newMessages.filter(
-      (m) =>
-        differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
-        !m.message.system &&
-        !isStaff(m.message.member) &&
-        m.authorId !== bot.user?.id,
-    );
     const [hiring, forHire] = partition(
       (m) => m.type === PostType.hiring,
-      humanNonStaffMessages,
+      newMessages,
     );
 
-    jobBoardMessageCache = { hiring, forHire };
+    jobBoardMessageCache.hiring.push(...hiring);
+    jobBoardMessageCache.forHire.push(...forHire);
   }
 };
 
@@ -178,7 +180,6 @@ export const deleteAgedPosts = async () => {
       FORHIRE_AGE_LIMIT
   ) {
     const { message } = jobBoardMessageCache.forHire[0];
-    jobBoardMessageCache.forHire.shift();
     try {
       await message.fetch();
       if (!message.deletable) {
@@ -199,7 +200,10 @@ export const deleteAgedPosts = async () => {
         message,
         extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
       });
+
       await message.delete();
+      jobBoardMessageCache.forHire.shift();
+
       console.log(
         `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(
           message,
