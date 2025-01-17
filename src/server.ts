@@ -2,7 +2,13 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import swagger from "@fastify/swagger";
-import { getJobPosts } from "./features/jobs-moderation/job-mod-helpers.js";
+import { marked } from "marked";
+import xss from "xss";
+import {
+  StoredMessage,
+  getJobPosts,
+} from "./features/jobs-moderation/job-mod-helpers.js";
+import { compressLineBreaks } from "./helpers/string.js";
 
 const fastify = Fastify({ logger: true });
 
@@ -23,13 +29,18 @@ const openApiConfig = {
             items: { type: "string" },
           },
           description: { type: "string" },
-          authorId: {
-            type: "string",
-            format: "snowflake",
-          },
-          message: {
+          author: {
             type: "object",
-            description: "Discord Message object",
+            requried: ["username", "displayName", "avatar"],
+            properties: {
+              username: { type: "string" },
+              displayName: { type: "string" },
+              avatar: { type: "string" },
+            },
+          },
+          reactions: {
+            type: "array",
+            items: { type: "string" },
           },
           createdAt: {
             type: "string",
@@ -99,8 +110,42 @@ fastify.get(
     },
   },
   async () => {
-    return getJobPosts();
+    const { hiring, forHire } = getJobPosts();
+
+    return { hiring: hiring.map(renderPost), forHire: forHire.map(renderPost) };
   },
 );
 
+interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
+  reactions: string[];
+  author: {
+    username: string;
+    displayName: string;
+    avatar: string;
+  };
+}
+
+const renderPost = (post: StoredMessage): RenderedPost => {
+  console.log({
+    reactions: post.message.reactions.cache.map((r) => r.emoji.name),
+  });
+  return {
+    ...post,
+    description: renderMdToHtml(compressLineBreaks(post.description)),
+    author: {
+      username: post.message.author.username,
+      displayName: post.message.author.displayName,
+      avatar: post.message.author.displayAvatarURL({
+        size: 128,
+        extension: "jpg",
+        forceStatic: true,
+      }),
+    },
+    reactions: post.message.reactions.cache.map((r) => r.emoji.name ?? "☐"),
+  };
+};
+
 await fastify.listen({ port: 3000, host: "0.0.0.0" });
+
+const renderMdToHtml = (md: string) =>
+  xss(marked(md, { async: false, gfm: true }));

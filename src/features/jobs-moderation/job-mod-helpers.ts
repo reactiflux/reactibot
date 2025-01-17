@@ -65,7 +65,7 @@ export const failedTooManyEmojis = (
 ): e is PostFailureTooManyEmojis =>
   e.type === POST_FAILURE_REASONS.tooManyEmojis;
 
-interface StoredMessage {
+export interface StoredMessage {
   message: Message;
   authorId: Snowflake;
   createdAt: Date;

@@ -10,7 +10,7 @@ describe("parseContent", () => {
       );
       expectTypeOf(parsed).toBeArray();
       expect(parsed[0]).toMatchObject({
-        tags: ["company", "jobtitle", "location", "compensation", "jobtype"],
+        tags: ["company", "job title", "location", "compensation", "job type"],
       });
 
       const emptyTags = ["|", "|||", "[]", " [ ] "];
@@ -27,7 +27,6 @@ describe("parseContent", () => {
         "[forhire]",
         "for hire|",
         "|for hire|",
-        "[f o r h i r e]",
         "|FoRhIrE|",
       ];
       validForHireTags.forEach((tag) => {
@@ -42,12 +41,28 @@ describe("parseContent", () => {
         "[hire]",
         "[HIRE]",
         "hiring|",
-        "|h i r i n g|",
         "|HiRiNg|",
       ];
       validHiringTags.forEach((tag) => {
         const [parsed] = parseContent(tag);
         expect(parsed).toMatchObject({ tags: [PostType.hiring] });
+      });
+    });
+    it("fancy", () => {
+      const parsed = parseContent(
+        "Company | Job Title | Location | Compensation | Job Type | Part time / full time",
+      );
+      expectTypeOf(parsed).toBeArray();
+      expect(parsed[0]).toMatchObject({
+        tags: [
+          "company",
+          "job title",
+          "location",
+          "compensation",
+          "job type",
+          "part time",
+          "full time",
+        ],
       });
     });
   });
