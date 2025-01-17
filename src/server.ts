@@ -2,7 +2,13 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import swagger from "@fastify/swagger";
-import { getJobPosts } from "./features/jobs-moderation/job-mod-helpers.js";
+import { marked } from "marked";
+import xss from "xss";
+import {
+  StoredMessage,
+  getJobPosts,
+} from "./features/jobs-moderation/job-mod-helpers.js";
+import { compressLineBreaks } from "./helpers/string.js";
 
 const fastify = Fastify({ logger: true });
 
@@ -99,8 +105,20 @@ fastify.get(
     },
   },
   async () => {
-    return getJobPosts();
+    const { hiring, forHire } = getJobPosts();
+
+    return { hiring: hiring.map(renderPost), forHire: forHire };
   },
 );
 
+const renderPost = (post: StoredMessage): StoredMessage => {
+  return {
+    ...post,
+    description: renderMdToHtml(compressLineBreaks(post.description)),
+  };
+};
+
 await fastify.listen({ port: 3000, host: "0.0.0.0" });
+
+const renderMdToHtml = (md: string) =>
+  xss(marked(md, { async: false, gfm: true }));

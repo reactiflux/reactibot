@@ -16,3 +16,11 @@ export const extractEmoji = (s: string) => s.match(EMOJI_RANGE) || [];
 
 const NEWLINE = /\n/g;
 export const countLines = (s: string) => s.match(NEWLINE)?.length || 0;
+
+const DOUBLE_NEWLINE = /\n\n/g;
+export const compressLineBreaks = (s: string) => {
+  while (DOUBLE_NEWLINE.test(s)) {
+    s = s.replaceAll(DOUBLE_NEWLINE, "\n");
+  }
+  return s;
+};
