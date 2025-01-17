@@ -179,7 +179,6 @@ export const deleteAgedPosts = async () => {
       FORHIRE_AGE_LIMIT
   ) {
     const { message } = jobBoardMessageCache.forHire[0];
-    jobBoardMessageCache.forHire.shift();
     try {
       await message.fetch();
       if (!message.deletable) {
@@ -200,7 +199,10 @@ export const deleteAgedPosts = async () => {
         message,
         extra: `Originally sent ${format(new Date(message.createdAt), "P p")}`,
       });
+
       await message.delete();
+      jobBoardMessageCache.forHire.shift();
+
       console.log(
         `[INFO]: deleteAgedPosts() deleted post ${constructDiscordLink(
           message,
