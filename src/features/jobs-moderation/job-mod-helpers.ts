@@ -97,8 +97,16 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     !oldestMessage ||
     differenceInDays(now, oldestMessage.createdAt) < DAYS_OF_POSTS
   ) {
-    const messages = await channel.messages.fetch(
-      oldestMessage ? { before: oldestMessage.message.id } : {},
+    const messages = (
+      await channel.messages.fetch(
+        oldestMessage ? { before: oldestMessage.message.id } : {},
+      )
+    ).filter(
+      (m) =>
+        differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
+        !m.system &&
+        !isStaff(m.member) &&
+        m.author.id !== bot.user?.id,
     );
     console.log(
       "[DEBUG] loadJobs()",
@@ -135,19 +143,12 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     }
     oldestMessage = newMessages
       .sort((a, b) => compareAsc(b.createdAt, a.createdAt))
-      .at(-1);
+      .at(-0);
     if (!oldestMessage) break;
 
-    const humanNonStaffMessages = newMessages.filter(
-      (m) =>
-        differenceInDays(now, m.createdAt) < DAYS_OF_POSTS &&
-        !m.message.system &&
-        !isStaff(m.message.member) &&
-        m.authorId !== bot.user?.id,
-    );
     const [hiring, forHire] = partition(
       (m) => m.type === PostType.hiring,
-      humanNonStaffMessages,
+      newMessages,
     );
 
     jobBoardMessageCache.hiring.push(...hiring);
