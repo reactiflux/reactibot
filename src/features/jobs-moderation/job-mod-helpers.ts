@@ -73,7 +73,7 @@ export interface StoredMessage {
   tags: string[];
   type: PostType;
 }
-let jobBoardMessageCache: {
+const jobBoardMessageCache: {
   forHire: StoredMessage[];
   hiring: StoredMessage[];
 } = { forHire: [], hiring: [] };
@@ -134,8 +134,8 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       break;
     }
     oldestMessage = newMessages
-      .sort((a, b) => compareAsc(a.createdAt, b.createdAt))
-      .at(0);
+      .sort((a, b) => compareAsc(b.createdAt, a.createdAt))
+      .at(-1);
     if (!oldestMessage) break;
 
     const humanNonStaffMessages = newMessages.filter(
@@ -150,7 +150,8 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
       humanNonStaffMessages,
     );
 
-    jobBoardMessageCache = { hiring, forHire };
+    jobBoardMessageCache.hiring.push(...hiring);
+    jobBoardMessageCache.forHire.push(...forHire);
   }
 };
 
