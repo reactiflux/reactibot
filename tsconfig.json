@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "Node16",
+    "module": "NodeNext",
     "sourceMap": true,
     "outDir": "dist",
     "skipLibCheck": true,
     "strict": true,
     "allowJs": false,
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
