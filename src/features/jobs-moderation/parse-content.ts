@@ -8,12 +8,17 @@ type StandardTag = string;
 // interpreting compensation, all sorts of fun follow ons.
 const tagMap = new Map<string, (s: SimplifiedTag) => StandardTag>([
   ["forhire", () => PostType.forHire],
+  ["for hire", () => PostType.forHire],
   ["hiring", () => PostType.hiring],
   ["hire", () => PostType.hiring],
 ]);
 
-const standardizeTag = (tag: string) => {
-  const simpleTag = simplifyString(tag).replace(/\W/g, "");
+const standardizeTag = (tag: string): string | string[] => {
+  if (tag.includes("/")) {
+    return tag.split("/").flatMap(standardizeTag);
+  }
+
+  const simpleTag = simplifyString(tag).replace(/\W+/g, " ").trim();
   const standardTagBuilder = tagMap.get(simpleTag);
   return standardTagBuilder?.(simpleTag) ?? simpleTag;
 };
@@ -21,7 +26,7 @@ const standardizeTag = (tag: string) => {
 export const parseTags = (tags: string) => {
   return tags
     .split(/[|[\]]/g)
-    .map((tag) => standardizeTag(tag.trim()))
+    .flatMap((tag) => standardizeTag(tag.trim()))
     .filter((tag) => tag !== "");
 };
 
