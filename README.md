@@ -8,6 +8,17 @@ Contact @vcarl (`@vcarl#7694` in Discord) for help getting into the test server.
 
 See [the contributing guide](./CONTRIBUTING.md) for specific instructions.
 
+### Adding a new environment variable
+
+This is dumb and I hate it but it's how the tools work together.
+
+New secrets need to be added in a bunch of different places in order to work in production:
+
+- the GitHub [secrets config for Reactibot in settings](https://github.com/reactiflux/reactibot/settings/secrets/actions)
+- [env.ts](https://github.com/reactiflux/reactibot/blob/main/src/helpers/env.ts) to load it from the environment (please do not freely use `process.env`)
+- [our deployment action](https://github.com/reactiflux/reactibot/blob/main/.github/workflows/node.js.yml#L88), under the Kubernetes secret creation step
+- [the Kubernetes deployment config](https://github.com/reactiflux/reactibot/blob/main/cluster/deployment.yaml#L18)
+
 ## Testing deployment
 
 You must have a working `.env` file that enables you to run the bot locally. With the values in `.env`, create a `reactibot-env` secret in your local minikube cluster. Everything must be provided a value, but it's okay if some of them are just random strings.
