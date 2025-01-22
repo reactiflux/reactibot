@@ -53,3 +53,8 @@ spec:
                 secretKeyRef:
                   name: reactibot-env
                   key: OPENAI_KEY
+            - name: REACTIBOT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: reactibot-env
+                  key: REACTIBOT_API_KEY
