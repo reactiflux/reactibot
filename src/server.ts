@@ -10,6 +10,7 @@ import {
 } from "./features/jobs-moderation/job-mod-helpers.js";
 import { compressLineBreaks } from "./helpers/string.js";
 import { constructDiscordLink } from "./helpers/discord.js";
+import { reactibotApiKey } from "./helpers/env.js";
 
 const fastify = Fastify({ logger: true });
 
@@ -22,6 +23,14 @@ const openApiConfig = {
     version: "1.0.0",
   },
   components: {
+    securitySchemes: {
+      apiKey: {
+        type: "apiKey",
+        name: "api-key",
+        in: "header",
+      },
+    },
+    security: [{ apiKey: [] }],
     schemas: {
       PaginationParams: {
         type: "object",
@@ -117,6 +126,15 @@ const openApiConfig = {
     },
   },
 };
+
+fastify.addHook("onRequest", async (request, reply) => {
+  const apiKey = request.headers["api-key"];
+  console.log("onreq");
+  if (apiKey !== reactibotApiKey) {
+    reply.code(401).send({ error: "Unauthorized" });
+    return;
+  }
+});
 
 try {
   Object.entries(openApiConfig.components.schemas).forEach(([k, schema]) => {
