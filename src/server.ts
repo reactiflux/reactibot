@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import swagger from "@fastify/swagger";
@@ -9,8 +9,11 @@ import {
   getJobPosts,
 } from "./features/jobs-moderation/job-mod-helpers.js";
 import { compressLineBreaks } from "./helpers/string.js";
+import { constructDiscordLink } from "./helpers/discord.js";
 
 const fastify = Fastify({ logger: true });
+
+const MAX_LIMIT = 50;
 
 const openApiConfig = {
   openapi: "3.0.0",
@@ -20,6 +23,25 @@ const openApiConfig = {
   },
   components: {
     schemas: {
+      PaginationParams: {
+        type: "object",
+        properties: {
+          limit: {
+            type: "integer",
+            minimum: 1,
+            maximum: MAX_LIMIT,
+            default: 10,
+            description: "Number of items to return",
+          },
+          offset: {
+            type: "integer",
+            minimum: 0,
+            default: 0,
+            description: "Number of items to skip",
+          },
+        },
+      },
+
       JobPost: {
         type: "object",
         required: ["tags", "description", "authorId", "message", "createdAt"],
@@ -38,9 +60,10 @@ const openApiConfig = {
               avatar: { type: "string" },
             },
           },
+          messageLink: { type: "string" },
           reactions: {
-            type: "object",
-            additionalProperties: { type: "number" },
+            type: "array",
+            items: { type: "string" },
           },
           createdAt: {
             type: "string",
@@ -49,33 +72,42 @@ const openApiConfig = {
         },
       },
       JobBoardCache: {
-        type: "object",
-        required: ["forHire", "hiring"],
-        properties: {
-          forHire: {
-            type: "array",
-            items: { $ref: "JobPost" },
-          },
-          hiring: {
-            type: "array",
-            items: { $ref: "JobPost" },
-          },
+        pages: { type: "number" },
+        page: { type: "number" },
+        limit: { type: "number" },
+        data: {
+          type: "array",
+          items: { $ref: "JobPost" },
         },
       },
-    },
-  },
-  paths: {
-    "/jobs": {
-      get: {
-        tags: ["jobs"],
-        summary: "Get all job posts",
-        responses: {
-          "200": {
-            description: "Successful response",
-            content: {
-              "application/json": {
-                schema: {
-                  $ref: "JobBoardCache",
+      paths: {
+        "/jobs/forhire": {
+          get: {
+            tags: ["jobs"],
+            summary: "Get all job posts",
+            responses: {
+              "200": {
+                description: "Successful response",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "JobBoardCache" },
+                  },
+                },
+              },
+            },
+          },
+        },
+        "/jobs/hiring": {
+          get: {
+            tags: ["jobs"],
+            summary: "Get all job posts",
+            responses: {
+              "200": {
+                description: "Successful response",
+                content: {
+                  "application/json": {
+                    schema: { $ref: "JobBoardCache" },
+                  },
                 },
               },
             },
@@ -99,7 +131,7 @@ try {
 }
 
 fastify.get(
-  "/jobs",
+  "/jobs/hiring",
   {
     schema: {
       response: {
@@ -109,15 +141,72 @@ fastify.get(
       },
     },
   },
-  async () => {
-    const { hiring, forHire } = getJobPosts();
+  async (req) => {
+    const { page, limit } = getPaginationFromRequest(req);
+    const { hiring } = getJobPosts();
 
-    return { hiring: hiring.map(renderPost), forHire: forHire.map(renderPost) };
+    return paginateResponse(page, limit, hiring.map(renderPost));
+  },
+);
+fastify.get(
+  "/jobs/forhire",
+  {
+    schema: {
+      querystring: {
+        $ref: "PaginationParams",
+      },
+      response: {
+        200: {
+          $ref: "JobBoardCache",
+        },
+      },
+    },
+  },
+  async (req) => {
+    const { page, limit } = getPaginationFromRequest(req);
+    const { forHire } = getJobPosts();
+
+    return paginateResponse(page, limit, forHire.map(renderPost));
   },
 );
 
+const DEFAULT_LIMIT = 10;
+const getPaginationFromRequest = (req: FastifyRequest) => {
+  const { page, limit } = req.query as { page?: string; limit?: string };
+  let outPage: number, outLimit: number;
+  if (!page) {
+    outPage = 1;
+  } else {
+    outPage = parseInt(page);
+    if (isNaN(outPage)) outPage = 1;
+  }
+  if (!limit) {
+    outLimit = DEFAULT_LIMIT;
+  } else {
+    outLimit = parseInt(limit);
+    if (isNaN(outLimit)) outLimit = DEFAULT_LIMIT;
+    if (outLimit > MAX_LIMIT) outLimit = MAX_LIMIT;
+  }
+  return { page: outPage, limit: outLimit };
+};
+
+const paginateResponse = <T extends Array<any>>(
+  page: number,
+  limit: number,
+  data: T,
+) => {
+  const offset = (page - 1) * limit;
+  return {
+    data: data.slice(offset, offset + limit),
+    page,
+    limit,
+    pages: Math.ceil(data.length / limit),
+  };
+};
+
 interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
-  reactions: Record<string, number>;
+  reactions: [string, number][];
+  messageLink: string;
   author: {
     username: string;
     displayName: string;
@@ -126,15 +215,16 @@ interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
 }
 
 const renderPost = (post: StoredMessage): RenderedPost => {
-  console.log({
+  return {
+    tags: post.tags,
+    type: post.type,
+    createdAt: post.createdAt,
+    description: renderMdToHtml(compressLineBreaks(post.description)),
+    messageLink: constructDiscordLink(post.message),
     reactions: post.message.reactions.cache.map((r) => [
       r.emoji.name ?? "☐",
       r.count,
     ]),
-  });
-  return {
-    ...post,
-    description: renderMdToHtml(compressLineBreaks(post.description)),
     author: {
       username: post.message.author.username,
       displayName: post.message.author.displayName,
@@ -144,9 +234,6 @@ const renderPost = (post: StoredMessage): RenderedPost => {
         forceStatic: true,
       }),
     },
-    reactions: Object.fromEntries(
-      post.message.reactions.cache.map((r) => [r.emoji.name ?? "☐", r.count]),
-    ),
   };
 };
 
