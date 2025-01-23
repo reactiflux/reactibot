@@ -8,7 +8,7 @@ import {
   StoredMessage,
   getJobPosts,
 } from "./features/jobs-moderation/job-mod-helpers.js";
-import { compressLineBreaks } from "./helpers/string.js";
+import { compressLineBreaks, simplifyString } from "./helpers/string.js";
 import { constructDiscordLink } from "./helpers/discord.js";
 import { reactibotApiKey } from "./helpers/env.js";
 
@@ -81,6 +81,7 @@ const openApiConfig = {
         },
       },
       JobBoardCache: {
+        count: { type: "number" },
         pages: { type: "number" },
         page: { type: "number" },
         limit: { type: "number" },
@@ -129,8 +130,7 @@ const openApiConfig = {
 
 fastify.addHook("onRequest", async (request, reply) => {
   const apiKey = request.headers["api-key"];
-  console.log("onreq");
-  if (apiKey !== reactibotApiKey) {
+  if (request.hostname !== "localhost" && apiKey !== reactibotApiKey) {
     reply.code(401).send({ error: "Unauthorized" });
     return;
   }
@@ -160,10 +160,14 @@ fastify.get(
     },
   },
   async (req) => {
-    const { page, limit } = getPaginationFromRequest(req);
+    const { page, limit, requiredTags } = parseQuery(req);
     const { hiring } = getJobPosts();
 
-    return paginateResponse(page, limit, hiring.map(renderPost));
+    return paginateResponse(
+      page,
+      limit,
+      filterTags(requiredTags, hiring).map(renderPost),
+    );
   },
 );
 fastify.get(
@@ -181,31 +185,58 @@ fastify.get(
     },
   },
   async (req) => {
-    const { page, limit } = getPaginationFromRequest(req);
+    const { page, limit, requiredTags } = parseQuery(req);
     const { forHire } = getJobPosts();
 
-    return paginateResponse(page, limit, forHire.map(renderPost));
+    return paginateResponse(
+      page,
+      limit,
+      filterTags(requiredTags, forHire).map(renderPost),
+    );
   },
 );
 
+const filterTags = (requiredTags: string[], posts: StoredMessage[]) => {
+  return posts.filter((post) => {
+    const simplifiedTags = post.tags.map((t) =>
+      simplifyString(t).replaceAll(" ", ""),
+    );
+    return requiredTags.every((rt) => simplifiedTags.includes(rt));
+  });
+};
+
 const DEFAULT_LIMIT = 10;
-const getPaginationFromRequest = (req: FastifyRequest) => {
-  const { page, limit } = req.query as { page?: string; limit?: string };
-  let outPage: number, outLimit: number;
-  if (!page) {
-    outPage = 1;
+const parseQuery = (req: FastifyRequest) => {
+  const {
+    page: rawPage,
+    limit: rawLimit,
+    ...tags
+  } = req.query as {
+    page?: string;
+    limit?: string;
+  };
+
+  return {
+    requiredTags: Object.entries(tags)
+      .filter(([, value]) => value)
+      .map(([tag]) => normalizeTags(tag)),
+    page: parseNumber(rawPage, 1),
+    limit: parseNumber(rawLimit, DEFAULT_LIMIT, MAX_LIMIT),
+  };
+};
+
+const normalizeTags = (tag: string) => simplifyString(tag);
+
+const parseNumber = (inVal: any, defaultVal: number, max = Infinity) => {
+  let out;
+  if (!inVal) {
+    out = defaultVal;
   } else {
-    outPage = parseInt(page);
-    if (isNaN(outPage)) outPage = 1;
+    out = parseInt(inVal);
+    if (isNaN(out)) out = defaultVal;
   }
-  if (!limit) {
-    outLimit = DEFAULT_LIMIT;
-  } else {
-    outLimit = parseInt(limit);
-    if (isNaN(outLimit)) outLimit = DEFAULT_LIMIT;
-    if (outLimit > MAX_LIMIT) outLimit = MAX_LIMIT;
-  }
-  return { page: outPage, limit: outLimit };
+  if (out > max) out = max;
+  return out;
 };
 
 const paginateResponse = <T extends Array<any>>(
@@ -215,6 +246,7 @@ const paginateResponse = <T extends Array<any>>(
 ) => {
   const offset = (page - 1) * limit;
   return {
+    count: data.length,
     data: data.slice(offset, offset + limit),
     page,
     limit,

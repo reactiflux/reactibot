@@ -159,8 +159,13 @@ const jobModeration = async (bot: Client) => {
     const errors = validate(posts, message).filter(
       (e) => e.type !== POST_FAILURE_REASONS.tooFrequent,
     );
+    console.log(
+      `[DEBUG] validating edited job post from @${
+        message.author.username
+      }, errors: ${JSON.stringify(errors)}`,
+    );
 
-    if (errors) {
+    if (errors.length > 0) {
       const isRecentEdit =
         differenceInMinutes(new Date(), message.createdAt) < REPOST_THRESHOLD;
       errors.unshift({
