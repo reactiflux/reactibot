@@ -143,7 +143,7 @@ export const loadJobs = async (bot: Client, channel: TextChannel) => {
     }
     oldestMessage = newMessages
       .sort((a, b) => compareAsc(b.createdAt, a.createdAt))
-      .at(-0);
+      .at(-1);
     if (!oldestMessage) break;
 
     const [hiring, forHire] = partition(
