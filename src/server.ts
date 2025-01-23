@@ -81,6 +81,7 @@ const openApiConfig = {
         },
       },
       JobBoardCache: {
+        count: { type: "number" },
         pages: { type: "number" },
         page: { type: "number" },
         limit: { type: "number" },
@@ -215,6 +216,7 @@ const paginateResponse = <T extends Array<any>>(
 ) => {
   const offset = (page - 1) * limit;
   return {
+    count: data.length,
     data: data.slice(offset, offset + limit),
     page,
     limit,
