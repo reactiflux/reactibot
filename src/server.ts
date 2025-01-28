@@ -290,4 +290,4 @@ const renderPost = (post: StoredMessage): RenderedPost => {
 await fastify.listen({ port: 3000, host: "0.0.0.0" });
 
 const renderMdToHtml = (md: string) =>
-  xss(marked(md, { async: false, gfm: true }));
+  xss(marked(md, { async: false, gfm: true, breaks: true }));
