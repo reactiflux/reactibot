@@ -64,6 +64,7 @@ const openApiConfig = {
             type: "object",
             requried: ["username", "displayName", "avatar"],
             properties: {
+              id: { type: "string" },
               username: { type: "string" },
               displayName: { type: "string" },
               avatar: { type: "string" },
@@ -258,6 +259,7 @@ interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
   reactions: [string, number][];
   messageLink: string;
   author: {
+    id: string;
     username: string;
     displayName: string;
     avatar: string;
@@ -276,6 +278,7 @@ const renderPost = (post: StoredMessage): RenderedPost => {
       r.count,
     ]),
     author: {
+      id: post.message.author.id,
       username: post.message.author.username,
       displayName: post.message.author.displayName,
       avatar: post.message.author.displayAvatarURL({
