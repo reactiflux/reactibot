@@ -232,8 +232,6 @@ const parseQuery = (req: FastifyRequest) => {
   };
 };
 
-const normalizeTags = (tag: string) => simplifyString(tag);
-
 const parseNumber = (inVal: any, defaultVal: number, max = Infinity) => {
   let out;
   if (!inVal) {
