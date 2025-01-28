@@ -64,6 +64,7 @@ const openApiConfig = {
             type: "object",
             requried: ["username", "displayName", "avatar"],
             properties: {
+              id: { type: "string" },
               username: { type: "string" },
               displayName: { type: "string" },
               avatar: { type: "string" },
@@ -201,7 +202,10 @@ const filterTags = (requiredTags: string[], posts: StoredMessage[]) => {
     const simplifiedTags = post.tags.map((t) =>
       simplifyString(t).replaceAll(" ", ""),
     );
-    return requiredTags.every((rt) => simplifiedTags.includes(rt));
+    return (
+      requiredTags.length === 0 ||
+      requiredTags.every((rt) => simplifiedTags.includes(rt))
+    );
   });
 };
 
@@ -210,22 +214,23 @@ const parseQuery = (req: FastifyRequest) => {
   const {
     page: rawPage,
     limit: rawLimit,
-    ...tags
+    "requiredTags[]": tagsArray,
   } = req.query as {
     page?: string;
     limit?: string;
+    "requiredTags[]"?: string | string[];
   };
 
   return {
-    requiredTags: Object.entries(tags)
-      .filter(([, value]) => value)
-      .map(([tag]) => normalizeTags(tag)),
+    requiredTags: tagsArray
+      ? Array.isArray(tagsArray)
+        ? tagsArray
+        : [tagsArray]
+      : [],
     page: parseNumber(rawPage, 1),
     limit: parseNumber(rawLimit, DEFAULT_LIMIT, MAX_LIMIT),
   };
 };
-
-const normalizeTags = (tag: string) => simplifyString(tag);
 
 const parseNumber = (inVal: any, defaultVal: number, max = Infinity) => {
   let out;
@@ -258,6 +263,7 @@ interface RenderedPost extends Omit<StoredMessage, "message" | "authorId"> {
   reactions: [string, number][];
   messageLink: string;
   author: {
+    id: string;
     username: string;
     displayName: string;
     avatar: string;
@@ -276,6 +282,7 @@ const renderPost = (post: StoredMessage): RenderedPost => {
       r.count,
     ]),
     author: {
+      id: post.message.author.id,
       username: post.message.author.username,
       displayName: post.message.author.displayName,
       avatar: post.message.author.displayAvatarURL({
@@ -290,4 +297,4 @@ const renderPost = (post: StoredMessage): RenderedPost => {
 await fastify.listen({ port: 3000, host: "0.0.0.0" });
 
 const renderMdToHtml = (md: string) =>
-  xss(marked(md, { async: false, gfm: true }));
+  xss(marked(md, { async: false, gfm: true, breaks: true }));
