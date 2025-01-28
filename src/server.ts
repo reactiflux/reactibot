@@ -202,7 +202,10 @@ const filterTags = (requiredTags: string[], posts: StoredMessage[]) => {
     const simplifiedTags = post.tags.map((t) =>
       simplifyString(t).replaceAll(" ", ""),
     );
-    return requiredTags.every((rt) => simplifiedTags.includes(rt));
+    return (
+      requiredTags.length === 0 ||
+      requiredTags.every((rt) => simplifiedTags.includes(rt))
+    );
   });
 };
 
@@ -211,16 +214,19 @@ const parseQuery = (req: FastifyRequest) => {
   const {
     page: rawPage,
     limit: rawLimit,
-    ...tags
+    "requiredTags[]": tagsArray,
   } = req.query as {
     page?: string;
     limit?: string;
+    "requiredTags[]"?: string | string[];
   };
 
   return {
-    requiredTags: Object.entries(tags)
-      .filter(([, value]) => value)
-      .map(([tag]) => normalizeTags(tag)),
+    requiredTags: tagsArray
+      ? Array.isArray(tagsArray)
+        ? tagsArray
+        : [tagsArray]
+      : [],
     page: parseNumber(rawPage, 1),
     limit: parseNumber(rawLimit, DEFAULT_LIMIT, MAX_LIMIT),
   };
