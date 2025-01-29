@@ -8,7 +8,11 @@ import {
   StoredMessage,
   getJobPosts,
 } from "./features/jobs-moderation/job-mod-helpers.js";
-import { compressLineBreaks, simplifyString } from "./helpers/string.js";
+import {
+  compressSpaces,
+  compressLineBreaks,
+  simplifyString,
+} from "./helpers/string.js";
 import { constructDiscordLink } from "./helpers/discord.js";
 import { reactibotApiKey } from "./helpers/env.js";
 
@@ -275,7 +279,9 @@ const renderPost = (post: StoredMessage): RenderedPost => {
     tags: post.tags,
     type: post.type,
     createdAt: post.createdAt,
-    description: renderMdToHtml(compressLineBreaks(post.description)),
+    description: renderMdToHtml(
+      compressLineBreaks(compressSpaces(post.description)),
+    ),
     messageLink: constructDiscordLink(post.message),
     reactions: post.message.reactions.cache.map((r) => [
       r.emoji.name ?? "☐",

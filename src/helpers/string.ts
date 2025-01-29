@@ -25,3 +25,12 @@ export const compressLineBreaks = (s: string) => {
   }
   return s;
 };
+
+const TOO_MANY_SPACES = / {3}/g;
+const APPROPRIATE_SPACES = "  ";
+export const compressSpaces = (s: string) => {
+  while (TOO_MANY_SPACES.test(s)) {
+    s = s.replaceAll(TOO_MANY_SPACES, APPROPRIATE_SPACES);
+  }
+  return s;
+};
