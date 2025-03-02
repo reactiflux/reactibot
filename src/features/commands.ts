@@ -38,7 +38,7 @@ const sortedCategories: Categories[] = [
   "React/Redux",
 ];
 
-const commandsList: Command[] = [
+export const commandsList: Command[] = [
   {
     words: [`!commands`],
     help: `lists all available commands`,
@@ -1350,6 +1350,39 @@ const createCommandsMessage = () => {
   return categoryDescriptions.join("\n\n").trim();
 };
 
+// Helper functions to handle commands inside codeblocks
+export function removeCodeBlocksAndQuotes(text: string): string {
+  if (!text) return '';
+  let filtered = text.replace(/```[\s\S]*?```/g, '');
+  filtered = filtered.replace(/`[^`]+`/g, '');
+  filtered = filtered.replace(/^>.*$/gm, '');
+  filtered = filtered.replace(/>>>[\s\S]*?(?=\n\n|$)/g, '');
+  filtered = filtered.replace(/\n{3,}/g, '\n\n').trim();
+  
+  return filtered;
+}
+
+export function isInsideCodeBlock(text: string, position: number): boolean {
+  // Count backticks before position
+  const beforeText = text.slice(0, position);
+  const singleBackticks = (beforeText.match(/`/g) || []).length;
+  const tripleBackticks = (beforeText.match(/```/g) || []).length;
+  
+  // Inside inline code block if odd number of single backticks
+  if (singleBackticks % 2 !== 0) return true;
+  
+  // Inside multi-line code block if odd number of triple backticks
+  if (tripleBackticks % 2 !== 0) return true;
+  
+  return false;
+}
+
+export function shouldProcessCommand(text: string, trigger: string): boolean {
+  const index = text.toLowerCase().indexOf(trigger.toLowerCase());
+  if (index === -1) return false;
+  return !isInsideCodeBlock(text, index);
+}
+
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (
@@ -1368,7 +1401,8 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        //return msg.content.toLowerCase().includes(word);
+        return shouldProcessCommand(msg.content, word);
       });
 
       if (keyword) {
