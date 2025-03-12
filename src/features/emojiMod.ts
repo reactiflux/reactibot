@@ -24,6 +24,7 @@ import { partition } from "../helpers/array.js";
 import { EMBED_COLOR } from "./commands.js";
 
 const config = {
+   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
   thumbsDownThreshold: 2,
   deletionThreshold: Infinity,

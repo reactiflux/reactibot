@@ -1401,7 +1401,6 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        //return msg.content.toLowerCase().includes(word);
         return shouldProcessCommand(msg.content, word);
       });
 
