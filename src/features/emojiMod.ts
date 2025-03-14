@@ -5,6 +5,7 @@ import {
   Guild,
   EmbedType,
   ChannelType,
+  ThreadChannel,
 } from "discord.js";
 import cooldown from "./cooldown.js";
 import type { ChannelHandlers } from "../types/index.d.ts";
@@ -25,9 +26,7 @@ import { EMBED_COLOR } from "./commands.js";
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
   warningThreshold: 1,
-  // This is how many ️️warning reactions a post must get until mods are alerted
   thumbsDownThreshold: 2,
-  // This is how many ️️warning reactions a post must get the message is deleted
   deletionThreshold: Infinity,
 };
 
@@ -43,6 +42,23 @@ type ReactionHandlers = {
     usersWhoReacted: GuildMember[];
   }) => void;
 };
+
+async function waitForThreadActivity(
+  thread: ThreadChannel,
+  maxAttempts = 5,
+  delayMs = 5000,
+): Promise<boolean> {
+  for (let attempts = 0; attempts < maxAttempts; attempts++) {
+    try {
+      const messages = await thread.messages.fetch({ limit: 1 });
+      if (messages.size > 0) return true;
+    } catch (error) {
+      console.warn(`Failed to fetch thread messages: ${error}`);
+    }
+    await new Promise((res) => setTimeout(res, delayMs));
+  }
+  return false;
+}
 
 export const reactionHandlers: ReactionHandlers = {
   "👎": async ({ message, reactor, usersWhoReacted }) => {
@@ -61,6 +77,7 @@ export const reactionHandlers: ReactionHandlers = {
     if (totalReacts < config.thumbsDownThreshold) {
       return;
     }
+
     let reason = ReportReasons.userWarn;
     if (totalReacts >= config.deletionThreshold) {
       reason = ReportReasons.userDelete;
@@ -71,17 +88,20 @@ export const reactionHandlers: ReactionHandlers = {
     const meetsDeletion = staffReactionCount >= config.deletionThreshold;
 
     if (meetsDeletion) {
-      message.delete();
+      try {
+        await message.delete();
+      } catch (error) {
+        console.error(`Failed to delete message: ${error}`);
+      }
     }
 
     reportUser({ reason, message, staff, members });
   },
   "🔍": async ({ message, usersWhoReacted }) => {
     const STAFF_OR_HELPFUL_REACTOR_THRESHOLD = 2;
-
     const staffOrHelpfulReactors = usersWhoReacted.filter(isStaffOrHelpful);
-
     const { channel } = message;
+
     if (
       staffOrHelpfulReactors.length < STAFF_OR_HELPFUL_REACTOR_THRESHOLD ||
       channel.type === ChannelType.PublicThread
@@ -89,17 +109,26 @@ export const reactionHandlers: ReactionHandlers = {
       return;
     }
 
-    const thread = await createPrivateThreadFromMessage(message, {
-      name: `Sorry ${message.author.username}, your question needs some work`,
-      autoArchiveDuration: 60,
-    });
+    try {
+      const thread = await createPrivateThreadFromMessage(message, {
+        name: `Sorry ${message.author.username}, your question needs some work`,
+        autoArchiveDuration: 60,
+      });
 
-    await thread.send({
-      embeds: [
-        {
-          title: "Please improve your question",
-          type: EmbedType.Rich,
-          description: `
+      const isThreadActive = await waitForThreadActivity(thread);
+      if (!isThreadActive) {
+        await thread.send(
+          `Hey ${message.author.username}, please send a message here first so I can continue assisting you.`,
+        );
+        return;
+      }
+
+      await thread.send({
+        embeds: [
+          {
+            title: "Please improve your question",
+            type: EmbedType.Rich,
+            description: `
 Sorry, our most active helpers have flagged this as a question that needs more work before a good answer can be given. This may be because it's ambiguous, too broad, or otherwise challenging to answer.
 
 Zell Liew [wrote a great resource](https://zellwk.com/blog/asking-questions/) about asking good programming questions.
@@ -110,21 +139,24 @@ Zell Liew [wrote a great resource](https://zellwk.com/blog/asking-questions/) ab
 - Making a question specific and to the point is a sign of respecting the responder’s time, which increases the likelihood of getting a good answer.
 
 (this was triggered by crossing a threshold of "🔍" reactions on the original message)
-          `,
-          color: EMBED_COLOR,
-        },
-      ],
-    });
-    await thread.send("Your message:");
-    await thread.send(truncateMessage(message.content));
+            `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
 
-    await message.delete();
+      await thread.send("Your message:");
+      await thread.send(truncateMessage(message.content));
 
-    reportUser({
-      reason: ReportReasons.lowEffortQuestionRemoved,
-      message,
-      staff: staffOrHelpfulReactors,
-    });
+      await message.delete();
+      reportUser({
+        reason: ReportReasons.lowEffortQuestionRemoved,
+        message,
+        staff: staffOrHelpfulReactors,
+      });
+    } catch (error) {
+      console.error(`Failed to create private thread: ${error}`);
+    }
   },
 };
 
@@ -138,7 +170,6 @@ const emojiMod: ChannelHandlers = {
     }
 
     let emoji = reaction.emoji.toString();
-
     if (thumbsDownEmojis.includes(emoji)) {
       emoji = "👎";
     }
@@ -147,30 +178,39 @@ const emojiMod: ChannelHandlers = {
       return;
     }
 
-    const [fullReaction, fullMessage, reactor] = await Promise.all([
-      reaction.partial ? reaction.fetch() : reaction,
-      message.partial ? message.fetch() : message,
-      guild.members.fetch(user.id),
-    ]);
-    const [usersWhoReacted, authorMember] = await Promise.all([
-      fetchReactionMembers(guild, fullReaction),
-      guild.members.fetch(fullMessage.author.id),
-    ]);
+    try {
+      const [fullReaction, fullMessage] = await Promise.all([
+        reaction.partial ? reaction.fetch() : reaction,
+        message.partial ? message.fetch() : message,
+      ]);
 
-    if (authorMember.id === bot.user?.id) return;
+      const reactor = await guild.members.fetch(user.id).catch(() => null);
+      if (!reactor) {
+        console.warn(`Reactor member ${user.id} not found in guild.`);
+        return;
+      }
 
-    if (authorMember.id === bot.user?.id) return;
+      const authorMember = await guild.members
+        .fetch(fullMessage.author.id)
+        .catch(() => null);
+      if (!authorMember || authorMember.id === bot.user?.id) {
+        return;
+      }
 
-    reactionHandlers[emoji]({
-      guild,
-      author: authorMember,
-      reactor,
-      message: fullMessage,
-      reaction: fullReaction,
-      usersWhoReacted: usersWhoReacted.filter(
-        (x): x is GuildMember => Boolean(x) && authorMember.id !== reactor.id,
-      ),
-    });
+      const usersWhoReacted = await fetchReactionMembers(guild, fullReaction);
+      reactionHandlers[emoji]({
+        guild,
+        author: authorMember,
+        reactor,
+        message: fullMessage,
+        reaction: fullReaction,
+        usersWhoReacted: usersWhoReacted.filter(
+          (x): x is GuildMember => Boolean(x) && authorMember.id !== reactor.id,
+        ),
+      });
+    } catch (error) {
+      console.error(`Error handling reaction: ${error}`);
+    }
   },
 };
 
