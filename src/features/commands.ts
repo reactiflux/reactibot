@@ -1352,13 +1352,13 @@ const createCommandsMessage = () => {
 
 // Helper functions to handle commands inside codeblocks
 export function removeCodeBlocksAndQuotes(text: string): string {
-  if (!text) return '';
-  let filtered = text.replace(/```[\s\S]*?```/g, '');
-  filtered = filtered.replace(/`[^`]+`/g, '');
-  filtered = filtered.replace(/^>.*$/gm, '');
-  filtered = filtered.replace(/>>>[\s\S]*?(?=\n\n|$)/g, '');
-  filtered = filtered.replace(/\n{3,}/g, '\n\n').trim();
-  
+  if (!text) return "";
+  let filtered = text.replace(/```[\s\S]*?```/g, "");
+  filtered = filtered.replace(/`[^`]+`/g, "");
+  filtered = filtered.replace(/^>.*$/gm, "");
+  filtered = filtered.replace(/>>>[\s\S]*?(?=\n\n|$)/g, "");
+  filtered = filtered.replace(/\n{3,}/g, "\n\n").trim();
+
   return filtered;
 }
 
@@ -1367,13 +1367,13 @@ export function isInsideCodeBlock(text: string, position: number): boolean {
   const beforeText = text.slice(0, position);
   const singleBackticks = (beforeText.match(/`/g) || []).length;
   const tripleBackticks = (beforeText.match(/```/g) || []).length;
-  
+
   // Inside inline code block if odd number of single backticks
   if (singleBackticks % 2 !== 0) return true;
-  
+
   // Inside multi-line code block if odd number of triple backticks
   if (tripleBackticks % 2 !== 0) return true;
-  
+
   return false;
 }
 
