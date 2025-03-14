@@ -34,4 +34,3 @@ export const compressSpaces = (s: string) => {
   }
   return s;
 };
-
