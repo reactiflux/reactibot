@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "npm-run-all --parallel dev:bot dev:test",
+    "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "tsx --watch ./src/index.ts",
     "dev:test": "vitest",
     "build": "tsc -b",
@@ -59,7 +59,7 @@
     "ts-node": "10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
-    "vitest": "^1.6.1"
+    "vitest": "1.6.0"
   },
   "prettier": {
     "trailingComma": "all"
