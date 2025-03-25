@@ -1335,6 +1335,7 @@ const createCommandsMessage = () => {
       return a.words[0].split("\n", 1)[0].localeCompare(b.words[0]);
     });
 
+    
     const boldTitle = `**${category}**`;
     const commandDescriptions = commands
       .map((command) => {
@@ -1350,7 +1351,6 @@ const createCommandsMessage = () => {
   return categoryDescriptions.join("\n\n").trim();
 };
 
-// Helper functions to handle commands inside codeblocks
 export function removeCodeBlocksAndQuotes(text: string): string {
   if (!text) return "";
   let filtered = text.replace(/```[\s\S]*?```/g, "");
@@ -1358,23 +1358,27 @@ export function removeCodeBlocksAndQuotes(text: string): string {
   filtered = filtered.replace(/^>.*$/gm, "");
   filtered = filtered.replace(/>>>[\s\S]*?(?=\n\n|$)/g, "");
   filtered = filtered.replace(/\n{3,}/g, "\n\n").trim();
-
   return filtered;
 }
 
 export function isInsideCodeBlock(text: string, position: number): boolean {
-  // Count backticks before position
-  const beforeText = text.slice(0, position);
-  const singleBackticks = (beforeText.match(/`/g) || []).length;
-  const tripleBackticks = (beforeText.match(/```/g) || []).length;
+  let insideSingle = false;
+  let insideTriple = false;
+  let i = 0;
+  
+  while (i < position) {
+    if (text.slice(i, i + 3) === "```") {
+      insideTriple = !insideTriple;
+      i += 3;
+    } else if (text[i] === "`" && !insideTriple) {
+      insideSingle = !insideSingle;
+      i++;
+    } else {
+      i++;
+    }
+  }
 
-  // Inside inline code block if odd number of single backticks
-  if (singleBackticks % 2 !== 0) return true;
-
-  // Inside multi-line code block if odd number of triple backticks
-  if (tripleBackticks % 2 !== 0) return true;
-
-  return false;
+  return insideSingle || insideTriple;
 }
 
 export function shouldProcessCommand(text: string, trigger: string): boolean {
