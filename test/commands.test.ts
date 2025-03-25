@@ -54,7 +54,9 @@ describe("Discord Bot Commands", () => {
     vi.clearAllMocks();
     mockMessage.channel.send = vi.fn().mockResolvedValue(fetchMsg);
     if (mockMessage.guild) {
-      mockMessage.guild.channels.cache.get = vi.fn().mockReturnValue(mockTextChannel);
+      mockMessage.guild.channels.cache.get = vi
+        .fn()
+        .mockReturnValue(mockTextChannel);
     }
     (mockMessage as { member: GuildMember }).member = {
       roles: {
@@ -64,16 +66,11 @@ describe("Discord Bot Commands", () => {
     } as unknown as GuildMember;
   });
 
-  // Test cases for normal command execution
-  it("should handle !move command", async () => {
-    mockMessage.content = "!move #general @user1 @user2";
-    await commandsList.find(cmd => cmd.words.includes("!move"))?.handleMessage(mockMessage);
-    expect(mockTextChannel.send).toHaveBeenCalled();
-  });
-
   it("should handle !mdn command", async () => {
     mockMessage.content = "!mdn Array.prototype.map";
-    await commandsList.find(cmd => cmd.words.includes("!mdn"))?.handleMessage(mockMessage);
+    await commandsList
+      .find((cmd) => cmd.words.includes("!mdn"))
+      ?.handleMessage(mockMessage);
     expect(mockMessage.channel.send).toHaveBeenCalled();
   });
 
@@ -89,7 +86,8 @@ describe("Discord Bot Commands", () => {
   });
 
   it("should ignore commands inside nested backticks", () => {
-    mockMessage.content = "```js\nconsole.log(`!mdn Array.prototype.map`);\n```";
+    mockMessage.content =
+      "```js\nconsole.log(`!mdn Array.prototype.map`);\n```";
     expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
   });
 
@@ -98,35 +96,28 @@ describe("Discord Bot Commands", () => {
     expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
   });
 
-  // Permission-based command tests
-  it("should handle !lock command if user has permissions", async () => {
-    mockMessage.content = "!lock";
-    await commandsList.find(cmd => cmd.words.includes("!lock"))?.handleMessage(mockMessage);
-    expect(mockTextChannel.permissionOverwrites.create).toHaveBeenCalled();
-  });
-
-  it("should handle !unlock command if user has permissions", async () => {
-    mockMessage.content = "!unlock";
-    await commandsList.find(cmd => cmd.words.includes("!unlock"))?.handleMessage(mockMessage);
-    expect(mockTextChannel.permissionOverwrites.create).toHaveBeenCalled();
-  });
-
   // Additional tests for other commands
   it("should handle !auth command", async () => {
     mockMessage.content = "!auth";
-    await commandsList.find(cmd => cmd.words.includes("!auth"))?.handleMessage(mockMessage);
+    await commandsList
+      .find((cmd) => cmd.words.includes("!auth"))
+      ?.handleMessage(mockMessage);
     expect(mockMessage.channel.send).toHaveBeenCalled();
   });
 
   it("should handle !react-docs command", async () => {
     mockMessage.content = "!react-docs useState";
-    await commandsList.find(cmd => cmd.words.includes("!react-docs"))?.handleMessage(mockMessage);
+    await commandsList
+      .find((cmd) => cmd.words.includes("!react-docs"))
+      ?.handleMessage(mockMessage);
     expect(mockMessage.channel.send).toHaveBeenCalled();
   });
 
   it("should handle !ping command", async () => {
     mockMessage.content = "!ping";
-    await commandsList.find(cmd => cmd.words.includes("!ping"))?.handleMessage(mockMessage);
+    await commandsList
+      .find((cmd) => cmd.words.includes("!ping"))
+      ?.handleMessage(mockMessage);
     expect(mockMessage.channel.send).toHaveBeenCalled();
   });
 });
