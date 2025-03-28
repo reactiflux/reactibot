@@ -1352,10 +1352,10 @@ const createCommandsMessage = () => {
 
 export function removeCodeBlocksAndQuotes(text: string): string {
   if (!text) return "";
-  let filtered = text.replace(/```[\s\S]*?```/g, "");
+  let filtered = text.replace(/```(?:[^`]*|`[^`]*`)*```/g, "");
   filtered = filtered.replace(/`[^`]+`/g, "");
   filtered = filtered.replace(/^>.*$/gm, "");
-  filtered = filtered.replace(/>>>[\s\S]*?(?=\n\n|$)/g, "");
+  filtered = filtered.replace(/>>>[\s\S]+?(?=\n\S|\s*$)/g, "");
   filtered = filtered.replace(/\n{3,}/g, "\n\n").trim();
   return filtered;
 }
