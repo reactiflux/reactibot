@@ -1352,32 +1352,34 @@ const createCommandsMessage = () => {
 
 export function removeCodeBlocksAndQuotes(text: string): string {
   if (!text) return "";
-  let filtered = text.replace(/```(?:[^`]*|`[^`]*`)*```/g, "");
-  filtered = filtered.replace(/`[^`]+`/g, "");
-  filtered = filtered.replace(/^>.*$/gm, "");
-  filtered = filtered.replace(/>>>[\s\S]+?(?=\n\S|\s*$)/g, "");
-  filtered = filtered.replace(/\n{3,}/g, "\n\n").trim();
-  return filtered;
+
+  return text
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`]+`/g, "")
+    .replace(/^>.*$/gm, "")
+    .replace(/>>>[\s\S]+?(?=\n\S|\s*$)/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
+// Optimized isInsideCodeBlock function
 export function isInsideCodeBlock(text: string, position: number): boolean {
-  let insideSingle = false;
   let insideTriple = false;
-  let i = 0;
-
-  while (i < position) {
-    if (text.slice(i, i + 3) === "```") {
-      insideTriple = !insideTriple;
-      i += 3;
-    } else if (text[i] === "`" && !insideTriple) {
-      insideSingle = !insideSingle;
-      i++;
-    } else {
-      i++;
+  let insideSingle = false;
+  let length = text.length;
+  
+  for (let i = 0; i < position; i++) {
+    if (text[i] === "`") {
+      if (i + 2 < length && text[i + 1] === "`" && text[i + 2] === "`") {
+        insideTriple = !insideTriple;
+        i += 2; 
+      } else if (!insideTriple) {
+        insideSingle = !insideSingle;
+      }
     }
   }
 
-  return insideSingle || insideTriple;
+  return insideTriple || insideSingle;
 }
 
 export function shouldProcessCommand(text: string, trigger: string): boolean {
@@ -1403,8 +1405,9 @@ const commands: ChannelHandlers = {
     }
 
     commandsList.forEach((command) => {
+      const cleanedContent = removeCodeBlocksAndQuotes(msg.content);
       const keyword = command.words.find((word) => {
-        return shouldProcessCommand(msg.content, word);
+        return shouldProcessCommand(cleanedContent, word);
       });
 
       if (keyword) {
