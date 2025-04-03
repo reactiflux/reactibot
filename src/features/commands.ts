@@ -1362,31 +1362,46 @@ export function removeCodeBlocksAndQuotes(text: string): string {
     .trim();
 }
 
-// Optimized isInsideCodeBlock function
 export function isInsideCodeBlock(text: string, position: number): boolean {
   let insideTriple = false;
   let insideSingle = false;
-  let length = text.length;
-  
-  for (let i = 0; i < position; i++) {
+  let i = 0;
+
+  while (i < position) {
     if (text[i] === "`") {
-      if (i + 2 < length && text[i + 1] === "`" && text[i + 2] === "`") {
+      // Check for triple backticks
+      if (text.slice(i, i + 3) === "```") {
         insideTriple = !insideTriple;
-        i += 2; 
-      } else if (!insideTriple) {
+        i += 3;
+        continue;
+      }
+      // Check for single backtick (if not inside triple)
+      if (!insideTriple) {
         insideSingle = !insideSingle;
       }
     }
+    i++;
   }
 
   return insideTriple || insideSingle;
 }
 
-export function shouldProcessCommand(text: string, trigger: string): boolean {
-  const index = text.toLowerCase().indexOf(trigger.toLowerCase());
-  if (index === -1) return false;
-  return !isInsideCodeBlock(text, index);
+export function shouldProcessCommand(content: string, command: string): boolean {
+  // Remove triple backtick blocks (handles multiline code blocks)
+  content = content.replace(/```[\s\S]*?```/g, '');
+
+  // Remove inline code blocks (single backtick)
+  content = content.replace(/`[^`]+`/g, '');
+
+  // Ignore quoted messages (lines that start with ">")
+  content = content
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('>'))
+      .join('\n');
+
+  return content.includes(command);
 }
+
 
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
