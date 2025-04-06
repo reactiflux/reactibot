@@ -1,3 +1,16 @@
+Text written in code blocks is treated as commands. We should ignore code blocks, for example, to avoid triggering the bot when the user has:
+
+if (!auth) {}
+
+Implementation details:
+
+    Ignore text fragments which are written in code blocks.
+
+
+I need to solve this issue in my discord bot,.
+
+command.ts - 
+
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import fetch from "node-fetch";
 import {
@@ -5,13 +18,11 @@ import {
   ChannelType,
   EmbedType,
   Message,
-  OmitPartialGroupDMChannel,
-  PartialGroupDMChannel,
   TextChannel,
 } from "discord.js";
 import cooldown from "./cooldown.js";
 import type { ChannelHandlers } from "../types/index.d.ts";
-import { getMessage, isStaff } from "../helpers/discord.js";
+import { isStaff } from "../helpers/discord.js";
 import {
   extractSearchKey,
   getReactDocsContent,
@@ -21,13 +32,15 @@ import dedent from "dedent";
 
 export const EMBED_COLOR = 7506394;
 
+
+
 type Categories = "Reactiflux" | "Communication" | "Web" | "React/Redux";
 
 type Command = {
   words: string[];
   help: string;
   category: Categories;
-  handleMessage: (msg: OmitPartialGroupDMChannel<Message>) => void;
+  handleMessage: (msg: Message) => void;
   cooldown?: number;
 };
 
@@ -69,58 +82,6 @@ export const commandsList: Command[] = [
             title: "Code of Conduct",
             type: EmbedType.Rich,
             description: `Reactiflux is the largest chat community of React developers. We make a deliberate effort to have a light touch when it comes to moderating, but we do have some expectations of how our members will behave. Please read the [full Reactiflux Code of Conduct](https://www.reactiflux.com/conduct)`,
-            color: EMBED_COLOR,
-          },
-        ],
-      });
-    },
-  },
-  {
-    words: [`!contribution`],
-    help: `informs user's of contributing to React codebase`,
-    category: "Communication",
-    handleMessage: (msg) => {
-      msg.reply({
-        embeds: [
-          {
-            title: "Contributing to React",
-            type: EmbedType.Rich,
-            description: `
-            React is a very large and complex project. It has a steep learning curve, involves a lot of internal tooling and architecture, and often requires deep context to make meaningful contributions.
-If you’re looking to gain experience in open source, we recommend starting with projects that are more beginner-friendly but still widely used and respected in the React ecosystem. Great alternatives include:
-            `,
-            fields: [
-              {
-                name: "Open Source Alternatives",
-                value: `
-- [TanStack](https://github.com/tanstack)
-- [Preact](https://github.com/preactjs/preact)
-- [Remix](https://github.com/remix-run/remix)
-- [SolidJS](https://github.com/solidjs/solid)
-- [React Hook Form](https://github.com/react-hook-form/react-hook-form)
-- [freeCodeCamp](https://github.com/freeCodeCamp/freeCodeCamp)
-- [Daily.dev](https://github.com/dailydotdev/daily)
-                                `,
-                inline: true,
-              },
-            ],
-          },
-        ],
-      });
-    },
-  },
-  {
-    words: [`!crosspost`],
-    help: `provides a no cross-post message`,
-    category: "Communication",
-    handleMessage: (msg) => {
-      msg.channel.send({
-        embeds: [
-          {
-            title: "Please Avoid Cross-Posting",
-            type: EmbedType.Rich,
-            description:
-              "Just a friendly reminder: please avoid posting the same message in multiple channels. Choose the channel that best fits your question and allow some time for a response. If you don’t hear back after a while, feel free to bump your message.",
             color: EMBED_COLOR,
           },
         ],
@@ -179,44 +140,6 @@ If you’re looking to gain experience in open source, we recommend starting wit
     },
   },
   {
-    words: [`!courses`],
-    help: `provides a curated list of quality React courses and learning platforms`,
-    category: "React/Redux",
-    handleMessage: (msg) => {
-      msg.channel.send({
-        embeds: [
-          {
-            title: "Quality React Courses & Learning Platforms",
-            type: EmbedType.Rich,
-            description: `Here are some highly recommended courses and platforms for learning React, from beginner to advanced levels:`,
-            fields: [
-              {
-                name: "Premium Courses",
-                value: `
-- [Joy of React](https://www.joyofreact.com/) - Comprehensive React course
-- [Epic React](https://epicreact.dev/) - Advanced React patterns and techniques
-- [Advanced React](https://www.advanced-react.com/) - By Nadia Makarevich
-- [Jack Herrington's Courses](https://www.youtube.com/@jherr) - Various React topics
-                `,
-                inline: true,
-              },
-              {
-                name: "Learning Platforms",
-                value: `
-- [Frontend Masters](https://frontendmasters.com/) - Professional-grade courses
-- [React.dev](https://react.dev/) - Official React documentation
-- [Reactiflux Learning Resources](https://www.reactiflux.com/learning) - Curated links
-                `,
-                inline: true,
-              },
-            ],
-            color: EMBED_COLOR,
-          },
-        ],
-      });
-    },
-  },
-  {
     words: [`!ymnnr`],
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
@@ -226,7 +149,7 @@ If you’re looking to gain experience in open source, we recommend starting wit
           {
             title: "You Might Not Need Redux",
             type: EmbedType.Rich,
-            description: `People often choose Redux before they need it. “What if our app doesn't scale without it?"
+            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?"
 
 Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367)`,
             color: EMBED_COLOR,
@@ -1255,16 +1178,15 @@ Authentication is a critical part of most web applications. Here are some resour
 - [TheCopenhagenBook](https://thecopenhagenbook.com/)
 - [OWASP Auth Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [OWASP Session Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
-- [Lucia](https://lucia-auth.com/)
 `,
             inline: true,
           },
           {
             name: "Authentication Libraries",
             value: `
+- [Lucia](https://lucia-auth.com/)
 - [Auth.js](https://authjs.dev/)
 - [Passport](http://www.passportjs.org/)
-- [Better Auth](https://www.better-auth.com/)
 `,
             inline: true,
           },
@@ -1301,7 +1223,7 @@ Authentication is a critical part of most web applications. Here are some resour
             title: "create-react-app is deprecated",
             type: EmbedType.Rich,
             description: `
-create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use [Vite](https://vitejs.dev/) or [Next.js](https://nextjs.org/) instead. Read more about [Sunsetting Create React](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
+create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use [Vite](https://vitejs.dev/) or [Next.js](https://nextjs.org/) instead. The [React docs](https://react.dev/learn/start-a-new-react-project#can-i-use-react-without-a-framework) has more to say about using React without the use of a framework like Next or Remix.
             `,
             color: EMBED_COLOR,
           },
@@ -1310,6 +1232,8 @@ create-react-app is deprecated and no longer recommended for use. It is not main
     },
   },
 ];
+
+
 
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
@@ -1350,10 +1274,7 @@ const createCommandsMessage = () => {
   return categoryDescriptions.join("\n\n").trim();
 };
 
-export const shouldProcessCommand = (
-  content: string,
-  commandWord: string,
-): boolean => {
+export const shouldProcessCommand = (content: string, commandWord: string): boolean => {
   // Convert to lowercase for case-insensitive comparison
   const lowerContent = content.toLowerCase();
   const lowerCommand = commandWord.toLowerCase();
@@ -1379,19 +1300,12 @@ export const shouldProcessCommand = (
 
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
-    if (
-      (!maybeMessage.inGuild() &&
-        maybeMessage.channel.type !== ChannelType.DM) ||
-      maybeMessage.channel instanceof PartialGroupDMChannel
-    ) {
+    if (!maybeMessage.guild && maybeMessage.channel.type !== ChannelType.DM) {
       return;
     }
-
-    const msg = await getMessage(maybeMessage);
-
-    if (!msg) {
-      return;
-    }
+    const msg = maybeMessage.partial
+      ? await maybeMessage.fetch()
+      : maybeMessage;
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
@@ -1428,3 +1342,333 @@ const generateReactDocsErrorEmbeds = (search: string): APIEmbed[] => {
 };
 
 export default commands;
+
+commands.test.ts - 
+
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Message, TextChannel, ChannelType, GuildMember } from "discord.js";
+import { commandsList, shouldProcessCommand } from "../src/features/commands";
+import { Collection } from "discord.js";
+
+const mockMessage = {
+  content: "",
+  channel: {
+    type: ChannelType.GuildText,
+    send: vi.fn(),
+  },
+  guild: {
+    channels: {
+      cache: {
+        get: vi.fn(),
+      },
+    },
+    roles: {
+      everyone: {},
+    },
+  },
+  author: {
+    id: "123456789",
+  },
+  mentions: {
+    users: {
+      first: vi.fn().mockReturnValue({ id: "123456789" }),
+    },
+    members: new Map(),
+  },
+  reply: vi.fn(),
+} as unknown as Message;
+
+const mockTextChannel = {
+  type: ChannelType.GuildText,
+  send: vi.fn(),
+  permissionOverwrites: {
+    create: vi.fn(),
+  },
+  guild: {
+    roles: {
+      everyone: {},
+    },
+  },
+} as unknown as TextChannel;
+
+const fetchMsg = {
+  delete: vi.fn(),
+  edit: vi.fn(),
+};
+
+describe("Discord Bot Commands", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockMessage.channel.send = vi.fn().mockResolvedValue(fetchMsg);
+    if (mockMessage.guild) {
+      mockMessage.guild.channels.cache.get = vi
+        .fn()
+        .mockReturnValue(mockTextChannel);
+    }
+    (mockMessage as { member: GuildMember }).member = {
+      roles: {
+        cache: new Collection([["staff", { name: "staff" }]]),
+        some: vi.fn().mockReturnValue(true),
+      },
+    } as unknown as GuildMember;
+  });
+
+  it("should handle !mdn command", async () => {
+    mockMessage.content = "!mdn Array.prototype.map";
+    await commandsList
+      .find((cmd) => cmd.words.includes("!mdn"))
+      ?.handleMessage(mockMessage);
+    expect(mockMessage.channel.send).toHaveBeenCalled();
+  });
+
+  // Edge case tests for commands inside code blocks
+  it("should ignore commands inside single backticks", () => {
+    mockMessage.content = "`!mdn Array.prototype.map`";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  it("should ignore commands inside triple backticks", () => {
+    mockMessage.content = "```\n!mdn Array.prototype.map\n```";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  it("should ignore commands inside nested backticks", () => {
+    mockMessage.content =
+      "```js\nconsole.log(`!mdn Array.prototype.map`);\n```";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  it("should process commands outside code blocks", () => {
+    mockMessage.content = "Hello, !mdn Array.prototype.map";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Additional tests for other commands
+  it("should handle !auth command", async () => {
+    mockMessage.content = "!auth";
+    await commandsList
+      .find((cmd) => cmd.words.includes("!auth"))
+      ?.handleMessage(mockMessage);
+    expect(mockMessage.channel.send).toHaveBeenCalled();
+  });
+
+  it("should handle !react-docs command", async () => {
+    mockMessage.content = "!react-docs useState";
+    await commandsList
+      .find((cmd) => cmd.words.includes("!react-docs"))
+      ?.handleMessage(mockMessage);
+    expect(mockMessage.channel.send).toHaveBeenCalled();
+  });
+
+  it("should handle !ping command", async () => {
+    mockMessage.content = "!ping";
+    await commandsList
+      .find((cmd) => cmd.words.includes("!ping"))
+      ?.handleMessage(mockMessage);
+    expect(mockMessage.channel.send).toHaveBeenCalled();
+  });
+
+  // Edge case: Command inside deeply nested triple backticks (should NOT process)
+  it("should ignore command inside deeply nested triple backticks", () => {
+    mockMessage.content =
+      "```\nSome random text\n```js\nconsole.log('!mdn Array.prototype.map');\n```\nMore text outside";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside multiple levels of markdown blocks (should NOT process)
+  it("should ignore command inside multiple markdown blocks", () => {
+    mockMessage.content =
+      "```\nCode block starts\n```\n```\nHere is another block with\n!mdn Array.prototype.map\n```\nOutside the block now.";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command buried inside a long, deeply nested code block (should NOT process)
+  it("should ignore command inside a long deeply nested code block", () => {
+    mockMessage.content =
+      "```\nSome setup information\n```\n```\nfunction test() {\n  console.log('Nested block start');\n  ```\n  Here is a deeply nested code block\n  !mdn Array.prototype.map\n  ```\n  console.log('Nested block end');\n}\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside mixed markdown and inline code blocks (should NOT process)
+  it("should ignore command inside mixed markdown and inline code", () => {
+    mockMessage.content =
+      "```\nfunction example() {\n  return `Hello, world! ${'!mdn Array.prototype.map'}`;\n}\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside nested markdown inside block quotes (should NOT process)
+  it("should ignore command inside nested markdown inside block quotes", () => {
+    mockMessage.content =
+      "> Here is a block quote\n>\n>```\nconst x = '!mdn Array.prototype.map';\nconsole.log(x);\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside multiple backtick styles in the same message (should NOT process)
+  it("should ignore command when multiple backtick styles exist in the same message", () => {
+    mockMessage.content =
+      "`Inline command test: !mdn Array.prototype.map`\n```\nconsole.log('Multi-line block test');\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside deeply nested backticks mixed with text outside (should process only the correct one)
+  it("should process command outside deeply nested backticks but ignore the inside one", () => {
+    mockMessage.content =
+      "Hey everyone, I need help with JavaScript! ```js\nfunction test() {\n  console.log('!mdn Array.prototype.map');\n}\n``` But I still need info on !mdn Object.keys.";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // The one outside should be processed.
+    expect(
+      shouldProcessCommand(
+        "```js\nconsole.log('!mdn Array.prototype.map');\n```",
+        "!mdn",
+      ),
+    ).toBe(false); // Inside should be ignored.
+  });
+
+  // Edge case: Command buried inside multiple levels of text and markdown (should NOT process)
+  it("should ignore command inside multi-level text and markdown blocks", () => {
+    mockMessage.content =
+      "This is a message with multiple levels:\n" +
+      "```\nStart of first block\n```\n" +
+      "```\nAnother block\n```js\nconsole.log('!mdn Array.prototype.map');\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside a massive block of markdown text (should NOT process)
+  it("should ignore command inside a huge markdown block", () => {
+    mockMessage.content =
+      "```\n" +
+      "This is a massive block\n".repeat(50) +
+      "\n!mdn Array.prototype.map\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command inside a comment-like markdown section (should NOT process)
+  it("should ignore command inside a comment-like markdown block", () => {
+    mockMessage.content =
+      "```\n# This is a comment block\n# !mdn Array.prototype.map should not be processed\n```";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command buried in a long message
+  it("should process command even when buried in a long message", () => {
+    mockMessage.content =
+      "Hey everyone, I was just wondering if someone could help me understand something about JavaScript. " +
+      "I came across a method called Array.prototype.map and wanted to learn more about it. " +
+      "I tried searching on MDN but wasn't sure how to use it. Can someone please explain? Also, !mdn Array.prototype.map";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Command surrounded by special characters and numbers
+  it("should process command with random characters around it", () => {
+    mockMessage.content = "###!!123!mdn Array.prototype.map@@@$$$";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Multiple commands in a single message
+  it("should process multiple commands in a message", () => {
+    mockMessage.content =
+      "!mdn Array.prototype.map and then maybe later !mdn Object.keys";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Command split across multiple lines
+  it("should process command even when split across lines", () => {
+    mockMessage.content = "!mdn\nArray.prototype.map";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Command inside an embedded link (should NOT process)
+  it("should ignore command if inside an embedded link", () => {
+    mockMessage.content =
+      "[Click here for !mdn Array.prototype.map](https://example.com)";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command appearing multiple times in a message (should still be processed)
+  it("should process command even when repeated multiple times", () => {
+    mockMessage.content =
+      "!mdn Array.prototype.map !mdn Object.keys !mdn String.prototype.split";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Command inside a deeply nested code block (should NOT process)
+  it("should ignore command inside nested code blocks", () => {
+    mockMessage.content =
+      "```\nHere is some code:\n```js\nconsole.log('!mdn Array.prototype.map');\n```";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command with excessive whitespace and new lines
+  it("should process command even with excessive spaces and new lines", () => {
+    mockMessage.content = "\n   \t  !mdn     Array.prototype.map   \n \t ";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: Command mentioned in a quote (should NOT process)
+  it("should ignore command if it's part of a quoted message", () => {
+    mockMessage.content = `> Someone said: "!mdn Array.prototype.map is useful"`;
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Command hidden in escaped characters
+  it("should ignore command if surrounded by escaped backticks", () => {
+    mockMessage.content = "\\`!mdn Array.prototype.map\\`"; // Escaped backticks should not trigger the command
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  });
+
+  // Edge case: Multiple different commands in a long message
+  it("should process multiple different commands in a long message", () => {
+    mockMessage.content =
+      "Hey team, just a quick update on the project. " +
+      "I was going through the documentation and needed help with JavaScript methods. " +
+      "!mdn Array.prototype.map is something I want to understand better. " +
+      "Also, I came across React hooks, so I checked !react-docs useState. " +
+      "If anyone has good resources, please share. Thanks!";
+
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+    expect(shouldProcessCommand(mockMessage.content, "!react-docs")).toBe(true);
+  });
+
+  // Edge case: multiple spaces
+  it("should process command with multiple spaces", () => {
+    mockMessage.content = "!mdn    Array.prototype.map";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: command inside two backticks (invalid code block)
+  it("should process command inside two backticks", () => {
+    mockMessage.content = "`` !mdn Array.prototype.map ``";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: command wrapped in parentheses
+  it("should process command inside special characters", () => {
+    mockMessage.content = "!mdn (Array.prototype.map)";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  });
+
+  // Edge case: command written in uppercase
+  it("should process command in uppercase", () => {
+    mockMessage.content = "!MDN Array.prototype.map";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // Case-insensitive
+  });
+
+  // Edge case: command partially inside a code block
+  it("should ignore command if part is inside a code block", () => {
+    mockMessage.content =
+      "```js\nconsole.log('!mdn Array.prototype.map');\n``` !mdn Array.prototype.map";
+    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // Only process the second one
+  });
+});
+
+All test cases should pass. help me modify commands.ts accordingly to pass all cases
