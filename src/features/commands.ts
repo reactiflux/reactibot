@@ -36,7 +36,7 @@ const sortedCategories: Categories[] = [
   "React/Redux",
 ];
 
-const commandsList: Command[] = [
+export const commandsList: Command[] = [
   {
     words: [`!commands`],
     help: `lists all available commands`,
@@ -524,6 +524,7 @@ Read more:
       });
     },
   },
+  
   {
     words: [`!imm`, `!immutability`],
     help: `provides resources for helping with immutability`,
@@ -1257,6 +1258,33 @@ const createCommandsMessage = () => {
   return categoryDescriptions.join("\n\n").trim();
 };
 
+export const shouldProcessCommand = (
+  content: string,
+  commandWord: string,
+): boolean => {
+  // Convert to lowercase for case-insensitive comparison
+  const lowerContent = content.toLowerCase();
+  const lowerCommand = commandWord.toLowerCase();
+
+  // Check if the command word exists in the message
+  if (!lowerContent.includes(lowerCommand)) {
+    return false;
+  }
+
+  // Check for code blocks (``` or `)
+  const codeBlockRegex = /```[\s\S]*?```|`[^`]*`/g;
+  const codeBlocks = content.match(codeBlockRegex) || [];
+
+  // Check if the command is inside any code block
+  for (const block of codeBlocks) {
+    if (block.toLowerCase().includes(lowerCommand)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (!maybeMessage.guild && maybeMessage.channel.type !== ChannelType.DM) {
@@ -1268,7 +1296,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        return shouldProcessCommand(msg.content, word);
       });
 
       if (keyword) {
