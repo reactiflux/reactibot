@@ -48,8 +48,6 @@ export const messageScanner: ChannelHandlers = {
 
     const content = msg.content.toLowerCase();
 
-    if (content.includes("```")) return;
-
     const containsJobKeyword = jobKeywords.some((keyword) =>
       content.includes(keyword),
     );
