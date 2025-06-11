@@ -36,9 +36,6 @@ const jobKeywords = [
   "job opportunities",
   "opportunities available",
   "new opportunity",
-  "frontend developer",
-  "full stack developer",
-  "software engineer",
   "open for",
   "₹",
   "$",
@@ -51,14 +48,14 @@ export const messageScanner: ChannelHandlers = {
 
     const content = msg.content.toLowerCase();
 
-    if (content.includes("?") || content.includes("```")) return;
+    if (content.includes("```")) return;
 
     const containsJobKeyword = jobKeywords.some((keyword) =>
       content.includes(keyword),
     );
 
     if (containsJobKeyword) {
-      const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job post or intro. Mind sharing that in <#${CHANNELS.jobsLog}> or <#${CHANNELS.introduction}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic 🙌`;
+      const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job post or collaboration. Mind sharing that in <#${CHANNELS.jobsLog}> or <#${CHANNELS.lookingForGroup}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic 🙌`;
       const sentMsg = await msg.reply({
         embeds: [
           {
