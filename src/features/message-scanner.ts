@@ -4,8 +4,6 @@ import { EmbedType } from "discord.js";
 import { CHANNELS } from "../constants/channels.js";
 import { EMBED_COLOR } from "./commands.js";
 
-const delayInMilliseconds = 300000; // 5 mins
-
 const jobKeywords = [
   "looking for work",
   "seeking opportunities",
@@ -37,29 +35,29 @@ const jobKeywords = [
   "opportunities available",
   "new opportunity",
   "open for",
-  "₹",
-  "$",
-  "€",
+  "we’re hiring",
+  "we are hiring",
 ];
+
+const currencyKeywords = ["₹", "€", "$"];
 const hasCodeBlockWithDollarSign = (content: string): boolean => {
   const codeBlockRegex = /```[\s\S]*?\$[\s\S]*?```/g;
   return codeBlockRegex.test(content);
 };
+
 export const messageScanner: ChannelHandlers = {
   handleMessage: async ({ msg }) => {
     if (msg.author.bot) return;
 
     const content = msg.content.toLowerCase();
     const ignoreDollar = hasCodeBlockWithDollarSign(content);
+    const hasCurrencyKeyword =
+      !ignoreDollar &&
+      currencyKeywords.some((keyword) => content.includes(keyword));
 
-    const keywordsToCheck = ignoreDollar
-      ? jobKeywords.filter((kw) => kw !== "$")
-      : jobKeywords;
-
-    const containsJobKeyword = keywordsToCheck.some((keyword) =>
-      content.includes(keyword),
-    );
-    if (!containsJobKeyword) return;
+    const keywordRegex = new RegExp(`\\b(${jobKeywords.join("|")})\\b`, "i");
+    const containsJobKeyword = keywordRegex.test(content);
+    if (!containsJobKeyword && !hasCurrencyKeyword) return;
 
     const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobsLog}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic 🙌`;
     const sentMsg = await msg.reply({
@@ -75,6 +73,6 @@ export const messageScanner: ChannelHandlers = {
     await msg.delete();
     setTimeout(() => {
       sentMsg.delete().catch(console.error);
-    }, delayInMilliseconds);
+    }, 300_000);
   },
 };
