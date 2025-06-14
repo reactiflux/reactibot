@@ -30,7 +30,6 @@ const jobKeywords = [
   "remote role",
   "remote opportunity",
   "full-time",
-  "remote position",
   "job opportunities",
   "opportunities available",
   "new opportunity",
