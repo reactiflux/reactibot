@@ -10,7 +10,7 @@ import {
   ActivityType,
   IntentsBitField,
 } from "discord.js";
-
+import { messageScanner } from "./features/message-scanner.js";
 import { logger, channelLog } from "./features/log.js";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation.js";
@@ -203,6 +203,19 @@ addHandler(
     CHANNELS.twitterFeed,
   ],
   promotionThread,
+);
+
+addHandler(
+  [
+    CHANNELS.helpReact,
+    CHANNELS.helpJs,
+    CHANNELS.helpReactNative,
+    CHANNELS.helpStyling,
+    CHANNELS.helpBackend,
+    CHANNELS.generalReact,
+    CHANNELS.generalTech,
+  ],
+  messageScanner,
 );
 
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];

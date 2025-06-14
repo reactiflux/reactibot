@@ -2,6 +2,7 @@ import { ChannelType, Client, TextChannel } from "discord.js";
 import { guildId, isProd } from "../helpers/env.js";
 
 const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
+  introduction: "925847644318879754",
   helpReact: "926931785219207301",
   helpThreadsReact: "950790460857794620",
   helpJs: "950790460857794620",
@@ -20,12 +21,25 @@ const LOCAL_CHANNELS: Record<keyof typeof PRODUCTION_CHANNELS, string> = {
   modLog: "925847644318879754",
   botLog: "916081991542276096",
   vcLog: "1237103703740121201",
+  generalTech: "1166062952084942940",
+  jobsAdvice: "1166062952084942940",
+  generalReact: "1166062952084942940",
+  helpReactNative: "1166062952084942940",
+  helpStyling: "1166062952084942940",
+  helpBackend: "1166062952084942940",
 };
 
 const PRODUCTION_CHANNELS = {
+  introduction: "306196179538935818",
   helpReact: "103696749012467712",
   helpThreadsReact: "902647189120118794",
   helpJs: "565213527673929729",
+  generalTech: "102860784329052160",
+  jobsAdvice: "287623405946011648",
+  generalReact: "102860784329052160",
+  helpReactNative: "469170673533583361",
+  helpStyling: "105765765117935616",
+  helpBackend: "145170347921113088",
   random: "103325358643752960",
   gaming: "509219336175747082",
   thanks: "798567961468076072",
