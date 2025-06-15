@@ -17,6 +17,7 @@ const validate = (posts: ReturnType<typeof parseContent>, message: Message) => {
   errors.push(...participation(posts, message));
   errors.push(...formatting(posts, message));
   errors.push(...links(posts, message));
+  errors.push(...insecureLinks(posts, message));
   return errors;
 };
 export default validate;
@@ -110,6 +111,16 @@ export const links: JobPostValidator<false> = (posts) => {
       errors.push({ type: POST_FAILURE_REASONS.linkRequired });
     }
   });
+
+  return errors;
+};
+const insecureUrlRegex = /\bhttp:\/\/[^\s"'<>]+/gi;
+export const insecureLinks: JobPostValidator = (posts, message) => {
+  const insecureUrls = message.content.match(insecureUrlRegex);
+  const errors: PostFailures[] = [];
+  if (!insecureUrls) return errors;
+
+  errors.push({ type: POST_FAILURE_REASONS.insecureLinks });
 
   return errors;
 };
