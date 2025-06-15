@@ -74,6 +74,43 @@ const commandsList: Command[] = [
     },
   },
   {
+    words: [`!contribution`],
+    help: `informs user's of contributing to React codebase`,
+    category: "Communication",
+    handleMessage: (msg) => {
+      msg.reply({
+        embeds: [
+          {
+            title: "Contributing to React",
+            type: EmbedType.Rich,
+            description: `
+
+            React is a very large and complex project. It has a steep learning curve, involves a lot of internal tooling and architecture, and often requires deep context to make meaningful contributions.
+
+If you’re looking to gain experience in open source, we recommend starting with projects that are more beginner-friendly but still widely used and respected in the React ecosystem. Great alternatives include:
+            `,
+            fields: [
+              {
+                name: "Open Source Alternatives",
+                value: `
+- [TanStack](https://github.com/tanstack)
+- [Preact](https://github.com/preactjs/preact)
+- [Remix](https://github.com/remix-run/remix)
+- [SolidJS](https://github.com/solidjs/solid)
+- [React Hook Form](https://github.com/react-hook-form/react-hook-form)
+- [freeCodeCamp](https://github.com/freeCodeCamp/freeCodeCamp)
+- [Daily.dev](https://github.com/dailydotdev/daily)
+                                `,
+                inline: true,
+              },
+            ],
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!promotion`],
     help: `informs user's of self-promotion guidelines`,
     category: "Reactiflux",
@@ -90,23 +127,7 @@ const commandsList: Command[] = [
       });
     },
   },
-  {
-    words: [`!crosspost`],
-    help: `provides a no cross-post message`,
-    category: "Communication",
-    handleMessage: (msg) => {
-      msg.channel.send({
-        embeds: [
-          {
-            title: "Please Avoid Cross-Posting",
-            type: EmbedType.Rich,
-            description: `Just a friendly reminder to please avoid posting the same message in multiple channels. Pick the one that best fits your question and give folks a bit of time to respond. If you haven’t heard back after a while, feel free to bump your message.`,
-            color: EMBED_COLOR,
-          },
-        ],
-      });
-    },
-  },
+
   {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
