@@ -131,7 +131,6 @@ const addHandler = (
       channelHandlersById[channelId] = [...handlers];
     }
   });
-  console.log(channelHandlersById);
 };
 
 const handleMessage = async (message: Message) => {
