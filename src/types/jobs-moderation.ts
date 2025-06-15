@@ -29,6 +29,7 @@ export const enum POST_FAILURE_REASONS {
   tooFrequent = "tooFrequent",
   replyOrMention = "replyOrMention",
   circumventedRules = "circumventedRules",
+  insecureLinks = "insecureLinks",
   // invalidContact = 'invalidContact',
   // unknownLocation = 'unknownLocation',
   // invalidPostType = 'invalidPostType',
@@ -68,6 +69,9 @@ export interface PostFailureTooFrequent {
 export interface PostFailureReplyOrMention {
   type: POST_FAILURE_REASONS.replyOrMention;
 }
+export interface PostFailureInsecureLinks {
+  type: POST_FAILURE_REASONS.insecureLinks;
+}
 export type PostFailures =
   | CircumventedRules
   | PostFailureMissingType
@@ -78,4 +82,5 @@ export type PostFailures =
   | PostFailureTooLong
   | PostFailureTooManyLines
   | PostFailureTooManyGaps
-  | PostFailureTooManyEmojis;
+  | PostFailureTooManyEmojis
+  | PostFailureInsecureLinks;
