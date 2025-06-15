@@ -127,7 +127,6 @@ If you’re looking to gain experience in open source, we recommend starting wit
       });
     },
   },
-
   {
     words: [`!rrlinks`],
     help: `shares a repository of helpful links regarding React and Redux`,
