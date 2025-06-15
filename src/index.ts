@@ -10,7 +10,7 @@ import {
   ActivityType,
   IntentsBitField,
 } from "discord.js";
-import { messageScanner } from "./features/message-scanner.js";
+
 import { logger, channelLog } from "./features/log.js";
 // import codeblock from './features/codeblock';
 import jobsMod, { resetJobCacheCommand } from "./features/jobs-moderation.js";
@@ -23,7 +23,7 @@ import emojiMod from "./features/emojiMod.js";
 import promotionThread from "./features/promotion-threads.js";
 import autothread, { cleanupThreads } from "./features/autothread.js";
 import voiceActivity from "./features/voice-activity.js";
-import { messageDuplicateChecker } from "./features/duplicate-scanner.js";
+
 import type { ChannelHandlers } from "./types/index.js";
 import { scheduleMessages } from "./features/scheduled-messages.js";
 import tsPlaygroundLinkShortener from "./features/tsplay.js";
@@ -203,31 +203,6 @@ addHandler(
     CHANNELS.twitterFeed,
   ],
   promotionThread,
-);
-
-addHandler(
-  [
-    CHANNELS.helpReact,
-    CHANNELS.helpJs,
-    CHANNELS.helpReactNative,
-    CHANNELS.helpStyling,
-    CHANNELS.helpBackend,
-    CHANNELS.generalReact,
-    CHANNELS.generalTech,
-  ],
-  messageScanner,
-);
-
-addHandler(
-  [
-    CHANNELS.helpReact,
-    CHANNELS.helpJs,
-    CHANNELS.helpStyling,
-    CHANNELS.helpBackend,
-    CHANNELS.generalReact,
-    CHANNELS.generalTech,
-  ],
-  messageDuplicateChecker,
 );
 
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
