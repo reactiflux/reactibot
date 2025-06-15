@@ -17,6 +17,7 @@ import {
   failedTooLong,
   failedTooManyGaps,
   failedLinkRequired,
+  failedInsecureLinks,
 } from "./job-mod-helpers.js";
 
 const ValidationMessages = {
@@ -30,6 +31,8 @@ const ValidationMessages = {
   [POST_FAILURE_REASONS.tooLong]: (e: PostFailureTooLong) =>
     `Your post is too long, please shorten it by ${e.overage} characters.`,
   [POST_FAILURE_REASONS.linkRequired]: `Hiring posts must include a link, either to the company website or a page to apply for the job. Make sure it includes \`https://\` so Discord makes it clickable.`,
+  [POST_FAILURE_REASONS.insecureLinks]:
+    "Your post contains insecure links (http://). Please use secure links (https://) instead.",
   [POST_FAILURE_REASONS.tooManyLines]: (e: PostFailureTooManyLines) =>
     `Your post has too many lines, please shorten it by ${e.overage} lines.`,
   [POST_FAILURE_REASONS.tooManyGaps]:
@@ -41,6 +44,9 @@ const ValidationMessages = {
 };
 
 export const getValidationMessage = (reason: PostFailures): string => {
+  if (failedInsecureLinks(reason)) {
+    return ValidationMessages[reason.type];
+  }
   if (failedCircumventedRules(reason)) {
     return ValidationMessages[reason.type](reason);
   }

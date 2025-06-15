@@ -29,6 +29,7 @@ import {
   PostFailures,
   PostType,
   PostFailureLinkRequired,
+  PostFailureInsecureLinks,
   CircumventedRules,
 } from "../../types/jobs-moderation.js";
 
@@ -54,6 +55,10 @@ export const failedTooLong = (e: PostFailures): e is PostFailureTooLong =>
 export const failedLinkRequired = (
   e: PostFailures,
 ): e is PostFailureLinkRequired => e.type === POST_FAILURE_REASONS.linkRequired;
+export const failedInsecureLinks = (
+  e: PostFailures,
+): e is PostFailureInsecureLinks =>
+  e.type === POST_FAILURE_REASONS.insecureLinks;
 export const failedTooManyLines = (
   e: PostFailures,
 ): e is PostFailureTooManyLines => e.type === POST_FAILURE_REASONS.tooManyLines;
