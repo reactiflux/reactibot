@@ -594,6 +594,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
     },
   },
   {
+    words: [`!crosspost`],
+    help: `provides a no cross post message`,
+    category: "Communication",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Do not cross post messages please",
+            type: EmbedType.Rich,
+            description: `Please do not cross post messages in multiple channels and spam. It makes it harder for people to follow conversations and can lead to confusion. 
+            Please post your question in the channel that is most relevant to your question, and wait for a response there. 
+            If you don't get a response after a while, you can bump your message or ask in another channel.`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!cors`],
     help: `provides a link to what CORS is and how to fix it`,
     category: "Web",
@@ -616,7 +635,6 @@ Read more:
       });
     },
   },
-  
   {
     words: [`!imm`, `!immutability`],
     help: `provides resources for helping with immutability`,
@@ -1312,6 +1330,18 @@ create-react-app is deprecated and no longer recommended for use. It is not main
   },
 ];
 
+//Regex to check commands inside codeblocks
+const shouldTriggerCommand = (
+  content: string,
+  commandWord: string,
+): boolean => {
+  const commandRegex = new RegExp(
+    `\\b${commandWord}\\b(?=[^\\\`]*(?:\\\`[^\\\`]*\\\`[^\\\`]*)*$)`,
+    "i",
+  );
+  return commandRegex.test(content);
+};
+
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
     Reactiflux: [],
@@ -1351,33 +1381,6 @@ const createCommandsMessage = () => {
   return categoryDescriptions.join("\n\n").trim();
 };
 
-export const shouldProcessCommand = (
-  content: string,
-  commandWord: string,
-): boolean => {
-  // Convert to lowercase for case-insensitive comparison
-  const lowerContent = content.toLowerCase();
-  const lowerCommand = commandWord.toLowerCase();
-
-  // Check if the command word exists in the message
-  if (!lowerContent.includes(lowerCommand)) {
-    return false;
-  }
-
-  // Check for code blocks (``` or `)
-  const codeBlockRegex = /```[\s\S]*?```|`[^`]*`/g;
-  const codeBlocks = content.match(codeBlockRegex) || [];
-
-  // Check if the command is inside any code block
-  for (const block of codeBlocks) {
-    if (block.toLowerCase().includes(lowerCommand)) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
     if (
@@ -1396,7 +1399,9 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return shouldProcessCommand(msg.content, word);
+        //return msg.content.toLowerCase().includes(word);
+        return shouldTriggerCommand(msg.content, word);
+        //return shouldProcessCommand(msg.content, word);
       });
 
       if (keyword) {
