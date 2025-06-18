@@ -74,6 +74,7 @@ const commandsList: Command[] = [
     },
   },
   {
+
     words: [`!contribution`],
     help: `informs user's of contributing to React codebase`,
     category: "Communication",
@@ -119,7 +120,6 @@ If you’re looking to gain experience in open source, we recommend starting wit
             type: EmbedType.Rich,
             description:
               "Just a friendly reminder: please avoid posting the same message in multiple channels. Choose the channel that best fits your question and allow some time for a response. If you don’t hear back after a while, feel free to bump your message.",
-
             color: EMBED_COLOR,
           },
         ],
