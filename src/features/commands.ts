@@ -83,7 +83,7 @@ const commandsList: Command[] = [
           {
             title: "Please Avoid Cross-Posting",
             type: EmbedType.Rich,
-            description: `Just a friendly reminder to please avoid posting the same message in multiple channels. Pick the one that best fits your question and give folks a bit of time to respond. If you haven’t heard back after a while, feel free to bump your message.`,
+            description: "Just a friendly reminder: please avoid posting the same message in multiple channels. Choose the channel that best fits your question and allow some time for a response. If you don’t hear back after a while, feel free to bump your message.",
             color: EMBED_COLOR,
           },
         ],
