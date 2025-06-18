@@ -74,7 +74,6 @@ const commandsList: Command[] = [
     },
   },
   {
-
     words: [`!contribution`],
     help: `informs user's of contributing to React codebase`,
     category: "Communication",
