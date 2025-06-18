@@ -74,6 +74,23 @@ const commandsList: Command[] = [
     },
   },
   {
+    words: [`!crosspost`],
+    help: `provides a no cross-post message`,
+    category: "Communication",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Please Avoid Cross-Posting",
+            type: EmbedType.Rich,
+            description: "Just a friendly reminder: please avoid posting the same message in multiple channels. Choose the channel that best fits your question and allow some time for a response. If you don’t hear back after a while, feel free to bump your message.",
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!promotion`],
     help: `informs user's of self-promotion guidelines`,
     category: "Reactiflux",
