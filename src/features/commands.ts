@@ -36,7 +36,7 @@ const sortedCategories: Categories[] = [
   "React/Redux",
 ];
 
-const commandsList: Command[] = [
+export const commandsList: Command[] = [
   {
     words: [`!commands`],
     help: `lists all available commands`,
@@ -547,6 +547,25 @@ Here's an article explaining the difference between the two: https://goshakkk.na
 
           https://github.com/florinpop17/app-ideas
           `,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
+    words: [`!crosspost`],
+    help: `provides a no cross post message`,
+    category: "Communication",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Do not cross post messages please",
+            type: EmbedType.Rich,
+            description: `Please do not cross post messages in multiple channels and spam. It makes it harder for people to follow conversations and can lead to confusion. 
+            Please post your question in the channel that is most relevant to your question, and wait for a response there. 
+            If you don't get a response after a while, you can bump your message or ask in another channel.`,
             color: EMBED_COLOR,
           },
         ],
@@ -1270,6 +1289,18 @@ create-react-app is deprecated and no longer recommended for use. It is not main
   },
 ];
 
+//Regex to check commands inside codeblocks
+const shouldTriggerCommand = (
+  content: string,
+  commandWord: string,
+): boolean => {
+  const commandRegex = new RegExp(
+    `\\b${commandWord}\\b(?=[^\\\`]*(?:\\\`[^\\\`]*\\\`[^\\\`]*)*$)`,
+    "i",
+  );
+  return commandRegex.test(content);
+};
+
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
     Reactiflux: [],
@@ -1320,7 +1351,9 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        //return msg.content.toLowerCase().includes(word);
+        return shouldTriggerCommand(msg.content, word);
+        //return shouldProcessCommand(msg.content, word);
       });
 
       if (keyword) {
