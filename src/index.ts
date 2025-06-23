@@ -41,6 +41,7 @@ import {
 import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
 import "./server.js";
+import { jobScanner } from "./features/job-scanner.js";
 
 export const bot = new Client({
   intents: [
@@ -205,7 +206,18 @@ addHandler(
   ],
   promotionThread,
 );
-
+addHandler(
+  [
+    CHANNELS.helpReact,
+    CHANNELS.helpJs,
+    CHANNELS.helpReactNative,
+    CHANNELS.helpStyling,
+    CHANNELS.helpBackend,
+    CHANNELS.generalReact,
+    CHANNELS.generalTech,
+  ],
+  jobScanner,
+);
 const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
