@@ -98,7 +98,7 @@ export const participation: JobPostValidator = (posts, message) => {
   return [];
 };
 
-const urlRegex = /(https):\/\/[^\s/$.?#].[^\s]*/g;
+const urlRegex = /(https?):\/\/[^\s/$.?#].[^\s]*/g;
 export const links: JobPostValidator<false> = (posts) => {
   const errors: PostFailures[] = [];
   posts.forEach(({ tags, description }) => {
