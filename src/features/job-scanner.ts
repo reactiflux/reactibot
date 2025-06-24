@@ -3,6 +3,7 @@ import { EmbedType } from "discord.js";
 
 import { CHANNELS } from "../constants/channels.js";
 import { EMBED_COLOR } from "./commands.js";
+import { isStaff } from "../helpers/discord.js";
 
 const jobKeywords = [
   "looking for work",
@@ -46,7 +47,7 @@ const hasCodeBlockWithDollarSign = (content: string): boolean => {
 
 export const jobScanner: ChannelHandlers = {
   handleMessage: async ({ msg }) => {
-    if (msg.author.bot) return;
+    if (msg.author.bot || isStaff(msg.member)) return;
 
     const content = msg.content.toLowerCase();
     const ignoreDollar = hasCodeBlockWithDollarSign(content);
