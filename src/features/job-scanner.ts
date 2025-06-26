@@ -3,6 +3,7 @@ import { EmbedType } from "discord.js";
 
 import { CHANNELS } from "../constants/channels.js";
 import { EMBED_COLOR } from "./commands.js";
+import { isStaff } from "../helpers/discord.js";
 
 const jobKeywords = [
   "looking for work",
@@ -46,7 +47,7 @@ const hasCodeBlockWithDollarSign = (content: string): boolean => {
 
 export const jobScanner: ChannelHandlers = {
   handleMessage: async ({ msg }) => {
-    if (msg.author.bot) return;
+    if (msg.author.bot || isStaff(msg.member)) return;
 
     const content = msg.content.toLowerCase();
     const ignoreDollar = hasCodeBlockWithDollarSign(content);
@@ -58,7 +59,7 @@ export const jobScanner: ChannelHandlers = {
     const containsJobKeyword = keywordRegex.test(content);
     if (!containsJobKeyword && !hasCurrencyKeyword) return;
 
-    const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobsLog}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic.`;
+    const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobBoard}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic.`;
     const sentMsg = await msg.reply({
       embeds: [
         {
