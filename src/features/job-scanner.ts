@@ -59,7 +59,7 @@ export const jobScanner: ChannelHandlers = {
     const containsJobKeyword = keywordRegex.test(content);
     if (!containsJobKeyword && !hasCurrencyKeyword) return;
 
-    const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobsLog}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic.`;
+    const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobBoard}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic.`;
     const sentMsg = await msg.reply({
       embeds: [
         {
