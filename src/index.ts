@@ -42,6 +42,7 @@ import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
 import "./server.js";
 import { jobScanner } from "./features/job-scanner.js";
+import { messageDuplicateChecker } from "./features/duplicate-scanner/duplicate-scanner.js";
 
 export const bot = new Client({
   intents: [
@@ -222,7 +223,17 @@ const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
 addHandler(CHANNELS.resumeReview, resumeReviewPdf);
-
+addHandler(
+  [
+    CHANNELS.helpReact,
+    CHANNELS.generalReact,
+    CHANNELS.generalTech,
+    CHANNELS.helpBackend,
+    CHANNELS.helpStyling,
+    CHANNELS.helpReactNative,
+  ],
+  messageDuplicateChecker,
+);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
