@@ -1320,7 +1320,7 @@ Authentication is a critical part of most web applications. Here are some resour
             title: "create-react-app is deprecated",
             type: EmbedType.Rich,
             description: `
-create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use [Vite](https://vitejs.dev/) or [Next.js](https://nextjs.org/) instead. Read more about [Sunsetting Create React](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
+create-react-app is deprecated and no longer recommended for use. It is not maintained and has a large number of security vulnerabilities. Please use [Vite](https://vitejs.dev/) or [Next.js](https://nextjs.org/) instead. The [React docs](https://react.dev/blog/2025/02/14/sunsetting-create-react-app) has more to say about using React without the use of a framework like Next or Remix.
             `,
             color: EMBED_COLOR,
           },
