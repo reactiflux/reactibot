@@ -21,6 +21,7 @@ import {
 } from "../helpers/discord.js";
 import { partition } from "../helpers/array.js";
 import { EMBED_COLOR } from "./commands.js";
+import { logger } from "./log.js";
 
 const config = {
   // This is how many ️️warning reactions a post must get until it's considered an official warning
@@ -146,31 +147,45 @@ const emojiMod: ChannelHandlers = {
     if (!reactionHandlers[emoji]) {
       return;
     }
+    try {
+      const [fullReaction, fullMessage, reactor] = await Promise.all([
+        reaction.partial ? reaction.fetch() : reaction,
+        message.partial ? message.fetch() : message,
+        guild.members.fetch(user.id),
+      ]);
+      const [usersWhoReacted, authorMember] = await Promise.all([
+        fetchReactionMembers(guild, fullReaction),
+        guild.members.fetch(fullMessage.author.id),
+      ]);
 
-    const [fullReaction, fullMessage, reactor] = await Promise.all([
-      reaction.partial ? reaction.fetch() : reaction,
-      message.partial ? message.fetch() : message,
-      guild.members.fetch(user.id),
-    ]);
-    const [usersWhoReacted, authorMember] = await Promise.all([
-      fetchReactionMembers(guild, fullReaction),
-      guild.members.fetch(fullMessage.author.id),
-    ]);
+      if (authorMember.id === bot.user?.id) return;
 
-    if (authorMember.id === bot.user?.id) return;
+      if (authorMember.id === bot.user?.id) return;
 
-    if (authorMember.id === bot.user?.id) return;
-
-    reactionHandlers[emoji]({
-      guild,
-      author: authorMember,
-      reactor,
-      message: fullMessage,
-      reaction: fullReaction,
-      usersWhoReacted: usersWhoReacted.filter(
-        (x): x is GuildMember => Boolean(x) && authorMember.id !== reactor.id,
-      ),
-    });
+      reactionHandlers[emoji]({
+        guild,
+        author: authorMember,
+        reactor,
+        message: fullMessage,
+        reaction: fullReaction,
+        usersWhoReacted: usersWhoReacted.filter(
+          (x): x is GuildMember => Boolean(x) && authorMember.id !== reactor.id,
+        ),
+      });
+    } catch (e) {
+      if (e instanceof Error) {
+        let descriptiveMessage = `Channel id: ${message.channelId}`;
+        if (message.channel.isThread()) {
+          const thread = message.channel;
+          descriptiveMessage += `Thread id: ${thread.id}`;
+        }
+        logger.log(
+          `${descriptiveMessage} username: ${user.username}  message: ${message.content}`,
+          e,
+        );
+      }
+      throw e;
+    }
   },
 };
 
