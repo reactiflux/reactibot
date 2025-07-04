@@ -177,6 +177,44 @@ If you’re looking to gain experience in open source, we recommend starting wit
     },
   },
   {
+    words: [`!courses`],
+    help: `provides a curated list of quality React courses and learning platforms`,
+    category: "React/Redux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Quality React Courses & Learning Platforms",
+            type: EmbedType.Rich,
+            description: `Here are some highly recommended courses and platforms for learning React, from beginner to advanced levels:`,
+            fields: [
+              {
+                name: "Premium Courses",
+                value: `
+- [Joy of React](https://www.joyofreact.com/) - Comprehensive React course
+- [Epic React](https://epicreact.dev/) - Advanced React patterns and techniques
+- [Advanced React](https://www.advanced-react.com/) - By Nadia Makarevich
+- [Jack Herrington's Courses](https://www.youtube.com/@jherr) - Various React topics
+                `,
+                inline: true,
+              },
+              {
+                name: "Learning Platforms",
+                value: `
+- [Frontend Masters](https://frontendmasters.com/) - Professional-grade courses
+- [React.dev](https://react.dev/) - Official React documentation
+- [Reactiflux Learning Resources](https://www.reactiflux.com/learning) - Curated links
+                `,
+                inline: true,
+              },
+            ],
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!ymnnr`],
     help: `links to the You Might Not Need Redux article`,
     category: "React/Redux",
@@ -186,7 +224,7 @@ If you’re looking to gain experience in open source, we recommend starting wit
           {
             title: "You Might Not Need Redux",
             type: EmbedType.Rich,
-            description: `People often choose Redux before they need it. “What if our app doesn’t scale without it?"
+            description: `People often choose Redux before they need it. “What if our app doesn't scale without it?"
 
 Read more about this in the [article "You Might Not Need Redux" by Dan Abramov](https://medium.com/@dan_abramov/you-might-not-need-redux-be46360cf367)`,
             color: EMBED_COLOR,
