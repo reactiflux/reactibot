@@ -50,7 +50,19 @@ export const lookingForGroup = async (bot: Client) => {
     }
 
     try {
-      await retry(thread.fetchStarterMessage);
+      const messages = await retry(() => thread.messages.fetch({ limit: 1 }));
+      const message = messages.first();
+      if (!message) {
+        return;
+      }
+
+      if (
+        !(message.attachments && message.attachments.size > 0) &&
+        message.content.length === 0
+      ) {
+        return;
+      }
+
       await thread.send({
         embeds: [
           {
@@ -78,7 +90,7 @@ Post authors: Once you've found collaborators or a project to contribute to, ple
       });
     } catch (e) {
       if (e instanceof Error) {
-        logger.log("looking for group threadCreate: ", e);
+        logger.log("looking for group threadCreate", e);
       }
     }
   });
