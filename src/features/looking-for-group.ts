@@ -55,11 +55,7 @@ export const lookingForGroup = async (bot: Client) => {
       if (!message) {
         return;
       }
-
-      if (
-        !(message.attachments && message.attachments.size > 0) &&
-        message.content.length === 0
-      ) {
+      if (message.attachments.size === 0 && message.content.length === 0) {
         return;
       }
       await thread.send({
