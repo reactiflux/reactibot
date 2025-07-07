@@ -50,7 +50,7 @@ export const lookingForGroup = async (bot: Client) => {
     }
 
     try {
-      await retry(thread.fetchStarterMessage);
+      await retry(() => thread.fetchStarterMessage());
       await thread.send({
         embeds: [
           {
