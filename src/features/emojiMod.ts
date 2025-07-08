@@ -160,8 +160,6 @@ const emojiMod: ChannelHandlers = {
 
       if (authorMember.id === bot.user?.id) return;
 
-      if (authorMember.id === bot.user?.id) return;
-
       reactionHandlers[emoji]({
         guild,
         author: authorMember,
