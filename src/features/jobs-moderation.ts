@@ -230,6 +230,13 @@ const validationRepl = async (message: Message) => {
   const posts = parseContent(message.content);
   const errors = validate(posts, message);
 
+  if (
+    message.channel.type !== ChannelType.GuildText &&
+    message.channel.type !== ChannelType.PublicThread
+  ) {
+    return;
+  }
+
   await message.channel.send(
     errors.length > 0
       ? errors.map((e) => `- ${getValidationMessage(e)}`).join("\n")

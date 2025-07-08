@@ -40,6 +40,9 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
       { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.jobBoard },
     ],
     message: async (channel) => {
+      if (channel.type !== ChannelType.GuildText) {
+        return;
+      }
       const msg = await channel.send({
         content: `Messages must start with [FORHIRE]/[HIRING]. Check the channel description for a full list of tags and rules!
 
