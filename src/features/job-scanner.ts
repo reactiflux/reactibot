@@ -3,7 +3,8 @@ import { EmbedType } from "discord.js";
 
 import { CHANNELS } from "../constants/channels.js";
 import { EMBED_COLOR } from "./commands.js";
-import { isStaff } from "../helpers/discord.js";
+import { isStaff, isHelpful } from "../helpers/discord.js";
+import { logger } from "./log.js";
 
 const jobKeywords = [
   "looking for work",
@@ -47,7 +48,7 @@ const hasCodeBlockWithDollarSign = (content: string): boolean => {
 
 export const jobScanner: ChannelHandlers = {
   handleMessage: async ({ msg }) => {
-    if (msg.author.bot || isStaff(msg.member)) return;
+    if (msg.author.bot || isStaff(msg.member) || isHelpful(msg.member)) return;
 
     const content = msg.content.toLowerCase();
     const ignoreDollar = hasCodeBlockWithDollarSign(content);
@@ -70,9 +71,19 @@ export const jobScanner: ChannelHandlers = {
         },
       ],
     });
-    await msg.delete().catch(console.error);
+    logger.log(
+      "job keyword detected",
+      `${msg.author.username} in <#${msg.channel.id}> \n${msg.content}`,
+    );
+    await msg
+      .delete()
+      .catch((e) => logger.log("failed to delete job posting message", e));
     setTimeout(() => {
-      sentMsg.delete().catch(console.error);
-    }, 300_000);
+      sentMsg
+        .delete()
+        .catch((e) =>
+          logger.log("failed to delete auto reply to a job posting message", e),
+        );
+    }, 30_000);
   },
 };
