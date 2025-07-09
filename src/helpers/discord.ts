@@ -51,6 +51,14 @@ export const isStaffOrHelpful = (member: GuildMember) => {
 export const constructDiscordLink = (message: Message | PartialMessage) =>
   `https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`;
 
+export const getMessage = async (message: Pick<Message, "fetch">) => {
+  try {
+    return await message.fetch();
+  } catch {
+    return null;
+  }
+};
+
 export const fetchReactionMembers = async (
   guild: Guild,
   reaction: MessageReaction | PartialMessageReaction,

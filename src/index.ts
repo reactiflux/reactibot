@@ -42,6 +42,7 @@ import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
 import "./server.js";
 import { jobScanner } from "./features/job-scanner.js";
+import { getMessage } from "./helpers/discord.js";
 
 export const bot = new Client({
   intents: [
@@ -132,29 +133,6 @@ const addHandler = (
       channelHandlersById[channelId] = [...handlers];
     }
   });
-};
-
-const getMessage = async (message: Message) => {
-  try {
-    return await message.fetch();
-  } catch (e: unknown) {
-    logger.log(
-      "ERROR",
-      `Failed to fetch message: ${JSON.stringify({
-        error: e,
-        messageId: message.id,
-        partial: message.partial,
-        channelId: message.channelId,
-        content: message.content,
-        authorUsername: message.author?.username,
-        authorSystem: message.author?.system,
-        authorBot: message.author?.bot,
-        system: message.system,
-      })}`,
-    );
-
-    return null;
-  }
 };
 
 const handleMessage = async (message: Message) => {

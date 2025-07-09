@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import cooldown from "./cooldown.js";
 import type { ChannelHandlers } from "../types/index.d.ts";
-import { isStaff } from "../helpers/discord.js";
+import { getMessage, isStaff } from "../helpers/discord.js";
 import {
   extractSearchKey,
   getReactDocsContent,
@@ -1359,7 +1359,11 @@ const commands: ChannelHandlers = {
       return;
     }
 
-    const msg = await maybeMessage.fetch();
+    const msg = await getMessage(maybeMessage);
+
+    if (!msg) {
+      return;
+    }
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
