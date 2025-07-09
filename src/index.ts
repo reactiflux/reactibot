@@ -134,11 +134,39 @@ const addHandler = (
   });
 };
 
+const getMessage = async (message: Message) => {
+  try {
+    return await message.fetch();
+  } catch (e: unknown) {
+    logger.log(
+      "ERROR",
+      `Failed to fetch message: ${JSON.stringify({
+        error: e,
+        messageId: message.id,
+        partial: message.partial,
+        channelId: message.channelId,
+        content: message.content,
+        authorUsername: message.author?.username,
+        authorSystem: message.author?.system,
+        authorBot: message.author?.bot,
+        system: message.system,
+      })}`,
+    );
+
+    return null;
+  }
+};
+
 const handleMessage = async (message: Message) => {
   if (message.system) {
     return;
   }
-  const msg = await message.fetch();
+
+  const msg = await getMessage(message);
+
+  if (!msg) {
+    return;
+  }
 
   const channel = msg.channel;
   const channelId = channel.isThread()
