@@ -3,7 +3,7 @@ import { EmbedType } from "discord.js";
 
 import { EMBED_COLOR } from "../commands.js";
 import { LRUCache } from "lru-cache";
-import { isStaff } from "../../helpers/discord.js";
+import { isStaff, isHelpful } from "../../helpers/discord.js";
 
 const maxMessagesPerUser = 5; // Maximum number of messages per user to track
 // Time (ms) to keep track of duplicates (e.g., 30 sec)
@@ -51,7 +51,7 @@ const normalizeContent = (content: string) =>
   content.trim().toLowerCase().replace(/\s+/g, " ");
 export const messageDuplicateChecker: ChannelHandlers = {
   handleMessage: async ({ msg, bot }) => {
-    if (msg.author.bot || isStaff(msg.member)) return;
+    if (msg.author.bot || isStaff(msg.member) || isHelpful(msg.member)) return;
 
     const content = normalizeContent(msg.content);
     const userId = msg.author.id;
