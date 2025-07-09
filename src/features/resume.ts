@@ -65,17 +65,18 @@ configure();
 
 export const resumeResources = async (bot: Client) => {
   bot.on("interactionCreate", async (interaction) => {
+    const { channel } = interaction;
     if (
       interaction.type !== InteractionType.MessageComponent ||
       interaction.componentType !== ComponentType.Button ||
-      !interaction.channel ||
-      interaction.channel.type !== ChannelType.PublicThread ||
-      interaction.channel.parentId !== CHANNELS.resumeReview
+      !channel ||
+      channel.type !== ChannelType.PublicThread ||
+      channel.parentId !== CHANNELS.resumeReview
     ) {
       return;
     }
 
-    if (interaction.user.id !== interaction.channel.ownerId) {
+    if (interaction.user.id !== channel.ownerId) {
       interaction.reply({
         ephemeral: true,
         content:
@@ -92,8 +93,7 @@ export const resumeResources = async (bot: Client) => {
     if (interaction.customId === REVIEW_COMMAND) {
       const deferred = await interaction.deferReply({ ephemeral: true });
       deferred.edit("Looking for a resume…");
-      const messages = await interaction.channel.messages.fetch();
-      const channel = interaction.channel;
+      const messages = await channel.messages.fetch();
 
       let firstMessage: Message<true> | null = null;
       try {
@@ -173,7 +173,7 @@ export const resumeResources = async (bot: Client) => {
         );
 
         run.on("textCreated", () => {
-          interaction.channel?.sendTyping();
+          channel?.sendTyping();
         });
 
         run.on("textDone", (content) => {
@@ -189,7 +189,7 @@ export const resumeResources = async (bot: Client) => {
             content: "Done!",
           });
 
-          interaction.channel?.send(content.value);
+          channel?.send(content.value);
         });
       } catch (e) {
         // recover

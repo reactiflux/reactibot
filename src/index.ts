@@ -138,7 +138,7 @@ const handleMessage = async (message: Message) => {
   if (message.system) {
     return;
   }
-  const msg = message.partial ? await message.fetch() : message;
+  const msg = await message.fetch();
 
   const channel = msg.channel;
   const channelId = channel.isThread()
