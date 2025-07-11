@@ -42,7 +42,7 @@ const jobKeywords = [
 
 const currencyKeywords = ["₹", "€", "$"];
 const hasCodeBlockWithDollarSign = (content: string): boolean => {
-  const codeBlockRegex = /```[\s\S]*?\$[\s\S]*?```/g;
+  const codeBlockRegex = /(`{1,3})([\s\S]*?\$[\s\S]*?)\1/g;
   return codeBlockRegex.test(content);
 };
 
