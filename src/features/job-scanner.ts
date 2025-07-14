@@ -1,8 +1,4 @@
 import type { ChannelHandlers } from "../types/index.js";
-import { EmbedType } from "discord.js";
-
-import { CHANNELS } from "../constants/channels.js";
-import { EMBED_COLOR } from "./commands.js";
 import { isStaff, isHelpful } from "../helpers/discord.js";
 import { logger } from "./log.js";
 
@@ -52,38 +48,21 @@ export const jobScanner: ChannelHandlers = {
 
     const content = msg.content.toLowerCase();
     const ignoreDollar = hasCodeBlockWithDollarSign(content);
-    const hasCurrencyKeyword =
-      !ignoreDollar &&
-      currencyKeywords.some((keyword) => content.includes(keyword));
 
+    const currencyMatches = !ignoreDollar
+      ? currencyKeywords.filter((keyword) => content.includes(keyword))
+      : [];
     const keywordRegex = new RegExp(`\\b(${jobKeywords.join("|")})\\b`, "i");
-    const containsJobKeyword = keywordRegex.test(content);
-    if (!containsJobKeyword && !hasCurrencyKeyword) return;
+    const jobKeywordMatches = content.match(keywordRegex) || [];
+    const uniqueJobKeywordMatches = new Set([...jobKeywordMatches]);
 
-    const warningMsg = `Oops <@${msg.author.id}>! This message looks more like a job/collaboration/advice post. Mind sharing that in <#${CHANNELS.jobBoard}> or <#${CHANNELS.lookingForGroup}> or <#${CHANNELS.jobsAdvice}> instead? If this was a mistake, please try again and ask your question. Appreciate you helping us keep channels on-topic.`;
-    const sentMsg = await msg.reply({
-      embeds: [
-        {
-          title: "Oops! Wrong Channel, Maybe?",
-          type: EmbedType.Rich,
-          description: warningMsg,
-          color: EMBED_COLOR,
-        },
-      ],
-    });
+    if (currencyMatches.length === 0 && jobKeywordMatches.length === 0) return;
     logger.log(
       "job keyword detected",
-      `${msg.author.username} in <#${msg.channel.id}> \n${msg.content}`,
+      `${msg.author.username} in <#${msg.channel.id}> \n*Content:* ${msg.content} \n*Matched Keywords:* ${[
+        ...currencyMatches,
+        ...uniqueJobKeywordMatches,
+      ].join(", ")}`,
     );
-    await msg
-      .delete()
-      .catch((e) => logger.log("failed to delete job posting message", e));
-    setTimeout(() => {
-      sentMsg
-        .delete()
-        .catch((e) =>
-          logger.log("failed to delete auto reply to a job posting message", e),
-        );
-    }, 30_000);
   },
 };
