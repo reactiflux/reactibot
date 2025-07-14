@@ -42,6 +42,9 @@ import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
 import "./server.js";
 import { jobScanner } from "./features/job-scanner.js";
+
+import { messageDuplicateChecker } from "./features/duplicate-scanner/duplicate-scanner.js";
+
 import { getMessage } from "./helpers/discord.js";
 
 export const bot = new Client({
@@ -228,7 +231,10 @@ const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
 addHandler(threadChannels, autothread);
 
 addHandler(CHANNELS.resumeReview, resumeReviewPdf);
-
+addHandler(
+  [CHANNELS.helpReact, CHANNELS.generalReact, CHANNELS.generalTech],
+  messageDuplicateChecker,
+);
 bot.on("ready", () => {
   deployCommands(bot);
   jobsMod(bot);
