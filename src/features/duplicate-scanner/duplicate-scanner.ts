@@ -4,7 +4,10 @@ import { EmbedType } from "discord.js";
 import { EMBED_COLOR } from "../commands.js";
 import { LRUCache } from "lru-cache";
 import { isStaff, isHelpful } from "../../helpers/discord.js";
-
+import { logger } from "../log.js";
+import { truncateMessage } from "../../helpers/modLog.js";
+import { formatWithEllipsis } from "./helper.js";
+import cooldown from "../cooldown.js";
 const maxMessagesPerUser = 5; // Maximum number of messages per user to track
 // Time (ms) to keep track of duplicates (e.g., 30 sec)
 export const duplicateCache = new LRUCache<string, Set<string>>({
@@ -28,6 +31,11 @@ const handleDuplicateMessage = async ({
   userId,
 }: HandleMessageArgs & { userId: string }) => {
   await msg.delete().catch(console.error);
+  const cooldownKey = `resume-${msg.channelId}`;
+  if (cooldown.hasCooldown(userId, cooldownKey)) {
+    return;
+  }
+  cooldown.addCooldown(userId, cooldownKey);
   const warningMsg = `Hey <@${userId}>, it looks like you've posted this message in another channel already. Please avoid cross-posting.`;
   const warning = await msg.channel.send({
     embeds: [
@@ -45,6 +53,10 @@ const handleDuplicateMessage = async ({
     warning.delete().catch(console.error);
   }, 30_000);
 
+  logger.log(
+    "duplicate message detected",
+    `${msg.author.username} in <#${msg.channel.id}> \n${formatWithEllipsis(truncateMessage(msg.content, 100))}`,
+  );
   return;
 };
 const normalizeContent = (content: string) =>
