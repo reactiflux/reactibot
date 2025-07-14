@@ -6,6 +6,7 @@ import {
   PartialMessageReaction,
   PartialUser,
   VoiceState,
+  OmitPartialGroupDMChannel,
 } from "discord.js";
 
 type CommonArgs = {
@@ -13,7 +14,7 @@ type CommonArgs = {
 };
 
 export type HandleMessageArgs = CommonArgs & {
-  msg: Message;
+  msg: OmitPartialGroupDMChannel<Message>;
 };
 
 export type HandleReactionArgs = CommonArgs & {

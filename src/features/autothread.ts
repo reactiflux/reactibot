@@ -4,6 +4,7 @@ import { CHANNELS } from "../constants/channels.js";
 import {
   constructDiscordLink,
   fetchReactionMembers,
+  getMessage,
   isHelpful,
   isStaff,
 } from "../helpers/discord.js";
@@ -58,7 +59,14 @@ const autoThread: ChannelHandlers = {
       return;
     }
 
-    const { channel: thread, author, guild } = await reaction.message.fetch();
+    const reactionMsg = await getMessage(reaction.message);
+
+    if (!reactionMsg) {
+      return;
+    }
+
+    const { channel: thread, author, guild } = reactionMsg;
+
     const starter = thread.isThread()
       ? await thread.fetchStarterMessage()
       : undefined;

@@ -18,6 +18,7 @@ import {
   GuildTextThreadCreateOptions,
   AutocompleteInteraction,
 } from "discord.js";
+import { logger } from "../features/log.js";
 
 export const difference = <T>(a: Set<T>, b: Set<T>) =>
   new Set(Array.from(a).filter((x) => !b.has(x)));
@@ -50,16 +51,45 @@ export const isStaffOrHelpful = (member: GuildMember) => {
 export const constructDiscordLink = (message: Message | PartialMessage) =>
   `https://discord.com/channels/${message.guild?.id}/${message.channel.id}/${message.id}`;
 
-export const fetchReactionMembers = (
+export const getMessage = async (message: Pick<Message, "fetch">) => {
+  try {
+    return await message.fetch();
+  } catch {
+    return null;
+  }
+};
+
+export const fetchReactionMembers = async (
   guild: Guild,
   reaction: MessageReaction | PartialMessageReaction,
 ) => {
   try {
-    return reaction.users
-      .fetch()
-      .then((users) =>
-        Promise.all(users.map((user) => guild.members.fetch(user.id))),
-      );
+    const users = await reaction.users.fetch();
+    const members = await Promise.allSettled(
+      users.map((user) =>
+        guild.members.fetch(user.id).then(
+          (member) => ({ member, user }),
+          () => ({ member: null, user }),
+        ),
+      ),
+    );
+
+    return members.flatMap((result) => {
+      // NOTE: This can't be a rejected promise, but we handle it just in case
+      if (result.status !== "fulfilled") {
+        return [];
+      }
+
+      if (!result.value.member) {
+        logger.log(
+          "REACTION_MEMBERS",
+          `Failed to fetch member for user ${result.value.user.username}, id: ${result.value.user.id} in guild ${guild.id}.`,
+        );
+        return [];
+      }
+
+      return [result.value.member];
+    });
   } catch (e) {
     return Promise.resolve([] as GuildMember[]);
   }

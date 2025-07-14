@@ -42,8 +42,10 @@ import { recommendBookCommand } from "./features/book-list.js";
 import { mdnSearch } from "./features/mdn.js";
 import "./server.js";
 import { jobScanner } from "./features/job-scanner.js";
+
 import { messageDuplicateChecker } from "./features/duplicate-scanner/duplicate-scanner.js";
-import cooldown from "./features/cooldown.js";
+
+import { getMessage } from "./helpers/discord.js";
 
 export const bot = new Client({
   intents: [
@@ -140,7 +142,12 @@ const handleMessage = async (message: Message) => {
   if (message.system) {
     return;
   }
-  const msg = message.partial ? await message.fetch() : message;
+
+  const msg = await getMessage(message);
+
+  if (!msg) {
+    return;
+  }
 
   const channel = msg.channel;
   const channelId = channel.isThread()
