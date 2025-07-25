@@ -14,13 +14,14 @@ const guildMemberTimeoutHandler = (
   const newTimeout = newMember.communicationDisabledUntil;
 
   const date = new Date();
+  const unixTime = Math.floor(newTimeout.getTime() / 1000);
 
   if (!oldTimeout && newTimeout) {
     if (newTimeout >= date) {
       // makes sure we don't log timeouts from the past if a user's role updates. It's still possible that a user is updated during a timeout, but this is the best we can do.
       logger.log(
         "TIMEOUT",
-        `${newMember.user.tag} has been timed out in ${newMember.guild.name} until ${newTimeout}.`,
+        `${newMember.user.tag} has been timed out in ${newMember.guild.name} until <t:${unixTime}:f> (<t:${unixTime}:R>).`,
         "modLog",
       );
     }
