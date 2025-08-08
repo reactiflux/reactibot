@@ -155,8 +155,12 @@ const emojiMod: ChannelHandlers = {
       ]);
       const [usersWhoReacted, authorMember] = await Promise.all([
         fetchReactionMembers(guild, fullReaction),
-        guild.members.fetch(fullMessage.author.id),
+        guild.members.fetch(fullMessage.author.id).catch(() => null),
       ]);
+
+      if (!authorMember) {
+        return null;
+      }
 
       if (authorMember.id === bot.user?.id) return;
 
