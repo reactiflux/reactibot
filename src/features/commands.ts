@@ -5,11 +5,13 @@ import {
   ChannelType,
   EmbedType,
   Message,
+  OmitPartialGroupDMChannel,
+  PartialGroupDMChannel,
   TextChannel,
 } from "discord.js";
 import cooldown from "./cooldown.js";
 import type { ChannelHandlers } from "../types/index.d.ts";
-import { isStaff } from "../helpers/discord.js";
+import { getMessage, isStaff } from "../helpers/discord.js";
 import {
   extractSearchKey,
   getReactDocsContent,
@@ -25,7 +27,7 @@ type Command = {
   words: string[];
   help: string;
   category: Categories;
-  handleMessage: (msg: Message) => void;
+  handleMessage: (msg: OmitPartialGroupDMChannel<Message>) => void;
   cooldown?: number;
 };
 
@@ -1349,12 +1351,19 @@ const createCommandsMessage = () => {
 
 const commands: ChannelHandlers = {
   handleMessage: async ({ msg: maybeMessage }) => {
-    if (!maybeMessage.guild && maybeMessage.channel.type !== ChannelType.DM) {
+    if (
+      (!maybeMessage.inGuild() &&
+        maybeMessage.channel.type !== ChannelType.DM) ||
+      maybeMessage.channel instanceof PartialGroupDMChannel
+    ) {
       return;
     }
-    const msg = maybeMessage.partial
-      ? await maybeMessage.fetch()
-      : maybeMessage;
+
+    const msg = await getMessage(maybeMessage);
+
+    if (!msg) {
+      return;
+    }
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
