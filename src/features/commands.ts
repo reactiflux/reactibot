@@ -1274,16 +1274,15 @@ Authentication is a critical part of most web applications. Here are some resour
 - [TheCopenhagenBook](https://thecopenhagenbook.com/)
 - [OWASP Auth Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [OWASP Session Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
-- [Lucia](https://lucia-auth.com/)
 `,
             inline: true,
           },
           {
             name: "Authentication Libraries",
             value: `
+- [Lucia](https://lucia-auth.com/)
 - [Auth.js](https://authjs.dev/)
 - [Passport](http://www.passportjs.org/)
-- [Better Auth](https://www.better-auth.com/)
 `,
             inline: true,
           },
@@ -1331,15 +1330,48 @@ create-react-app is deprecated and no longer recommended for use. It is not main
 ];
 
 //Regex to check commands inside codeblocks
-const shouldTriggerCommand = (
+// Keep this helper function as it is correct
+const escapeRegex = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+// Replace the old `shouldTriggerCommand` and remove `removeBacktickContent`
+export const shouldTriggerCommand = (
   content: string,
   commandWord: string,
 ): boolean => {
+  // A command word must exist to trigger a command.
+  if (!commandWord) {
+    return false;
+  }
+
+  // This simple parsing strategy correctly removes content inside code blocks.
+  // 1. Split by ```. Even-indexed parts are outside code blocks.
+  const sanitizedContent = content
+    .replace(/\\```/g, "\uE001") // Placeholder for escaped ```
+    .replace(/\\`/g, "\uE000"); // Placeholder for escaped `
+
+  const partsOutsideTripleBackticks = sanitizedContent
+    .split("```")
+    .filter((_, i) => i % 2 === 0);
+
+  const partsOutsideAllBackticks = partsOutsideTripleBackticks.flatMap((part) =>
+    part.split("`").filter((_, i) => i % 2 === 0),
+  );
+
+  const processedContent = partsOutsideAllBackticks.join("");
+
+  // Restore the literal backticks from the placeholders.
+  const finalContent = processedContent
+    .replace(/\uE001/g, "```")
+    .replace(/\uE000/g, "`");
+
   const commandRegex = new RegExp(
-    `\\b${commandWord}\\b(?=[^\\\`]*(?:\\\`[^\\\`]*\\\`[^\\\`]*)*$)`,
+    `(?<!\\w)${escapeRegex(commandWord)}(?!\\w)`,
     "i",
   );
-  return commandRegex.test(content);
+
+  return commandRegex.test(finalContent);
 };
 
 const createCommandsMessage = () => {

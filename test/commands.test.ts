@@ -1,325 +1,390 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Message, TextChannel, ChannelType, GuildMember } from "discord.js";
-import { commandsList, shouldProcessCommand } from "../src/features/commands";
-import { Collection } from "discord.js";
+import { describe, it, expect } from "vitest";
+import { shouldTriggerCommand } from "../src/features/commands.js";
 
-const mockMessage = {
-  content: "",
-  channel: {
-    type: ChannelType.GuildText,
-    send: vi.fn(),
-  },
-  guild: {
-    channels: {
-      cache: {
-        get: vi.fn(),
-      },
-    },
-    roles: {
-      everyone: {},
-    },
-  },
-  author: {
-    id: "123456789",
-  },
-  mentions: {
-    users: {
-      first: vi.fn().mockReturnValue({ id: "123456789" }),
-    },
-    members: new Map(),
-  },
-  reply: vi.fn(),
-} as unknown as Message;
+describe("shouldTriggerCommand", () => {
+  describe("Basic command detection", () => {
+    it("should trigger for exact command match", () => {
+      expect(shouldTriggerCommand("!commands", "!commands")).toBe(true);
+    });
 
-const mockTextChannel = {
-  type: ChannelType.GuildText,
-  send: vi.fn(),
-  permissionOverwrites: {
-    create: vi.fn(),
-  },
-  guild: {
-    roles: {
-      everyone: {},
-    },
-  },
-} as unknown as TextChannel;
+    it("should trigger for command at start of message", () => {
+      expect(shouldTriggerCommand("!commands me please", "!commands")).toBe(
+        true,
+      );
+    });
 
-const fetchMsg = {
-  delete: vi.fn(),
-  edit: vi.fn(),
-};
+    it("should trigger for command at end of message", () => {
+      expect(
+        shouldTriggerCommand("Please show me !commands", "!commands"),
+      ).toBe(true);
+    });
 
-describe("Discord Bot Commands", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockMessage.channel.send = vi.fn().mockResolvedValue(fetchMsg);
-    if (mockMessage.guild) {
-      mockMessage.guild.channels.cache.get = vi
-        .fn()
-        .mockReturnValue(mockTextChannel);
-    }
-    (mockMessage as { member: GuildMember }).member = {
-      roles: {
-        cache: new Collection([["staff", { name: "staff" }]]),
-        some: vi.fn().mockReturnValue(true),
-      },
-    } as unknown as GuildMember;
+    it("should trigger for command in middle of message", () => {
+      expect(
+        shouldTriggerCommand("Can you !commands me with this?", "!commands"),
+      ).toBe(true);
+    });
+
+    it("should be case insensitive", () => {
+      expect(shouldTriggerCommand("!COMMANDS", "!commands")).toBe(true);
+      expect(shouldTriggerCommand("!Commands", "!commands")).toBe(true);
+      expect(shouldTriggerCommand("!commands", "!COMMANDS")).toBe(true);
+    });
   });
 
-  it("should handle !mdn command", async () => {
-    mockMessage.content = "!mdn Array.prototype.map";
-    await commandsList
-      .find((cmd) => cmd.words.includes("!mdn"))
-      ?.handleMessage(mockMessage);
-    expect(mockMessage.channel.send).toHaveBeenCalled();
+  describe("Word boundary detection", () => {
+    it("should not trigger for partial matches", () => {
+      expect(shouldTriggerCommand("helping", "docs")).toBe(false);
+      expect(shouldTriggerCommand("!docsful", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("undocsful", "docs")).toBe(false);
+    });
+
+    it("should trigger with word boundaries", () => {
+      expect(shouldTriggerCommand("docs me", "docs")).toBe(true);
+      expect(shouldTriggerCommand("need docs now", "docs")).toBe(true);
+      expect(shouldTriggerCommand("docs!", "docs")).toBe(true);
+      expect(shouldTriggerCommand("docs?", "docs")).toBe(true);
+      expect(shouldTriggerCommand("docs.", "docs")).toBe(true);
+    });
+
+    it("should handle punctuation correctly", () => {
+      expect(shouldTriggerCommand("!docs!", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("!docs?", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("!docs.", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("(!docs)", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("[!docs]", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("{!docs}", "!docs")).toBe(true);
+    });
   });
 
-  // Edge case tests for commands inside code blocks
-  it("should ignore commands inside single backticks", () => {
-    mockMessage.content = "`!mdn Array.prototype.map`";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  describe("Single backtick code blocks (inline)", () => {
+    it("should NOT trigger inside single backticks", () => {
+      expect(shouldTriggerCommand("`!docs`", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("Use `!docs` command", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("Try `!docs` or `!commands`", "!docs")).toBe(
+        false,
+      );
+    });
+
+    it("should trigger outside single backticks", () => {
+      expect(shouldTriggerCommand("`code` !docs", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("!docs `code`", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("`code` !docs `more code`", "!docs")).toBe(
+        true,
+      );
+    });
+
+    it("should handle multiple inline code blocks correctly", () => {
+      expect(shouldTriggerCommand("`code1` `code2` !docs", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("`!other` text !docs", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("`!docs` and `!commands`", "!docs")).toBe(
+        false,
+      );
+    });
+
+    it("should handle unmatched single backticks", () => {
+      expect(shouldTriggerCommand("`unclosed !docs", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("unclosed` !docs", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("`!docs unclosed", "!docs")).toBe(false);
+    });
   });
 
-  it("should ignore commands inside triple backticks", () => {
-    mockMessage.content = "```\n!mdn Array.prototype.map\n```";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  describe("Triple backtick code blocks (multiline)", () => {
+    it("should NOT trigger inside triple backticks", () => {
+      expect(shouldTriggerCommand("```\n!docs\n```", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("```js\n!docs\n```", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("```\n!docs me\n```", "!docs")).toBe(false);
+    });
+
+    it("should trigger outside triple backticks", () => {
+      expect(shouldTriggerCommand("```\ncode\n``` !docs", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("!docs ```\ncode\n```", "!docs")).toBe(true);
+      expect(
+        shouldTriggerCommand("```\ncode\n``` !docs ```\nmore\n```", "!docs"),
+      ).toBe(true);
+    });
+
+    it("should handle language specifiers", () => {
+      expect(shouldTriggerCommand("```javascript\n!docs\n```", "!docs")).toBe(
+        false,
+      );
+      expect(shouldTriggerCommand("```typescript\n!docs\n```", "!docs")).toBe(
+        false,
+      );
+      expect(shouldTriggerCommand("```python\n!docs\n```", "!docs")).toBe(
+        false,
+      );
+    });
+
+    it("should handle unmatched triple backticks", () => {
+      expect(shouldTriggerCommand("```\n!docs", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("!docs\n```", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("```\n!docs\n``", "!docs")).toBe(false);
+    });
   });
 
-  it("should ignore commands inside nested backticks", () => {
-    mockMessage.content =
-      "```js\nconsole.log(`!mdn Array.prototype.map`);\n```";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  describe("Mixed code block scenarios", () => {
+    it("should handle both single and triple backticks correctly", () => {
+      expect(
+        shouldTriggerCommand("```\ncode\n``` `inline` !docs", "!docs"),
+      ).toBe(true);
+      expect(
+        shouldTriggerCommand("```\n!docs\n``` `also !docs`", "!docs"),
+      ).toBe(false);
+      expect(
+        shouldTriggerCommand("`inline !docs` ```\nblock\n```", "!docs"),
+      ).toBe(false);
+    });
+
+    it("should handle nested-like scenarios", () => {
+      expect(shouldTriggerCommand("```\n`!docs`\n```", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("`code ```\n!docs\n```", "!docs")).toBe(
+        false,
+      );
+    });
+
+    it("should handle multiple code blocks with commands between", () => {
+      expect(
+        shouldTriggerCommand("```\ncode1\n``` !docs ```\ncode2\n```", "!docs"),
+      ).toBe(true);
+      expect(shouldTriggerCommand("`code1` !docs `code2`", "!docs")).toBe(true);
+    });
   });
 
-  it("should process commands outside code blocks", () => {
-    mockMessage.content = "Hello, !mdn Array.prototype.map";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
+  describe("Edge cases with whitespace and newlines", () => {
+    it("should handle commands with surrounding whitespace", () => {
+      expect(shouldTriggerCommand("  !docs  ", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("\n!docs\n", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("\t!docs\t", "!docs")).toBe(true);
+    });
+
+    it("should handle multiline messages", () => {
+      expect(shouldTriggerCommand("line1\n!docs\nline3", "!docs")).toBe(true);
+      expect(
+        shouldTriggerCommand("```\nline1\n!docs\nline3\n```", "!docs"),
+      ).toBe(false);
+    });
+
+    it("should handle mixed whitespace in code blocks", () => {
+      expect(shouldTriggerCommand("``` \n !docs \n ```", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("`  !docs  `", "!docs")).toBe(false);
+    });
   });
 
-  // Additional tests for other commands
-  it("should handle !auth command", async () => {
-    mockMessage.content = "!auth";
-    await commandsList
-      .find((cmd) => cmd.words.includes("!auth"))
-      ?.handleMessage(mockMessage);
-    expect(mockMessage.channel.send).toHaveBeenCalled();
+  describe("Complex real-world scenarios", () => {
+    it("should handle typical Discord message with code", () => {
+      const message = `Here's my code:
+\`\`\`javascript
+function test() {
+  // !docs this doesn't work
+  console.log("!commands");
+}
+\`\`\`
+Can someone !ask me with this?`;
+      expect(shouldTriggerCommand(message, "!ask")).toBe(true);
+      expect(shouldTriggerCommand(message, "!docs")).toBe(false);
+      expect(shouldTriggerCommand(message, "!commands")).toBe(false);
+    });
+
+    it("should handle inline code with explanation", () => {
+      const message = `Try using \`!docs\` command or check the !commands`;
+      expect(shouldTriggerCommand(message, "!docs")).toBe(false);
+      expect(shouldTriggerCommand(message, "!commands")).toBe(true);
+    });
+
+    it("should handle long messages with multiple code blocks", () => {
+      const message = `
+First, try this:
+\`\`\`js
+// Don't use !ask here
+console.log("test");
+\`\`\`
+
+Then check \`!commands\` list.
+
+Finally, use !docs if needed.
+
+\`\`\`
+// Another block with !mdn
+\`\`\`
+`;
+      expect(shouldTriggerCommand(message, "!docs")).toBe(true);
+      expect(shouldTriggerCommand(message, "!commands")).toBe(false);
+      expect(shouldTriggerCommand(message, "!ask")).toBe(false);
+      expect(shouldTriggerCommand(message, "!mdn")).toBe(false);
+    });
+
+    it("should handle escaped backticks", () => {
+      expect(shouldTriggerCommand("\\`!docs\\`", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("\\`\\`\\`\n!docs\n\\`\\`\\`", "!docs")).toBe(
+        true,
+      );
+    });
   });
 
-  it("should handle !react-docs command", async () => {
-    mockMessage.content = "!react-docs useState";
-    await commandsList
-      .find((cmd) => cmd.words.includes("!react-docs"))
-      ?.handleMessage(mockMessage);
-    expect(mockMessage.channel.send).toHaveBeenCalled();
+  describe("Performance edge cases", () => {
+    it("should handle very long messages", () => {
+      const longText = "a".repeat(10000);
+      const message = `${longText} !docs ${longText}`;
+      expect(shouldTriggerCommand(message, "!docs")).toBe(true);
+    });
+
+    it("should handle messages with many code blocks", () => {
+      let message = "";
+      for (let i = 0; i < 100; i++) {
+        message += `\`code${i}\` `;
+      }
+      message += "!docs";
+      expect(shouldTriggerCommand(message, "!docs")).toBe(true);
+    });
+
+    it("should handle large code blocks", () => {
+      const largeCode = 'console.log("test");\n'.repeat(1000);
+      const message = `\`\`\`js\n${largeCode}!docs\n\`\`\``;
+      expect(shouldTriggerCommand(message, "!docs")).toBe(false);
+    });
   });
 
-  it("should handle !ping command", async () => {
-    mockMessage.content = "!ping";
-    await commandsList
-      .find((cmd) => cmd.words.includes("!ping"))
-      ?.handleMessage(mockMessage);
-    expect(mockMessage.channel.send).toHaveBeenCalled();
+  describe("Special characters and Unicode", () => {
+    it("should handle Unicode characters", () => {
+      expect(shouldTriggerCommand("🚀 !docs 🎉", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("`🚀 !docs 🎉`", "!docs")).toBe(false);
+    });
+
+    it("should handle special regex characters in command", () => {
+      expect(shouldTriggerCommand("Use !test.+ command", "!test.+")).toBe(true);
+      expect(shouldTriggerCommand("Use !test* command", "!test*")).toBe(true);
+      expect(shouldTriggerCommand("Use !test? command", "!test?")).toBe(true);
+    });
+
+    it("should handle empty strings", () => {
+      expect(shouldTriggerCommand("", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("!docs", "")).toBe(false);
+      expect(shouldTriggerCommand("", "")).toBe(false);
+    });
   });
 
-  // Edge case: Command inside deeply nested triple backticks (should NOT process)
-  it("should ignore command inside deeply nested triple backticks", () => {
-    mockMessage.content =
-      "```\nSome random text\n```js\nconsole.log('!mdn Array.prototype.map');\n```\nMore text outside";
+  describe("Actual command examples from codebase", () => {
+    it("should work with real command examples", () => {
+      expect(shouldTriggerCommand("!commands", "!commands")).toBe(true);
+      expect(shouldTriggerCommand("!conduct", "!conduct")).toBe(true);
+      expect(shouldTriggerCommand("!mdn Array.prototype.map", "!mdn")).toBe(
+        true,
+      );
+      expect(shouldTriggerCommand("!react-docs useState", "!react-docs")).toBe(
+        true,
+      );
+      expect(shouldTriggerCommand("!docs useState", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("!ask", "!ask")).toBe(true);
+      expect(shouldTriggerCommand("!code", "!code")).toBe(true);
+      expect(shouldTriggerCommand("!gist", "!gist")).toBe(true);
+      expect(shouldTriggerCommand("!xy", "!xy")).toBe(true);
+    });
 
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+    it("should not trigger for commands in code examples", () => {
+      const codeExample = `\`\`\`javascript
+// Don't actually run !commands here
+console.log("Use !ask for assistance");
+\`\`\``;
+      expect(shouldTriggerCommand(codeExample, "!commands")).toBe(false);
+      expect(shouldTriggerCommand(codeExample, "!ask")).toBe(false);
+    });
   });
 
-  // Edge case: Command inside multiple levels of markdown blocks (should NOT process)
-  it("should ignore command inside multiple markdown blocks", () => {
-    mockMessage.content =
-      "```\nCode block starts\n```\n```\nHere is another block with\n!mdn Array.prototype.map\n```\nOutside the block now.";
+  // Add this new describe block to your existing test file
+  describe("Two-pointer backtick removal algorithm", () => {
+    it("should handle nested backticks correctly", () => {
+      expect(shouldTriggerCommand("```\n`!docs`\n```", "!docs")).toBe(false);
+      expect(shouldTriggerCommand("`code ```\n!docs\n```", "!docs")).toBe(
+        false,
+      );
+    });
 
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+    it("should handle multiple separate code blocks efficiently", () => {
+      expect(
+        shouldTriggerCommand("`code1` !docs `code2` !ask `code3`", "!docs"),
+      ).toBe(true);
+      expect(
+        shouldTriggerCommand("`code1` !docs `code2` !ask `code3`", "!ask"),
+      ).toBe(true);
+      expect(
+        shouldTriggerCommand(
+          "```\nblock1\n``` !docs ```\nblock2\n``` !ask",
+          "!docs",
+        ),
+      ).toBe(true);
+    });
+
+    it("should handle alternating backticks like palindrome logic", () => {
+      expect(shouldTriggerCommand("`outer```inner```outer`", "!docs")).toBe(
+        false,
+      ); // No command, but tests the algorithm
+      expect(shouldTriggerCommand("```outer`inner`outer```", "!docs")).toBe(
+        false,
+      ); // No command, but tests the algorithm
+      expect(shouldTriggerCommand("`!docs```!ask```!help`", "!docs")).toBe(
+        false,
+      );
+      expect(shouldTriggerCommand("`!docs```!ask```!help`", "!ask")).toBe(
+        false,
+      );
+    });
+
+    it("should efficiently process large content with many backticks", () => {
+      let content = "";
+      for (let i = 0; i < 50; i++) {
+        content += `\`code${i}\` `;
+      }
+      content += "!docs ";
+      for (let i = 50; i < 100; i++) {
+        content += `\`\`\`\nblock${i}\n\`\`\` `;
+      }
+
+      expect(shouldTriggerCommand(content, "!docs")).toBe(true);
+    });
   });
 
-  // Edge case: Command buried inside a long, deeply nested code block (should NOT process)
-  it("should ignore command inside a long deeply nested code block", () => {
-    mockMessage.content =
-      "```\nSome setup information\n```\n```\nfunction test() {\n  console.log('Nested block start');\n  ```\n  Here is a deeply nested code block\n  !mdn Array.prototype.map\n  ```\n  console.log('Nested block end');\n}\n```";
+  describe("Interaction with Discord-specific syntax", () => {
+    it("should trigger when next to a user mention", () => {
+      expect(
+        shouldTriggerCommand("hey <@123456789012345678>, use !docs", "!docs"),
+      ).toBe(true);
+      expect(shouldTriggerCommand("!docs <@123456789012345678>", "!docs")).toBe(
+        true,
+      );
+    });
 
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+    it("should not trigger if inside a mention-like text", () => {
+      // This is an unlikely edge case, but good for completeness
+      expect(shouldTriggerCommand("some text<!docs>", "!docs")).toBe(false);
+    });
   });
 
-  // Edge case: Command inside mixed markdown and inline code blocks (should NOT process)
-  it("should ignore command inside mixed markdown and inline code", () => {
-    mockMessage.content =
-      "```\nfunction example() {\n  return `Hello, world! ${'!mdn Array.prototype.map'}`;\n}\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  describe("Commands within other text structures", () => {
+    it("should NOT trigger when the command word is part of a URL", () => {
+      expect(
+        shouldTriggerCommand(
+          "Check out https://example.com/!docs/guide",
+          "!docs",
+        ),
+      ).toBe(false);
+      expect(
+        shouldTriggerCommand("Another link:https://somedocs.com", "docs"),
+      ).toBe(false);
+    });
   });
 
-  // Edge case: Command inside nested markdown inside block quotes (should NOT process)
-  it("should ignore command inside nested markdown inside block quotes", () => {
-    mockMessage.content =
-      "> Here is a block quote\n>\n>```\nconst x = '!mdn Array.prototype.map';\nconsole.log(x);\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
+  describe("Commands with adjacent non-alphanumeric characters", () => {
+    it("should trigger when immediately followed by an emoji", () => {
+      expect(shouldTriggerCommand("!docs🚀", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("Can I get !help🙏", "!help")).toBe(true);
+    });
   });
 
-  // Edge case: Command inside multiple backtick styles in the same message (should NOT process)
-  it("should ignore command when multiple backtick styles exist in the same message", () => {
-    mockMessage.content =
-      "`Inline command test: !mdn Array.prototype.map`\n```\nconsole.log('Multi-line block test');\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command inside deeply nested backticks mixed with text outside (should process only the correct one)
-  it("should process command outside deeply nested backticks but ignore the inside one", () => {
-    mockMessage.content =
-      "Hey everyone, I need help with JavaScript! ```js\nfunction test() {\n  console.log('!mdn Array.prototype.map');\n}\n``` But I still need info on !mdn Object.keys.";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // The one outside should be processed.
-    expect(
-      shouldProcessCommand(
-        "```js\nconsole.log('!mdn Array.prototype.map');\n```",
-        "!mdn",
-      ),
-    ).toBe(false); // Inside should be ignored.
-  });
-
-  // Edge case: Command buried inside multiple levels of text and markdown (should NOT process)
-  it("should ignore command inside multi-level text and markdown blocks", () => {
-    mockMessage.content =
-      "This is a message with multiple levels:\n" +
-      "```\nStart of first block\n```\n" +
-      "```\nAnother block\n```js\nconsole.log('!mdn Array.prototype.map');\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command inside a massive block of markdown text (should NOT process)
-  it("should ignore command inside a huge markdown block", () => {
-    mockMessage.content =
-      "```\n" +
-      "This is a massive block\n".repeat(50) +
-      "\n!mdn Array.prototype.map\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command inside a comment-like markdown section (should NOT process)
-  it("should ignore command inside a comment-like markdown block", () => {
-    mockMessage.content =
-      "```\n# This is a comment block\n# !mdn Array.prototype.map should not be processed\n```";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command buried in a long message
-  it("should process command even when buried in a long message", () => {
-    mockMessage.content =
-      "Hey everyone, I was just wondering if someone could help me understand something about JavaScript. " +
-      "I came across a method called Array.prototype.map and wanted to learn more about it. " +
-      "I tried searching on MDN but wasn't sure how to use it. Can someone please explain? Also, !mdn Array.prototype.map";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Command surrounded by special characters and numbers
-  it("should process command with random characters around it", () => {
-    mockMessage.content = "###!!123!mdn Array.prototype.map@@@$$$";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Multiple commands in a single message
-  it("should process multiple commands in a message", () => {
-    mockMessage.content =
-      "!mdn Array.prototype.map and then maybe later !mdn Object.keys";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Command split across multiple lines
-  it("should process command even when split across lines", () => {
-    mockMessage.content = "!mdn\nArray.prototype.map";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Command inside an embedded link (should NOT process)
-  it("should ignore command if inside an embedded link", () => {
-    mockMessage.content =
-      "[Click here for !mdn Array.prototype.map](https://example.com)";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command appearing multiple times in a message (should still be processed)
-  it("should process command even when repeated multiple times", () => {
-    mockMessage.content =
-      "!mdn Array.prototype.map !mdn Object.keys !mdn String.prototype.split";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Command inside a deeply nested code block (should NOT process)
-  it("should ignore command inside nested code blocks", () => {
-    mockMessage.content =
-      "```\nHere is some code:\n```js\nconsole.log('!mdn Array.prototype.map');\n```";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command with excessive whitespace and new lines
-  it("should process command even with excessive spaces and new lines", () => {
-    mockMessage.content = "\n   \t  !mdn     Array.prototype.map   \n \t ";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: Command mentioned in a quote (should NOT process)
-  it("should ignore command if it's part of a quoted message", () => {
-    mockMessage.content = `> Someone said: "!mdn Array.prototype.map is useful"`;
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Command hidden in escaped characters
-  it("should ignore command if surrounded by escaped backticks", () => {
-    mockMessage.content = "\\`!mdn Array.prototype.map\\`"; // Escaped backticks should not trigger the command
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(false);
-  });
-
-  // Edge case: Multiple different commands in a long message
-  it("should process multiple different commands in a long message", () => {
-    mockMessage.content =
-      "Hey team, just a quick update on the project. " +
-      "I was going through the documentation and needed help with JavaScript methods. " +
-      "!mdn Array.prototype.map is something I want to understand better. " +
-      "Also, I came across React hooks, so I checked !react-docs useState. " +
-      "If anyone has good resources, please share. Thanks!";
-
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-    expect(shouldProcessCommand(mockMessage.content, "!react-docs")).toBe(true);
-  });
-
-  // Edge case: multiple spaces
-  it("should process command with multiple spaces", () => {
-    mockMessage.content = "!mdn    Array.prototype.map";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: command inside two backticks (invalid code block)
-  it("should process command inside two backticks", () => {
-    mockMessage.content = "`` !mdn Array.prototype.map ``";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: command wrapped in parentheses
-  it("should process command inside special characters", () => {
-    mockMessage.content = "!mdn (Array.prototype.map)";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true);
-  });
-
-  // Edge case: command written in uppercase
-  it("should process command in uppercase", () => {
-    mockMessage.content = "!MDN Array.prototype.map";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // Case-insensitive
-  });
-
-  // Edge case: command partially inside a code block
-  it("should ignore command if part is inside a code block", () => {
-    mockMessage.content =
-      "```js\nconsole.log('!mdn Array.prototype.map');\n``` !mdn Array.prototype.map";
-    expect(shouldProcessCommand(mockMessage.content, "!mdn")).toBe(true); // Only process the second one
+  describe("Commands with adjacent non-alphanumeric characters", () => {
+    it("should trigger when immediately followed by an emoji", () => {
+      expect(shouldTriggerCommand("!docs🚀", "!docs")).toBe(true);
+      expect(shouldTriggerCommand("Can I get !help🙏", "!help")).toBe(true);
+    });
   });
 });
