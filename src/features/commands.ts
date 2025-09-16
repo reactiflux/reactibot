@@ -1335,9 +1335,9 @@ const escapeRegex = (string: string): string => {
 };
 
 /**
-* Checks if a command word exists in a string, ignoring any commands
-* found inside Markdown code blocks (both single ` and triple ```).
-*/
+ * Checks if a command word exists in a string, ignoring any commands
+ * found inside Markdown code blocks (both single ` and triple ```).
+ */
 
 export const shouldTriggerCommand = (
   content: string,
@@ -1374,7 +1374,7 @@ export const shouldTriggerCommand = (
     .replace(/\uE001/g, "```")
     .replace(/\uE000/g, "`");
 
-  // 6. Create a regular expression to find the command as a "whole word" 
+  // 6. Create a regular expression to find the command as a "whole word"
   const commandRegex = new RegExp(
     `(?<![\\w/<])${escapeRegex(commandWord)}(?!\\w)`,
     "i",
