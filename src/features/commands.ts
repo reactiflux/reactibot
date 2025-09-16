@@ -1329,13 +1329,16 @@ create-react-app is deprecated and no longer recommended for use. It is not main
   },
 ];
 
-//Regex to check commands inside codeblocks
-// Keep this helper function as it is correct
+// Escapes characters in a string that have special meaning in regular expressions.
 const escapeRegex = (string: string): string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
-// Replace the old `shouldTriggerCommand` and remove `removeBacktickContent`
+/**
+* Checks if a command word exists in a string, ignoring any commands
+* found inside Markdown code blocks (both single ` and triple ```).
+*/
+
 export const shouldTriggerCommand = (
   content: string,
   commandWord: string,
@@ -1345,29 +1348,35 @@ export const shouldTriggerCommand = (
     return false;
   }
 
-  // This simple parsing strategy correctly removes content inside code blocks.
-  // 1. Split by ```. Even-indexed parts are outside code blocks.
+  // 1. Sanitize the content by replacing escaped backticks with placeholders.
   const sanitizedContent = content
     .replace(/\\```/g, "\uE001") // Placeholder for escaped ```
     .replace(/\\`/g, "\uE000"); // Placeholder for escaped `
 
+  // 2. Isolate content outside of multi-line code blocks.
+  // By splitting by ```, the even-indexed parts of the array are the sections
+  // of text that are *outside* the code blocks.
   const partsOutsideTripleBackticks = sanitizedContent
     .split("```")
     .filter((_, i) => i % 2 === 0);
 
+  // 3. From the remaining parts, isolate content outside of inline code blocks.
+  // We do the same process for single backticks on each of the remaining parts.
   const partsOutsideAllBackticks = partsOutsideTripleBackticks.flatMap((part) =>
     part.split("`").filter((_, i) => i % 2 === 0),
   );
 
+  // 4. Rebuild the string with all code block content now removed.
   const processedContent = partsOutsideAllBackticks.join("");
 
-  // Restore the literal backticks from the placeholders.
+  // 5. Restore the literal backticks from the placeholders.
   const finalContent = processedContent
     .replace(/\uE001/g, "```")
     .replace(/\uE000/g, "`");
 
+  // 6. Create a regular expression to find the command as a "whole word" 
   const commandRegex = new RegExp(
-    `(?<!\\w)${escapeRegex(commandWord)}(?!\\w)`,
+    `(?<![\\w/<])${escapeRegex(commandWord)}(?!\\w)`,
     "i",
   );
 
