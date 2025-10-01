@@ -1311,6 +1311,60 @@ create-react-app is deprecated and no longer recommended for use. It is not main
   },
 ];
 
+// Escapes characters in a string that have special meaning in regular expressions.
+const escapeRegex = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+/**
+ * Checks if a command word exists in a string, ignoring any commands
+ * found inside Markdown code blocks (both single ` and triple ```).
+ */
+
+export const shouldTriggerCommand = (
+  content: string,
+  commandWord: string,
+): boolean => {
+  // A command word must exist to trigger a command.
+  if (!commandWord) {
+    return false;
+  }
+
+  // 1. Sanitize the content by replacing escaped backticks with placeholders.
+  const sanitizedContent = content
+    .replace(/\\```/g, "\uE001") // Placeholder for escaped ```
+    .replace(/\\`/g, "\uE000"); // Placeholder for escaped `
+
+  // 2. Isolate content outside of multi-line code blocks.
+  // By splitting by ```, the even-indexed parts of the array are the sections
+  // of text that are *outside* the code blocks.
+  const partsOutsideTripleBackticks = sanitizedContent
+    .split("```")
+    .filter((_, i) => i % 2 === 0);
+
+  // 3. From the remaining parts, isolate content outside of inline code blocks.
+  // We do the same process for single backticks on each of the remaining parts.
+  const partsOutsideAllBackticks = partsOutsideTripleBackticks.flatMap((part) =>
+    part.split("`").filter((_, i) => i % 2 === 0),
+  );
+
+  // 4. Rebuild the string with all code block content now removed.
+  const processedContent = partsOutsideAllBackticks.join("");
+
+  // 5. Restore the literal backticks from the placeholders.
+  const finalContent = processedContent
+    .replace(/\uE001/g, "```")
+    .replace(/\uE000/g, "`");
+
+  // 6. Create a regular expression to find the command as a "whole word"
+  const commandRegex = new RegExp(
+    `(?<![\\w/<])${escapeRegex(commandWord)}(?!\\w)`,
+    "i",
+  );
+
+  return commandRegex.test(finalContent);
+};
+
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
     Reactiflux: [],
@@ -1368,7 +1422,7 @@ const commands: ChannelHandlers = {
 
     commandsList.forEach((command) => {
       const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
+        return shouldTriggerCommand(msg.content, word);
       });
 
       if (keyword) {
