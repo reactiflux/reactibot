@@ -1255,15 +1255,16 @@ Authentication is a critical part of most web applications. Here are some resour
 - [TheCopenhagenBook](https://thecopenhagenbook.com/)
 - [OWASP Auth Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [OWASP Session Cheatsheet](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
+- [Lucia](https://lucia-auth.com/)
 `,
             inline: true,
           },
           {
             name: "Authentication Libraries",
             value: `
-- [Lucia](https://lucia-auth.com/)
 - [Auth.js](https://authjs.dev/)
 - [Passport](http://www.passportjs.org/)
+- [Better Auth](https://www.better-auth.com/)
 `,
             inline: true,
           },
