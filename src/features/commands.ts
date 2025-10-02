@@ -1420,21 +1420,49 @@ const commands: ChannelHandlers = {
       return;
     }
 
-    commandsList.forEach((command) => {
-      const keyword = command.words.find((word) => {
-        return shouldTriggerCommand(msg.content, word);
-      });
+    const { content } = msg;
 
-      if (keyword) {
-        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(
-          msg.author.id,
-          `commands.${keyword}`,
-          command.cooldown,
-        );
-        command.handleMessage(msg);
-      }
-    });
+    // 1. CHEAP GUARD CLAUSE: If the message doesn't even contain a '!',
+    // it can't be a command. Exit immediately. This handles >99% of messages
+    // with virtually zero overhead.
+    if (!content.trim().startsWith("!")) {
+      return;
+    }
+
+    // 2. EXTRACT POTENTIAL COMMAND: Get the first word, which is the only
+    // possible command trigger. This is also a very cheap operation.
+    const potentialCommandWord = content.trim().split(" ")[0];
+
+    // 3. FIND THE COMMAND OBJECT: Quickly find the corresponding command object
+    // from the list. This is a fast lookup.
+    const command = commandsList.find((c) =>
+      c.words.includes(potentialCommandWord),
+    );
+
+    // If no command object matches the word, it's not a valid command. Exit.
+    if (!command) {
+      return;
+    }
+
+    // 4. EXPENSIVE CHECK (LAST RESORT): Now, and ONLY NOW, we run our expensive
+    // check because we are highly confident this is an attempt to use a valid command.
+    // We confirm it's not inside a code block.
+    if (!shouldTriggerCommand(content, potentialCommandWord)) {
+      return;
+    }
+
+    // 5. EXECUTE: All checks have passed. Apply cooldown and run the command.
+    if (cooldown.hasCooldown(msg.author.id, `commands.${potentialCommandWord}`)) {
+      return;
+    }
+    
+    cooldown.addCooldown(
+      msg.author.id,
+      `commands.${potentialCommandWord}`,
+      command.cooldown,
+    );
+    
+    command.handleMessage(msg);
   },
 };
 
