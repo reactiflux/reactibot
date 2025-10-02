@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "npm-run-all --parallel dev:bot dev:test",
+    "dev": "npm-run-all --parallel 'dev:*'",
     "dev:bot": "tsx --watch ./src/index.ts",
     "dev:test": "vitest",
     "build": "tsc -b",
