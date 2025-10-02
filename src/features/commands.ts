@@ -1452,16 +1452,18 @@ const commands: ChannelHandlers = {
     }
 
     // 5. EXECUTE: All checks have passed. Apply cooldown and run the command.
-    if (cooldown.hasCooldown(msg.author.id, `commands.${potentialCommandWord}`)) {
+    if (
+      cooldown.hasCooldown(msg.author.id, `commands.${potentialCommandWord}`)
+    ) {
       return;
     }
-    
+
     cooldown.addCooldown(
       msg.author.id,
       `commands.${potentialCommandWord}`,
       command.cooldown,
     );
-    
+
     command.handleMessage(msg);
   },
 };
