@@ -227,7 +227,7 @@ addHandler(
   ],
   jobScanner,
 );
-const threadChannels = [CHANNELS.helpJs, CHANNELS.helpThreadsReact];
+const threadChannels: string[] = [];
 addHandler(threadChannels, autothread);
 
 addHandler(CHANNELS.resumeReview, resumeReviewPdf);
