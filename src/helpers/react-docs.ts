@@ -128,4 +128,7 @@ const REACT_AVAILABLE_DOCS = [
   "react-dom/static/prerender",
   "react-dom/static/prerenderToNodeStream",
   "react/Activity",
+  "react/useEffectEvent",
+  "react/useDeferredValue",
+  "react/useTransition",
 ];
