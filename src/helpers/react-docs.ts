@@ -133,6 +133,4 @@ const REACT_AVAILABLE_DOCS = [
   "react-dom/static/resume",
   "react-dom/static/resumeAndPrerender",
   "react-dom/static/resumeToPipeableStream",
-  "react-dom/server/renderToReadableStream",
-  "react-dom/static/prerender",
 ];
