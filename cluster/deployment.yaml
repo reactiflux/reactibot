@@ -1,11 +1,12 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: reactibot-deployment
+  name: reactibot
 spec:
   selector:
     matchLabels:
       app: reactibot
+  serviceName: "reactibot-service"
   replicas: 1
   template:
     metadata:
@@ -58,3 +59,15 @@ spec:
                 secretKeyRef:
                   name: reactibot-env
                   key: REACTIBOT_API_KEY
+          volumeMounts:
+            - name: reactibot-data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: reactibot-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi
