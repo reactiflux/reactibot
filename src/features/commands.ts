@@ -1330,6 +1330,60 @@ create-react-app is deprecated and no longer recommended for use. It is not main
   },
 ];
 
+// Escapes characters in a string that have special meaning in regular expressions.
+const escapeRegex = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+/**
+ * Checks if a command word exists in a string, ignoring any commands
+ * found inside Markdown code blocks (both single ` and triple ```).
+ */
+
+export const shouldTriggerCommand = (
+  content: string,
+  commandWord: string,
+): boolean => {
+  // A command word must exist to trigger a command.
+  if (!commandWord) {
+    return false;
+  }
+
+  // 1. Sanitize the content by replacing escaped backticks with placeholders.
+  const sanitizedContent = content
+    .replace(/\\```/g, "\uE001") // Placeholder for escaped ```
+    .replace(/\\`/g, "\uE000"); // Placeholder for escaped `
+
+  // 2. Isolate content outside of multi-line code blocks.
+  // By splitting by ```, the even-indexed parts of the array are the sections
+  // of text that are *outside* the code blocks.
+  const partsOutsideTripleBackticks = sanitizedContent
+    .split("```")
+    .filter((_, i) => i % 2 === 0);
+
+  // 3. From the remaining parts, isolate content outside of inline code blocks.
+  // We do the same process for single backticks on each of the remaining parts.
+  const partsOutsideAllBackticks = partsOutsideTripleBackticks.flatMap((part) =>
+    part.split("`").filter((_, i) => i % 2 === 0),
+  );
+
+  // 4. Rebuild the string with all code block content now removed.
+  const processedContent = partsOutsideAllBackticks.join("");
+
+  // 5. Restore the literal backticks from the placeholders.
+  const finalContent = processedContent
+    .replace(/\uE001/g, "```")
+    .replace(/\uE000/g, "`");
+
+  // 6. Create a regular expression to find the command as a "whole word"
+  const commandRegex = new RegExp(
+    `(?<![\\w/<])${escapeRegex(commandWord)}(?!\\w)`,
+    "i",
+  );
+
+  return commandRegex.test(finalContent);
+};
+
 const createCommandsMessage = () => {
   const groupedMessages: { [key in Categories]: Command[] } = {
     Reactiflux: [],
@@ -1385,21 +1439,51 @@ const commands: ChannelHandlers = {
       return;
     }
 
-    commandsList.forEach((command) => {
-      const keyword = command.words.find((word) => {
-        return msg.content.toLowerCase().includes(word);
-      });
+    const { content } = msg;
 
-      if (keyword) {
-        if (cooldown.hasCooldown(msg.author.id, `commands.${keyword}`)) return;
-        cooldown.addCooldown(
-          msg.author.id,
-          `commands.${keyword}`,
-          command.cooldown,
-        );
-        command.handleMessage(msg);
-      }
-    });
+    // 1. CHEAP GUARD CLAUSE: If the message doesn't even contain a '!',
+    // it can't be a command. Exit immediately. This handles >99% of messages
+    // with virtually zero overhead.
+    if (!content.trim().startsWith("!")) {
+      return;
+    }
+
+    // 2. EXTRACT POTENTIAL COMMAND: Get the first word, which is the only
+    // possible command trigger. This is also a very cheap operation.
+    const potentialCommandWord = content.trim().split(" ")[0];
+
+    // 3. FIND THE COMMAND OBJECT: Quickly find the corresponding command object
+    // from the list. This is a fast lookup.
+    const command = commandsList.find((c) =>
+      c.words.includes(potentialCommandWord),
+    );
+
+    // If no command object matches the word, it's not a valid command. Exit.
+    if (!command) {
+      return;
+    }
+
+    // 4. EXPENSIVE CHECK (LAST RESORT): Now, and ONLY NOW, we run our expensive
+    // check because we are highly confident this is an attempt to use a valid command.
+    // We confirm it's not inside a code block.
+    if (!shouldTriggerCommand(content, potentialCommandWord)) {
+      return;
+    }
+
+    // 5. EXECUTE: All checks have passed. Apply cooldown and run the command.
+    if (
+      cooldown.hasCooldown(msg.author.id, `commands.${potentialCommandWord}`)
+    ) {
+      return;
+    }
+
+    cooldown.addCooldown(
+      msg.author.id,
+      `commands.${potentialCommandWord}`,
+      command.cooldown,
+    );
+
+    command.handleMessage(msg);
   },
 };
 
