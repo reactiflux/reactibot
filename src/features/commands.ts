@@ -41,10 +41,10 @@ const sortedCategories: Categories[] = [
 const commandsList: Command[] = [
   {
     words: [`!ai`],
-    help: `explains why AI-generated responses should be avoided.`,
+    help: `explains why AI-generated responses should be avoided`,
     category: "Communication",
     handleMessage: (msg) => {
-      msg.reply({
+      msg.channel.send({
         embeds: [
           {
             title: "Please Avoid AI-Generated Posts",
