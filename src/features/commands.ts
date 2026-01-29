@@ -40,6 +40,24 @@ const sortedCategories: Categories[] = [
 
 const commandsList: Command[] = [
   {
+    words: [`!ai`],
+    help: `explains why AI-generated responses should be avoided.`,
+    category: "Communication",
+    handleMessage: (msg) => {
+      msg.reply({
+        embeds: [
+          {
+            title: "Please Avoid AI-Generated Posts",
+            type: EmbedType.Rich,
+            description:
+              "AI-generated responses may seem helpful but are often unverified or misleading unless you’ve personally tried them. This server is for human experience and discussion—many users are here specifically for firsthand insight rather than AI-generated answers. Sharing your own thoughts or experience helps everyone more.",
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!commands`],
     help: `lists all available commands`,
     category: "Reactiflux",
