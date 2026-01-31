@@ -381,6 +381,33 @@ Have a look at these resources on how to ask good questions:
     },
   },
   {
+    words: [`!security`],
+    help: `general information around managing security for a web application.`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Security Tips",
+            type: EmbedType.Rich,
+            description: `Managing security in a web application requires a proactive approach.
+
+Some points to consider:
+
+- Don't use create-react-app it is [no longer recommended](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
+- Set up automated alerts via a service like [dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to be notified of new disclosures.
+- Review packages either by inspecting the code or use a service like [Snyk](https://security.snyk.io/vuln/npm).
+- Proactively keep your technology up to date – (everything not just packages).
+- Test your code – follow safe practices (like sanitising errors) and ensure you audit features and functionality before pushing to prod.
+- Set up multi-factor authentication and avoid re-using passwords by implementing something like a password manager to avoid credential stuffing attacks.
+`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!code`, `!gist`],
     help: `explains how to attach code`,
     category: "Reactiflux",
