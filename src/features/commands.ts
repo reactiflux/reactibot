@@ -394,12 +394,14 @@ Have a look at these resources on how to ask good questions:
 
 Some points to consider:
 
-- Don't use create-react-app it is [no longer recommended](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
+- Don't use create-react-app it is [no longer supported](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
 - Set up automated alerts via a service like [dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to be notified of new disclosures.
-- Review packages either by inspecting the code or use a service like [Snyk](https://security.snyk.io/vuln/npm).
+- Review packages either by inspecting the code or using a service like [Snyk](https://security.snyk.io/vuln/npm).
+- Apply [secure coding principles and practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/02-checklist/05-checklist.html) - there are [free for open source tool](https://owasp.org/www-community/Free_for_Open_Source_Application_Security_Tools) like [Sonar Qube](https://www.sonarsource.com/open-source-editions/sonarqube-community-edition/) which help find common vulnerabilities like SQL injection, cross-site scripting (XSS), path traversal, and insecure configurations.
 - Proactively keep your technology up to date – (everything not just packages).
-- Test your code – follow safe practices (like sanitising errors) and ensure you audit features and functionality before pushing to prod.
-- Set up multi-factor authentication and avoid re-using passwords by implementing something like a password manager to avoid credential stuffing attacks.
+- Keep your identity safe online, don't reuse passwords, enable multi-factor authentication and use a password manager service.
+
+If you are ever unsure just ask! Better to be safe then sorry.
 `,
             color: EMBED_COLOR,
           },
