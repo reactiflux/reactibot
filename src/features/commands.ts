@@ -399,6 +399,35 @@ Have a look at these resources on how to ask good questions:
     },
   },
   {
+    words: [`!security`],
+    help: `general information around managing security for a web application.`,
+    category: "Reactiflux",
+    handleMessage: (msg) => {
+      msg.channel.send({
+        embeds: [
+          {
+            title: "Security Tips",
+            type: EmbedType.Rich,
+            description: `Managing security in a web application requires a proactive approach.
+
+Some points to consider:
+
+- Don't use create-react-app it is [no longer supported](https://react.dev/blog/2025/02/14/sunsetting-create-react-app).
+- Set up automated alerts via a service like [dependabot](https://docs.github.com/en/code-security/getting-started/dependabot-quickstart-guide) to be notified of new disclosures.
+- Review packages either by inspecting the code or using a service like [Snyk](https://security.snyk.io/vuln/npm).
+- Apply [secure coding principles and practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/02-checklist/05-checklist.html) - there are [free for open source tool](https://owasp.org/www-community/Free_for_Open_Source_Application_Security_Tools) like [Sonar Qube](https://www.sonarsource.com/open-source-editions/sonarqube-community-edition/) which help find common vulnerabilities like SQL injection, cross-site scripting (XSS), path traversal, and insecure configurations.
+- Proactively keep your technology up to date – (everything not just packages).
+- Keep your identity safe online, don't reuse passwords, enable multi-factor authentication and use a password manager service.
+
+If you are ever unsure just ask! Better to be safe then sorry.
+`,
+            color: EMBED_COLOR,
+          },
+        ],
+      });
+    },
+  },
+  {
     words: [`!code`, `!gist`],
     help: `explains how to attach code`,
     category: "Reactiflux",
