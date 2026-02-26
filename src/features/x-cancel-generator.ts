@@ -11,7 +11,7 @@ const xCancelGenerator: ChannelHandlers = {
     const [url] = match;
     const alternativeUrl = url.replace(/(x|twitter)\.com/i, "xcancel.com");
     await msg.channel.send(
-      `This \`x.com\` link has been converted to \`xcancel.com\` so that server members won't require an account to view content and threads:\n ${alternativeUrl}`,
+      `[Converted to \`xcancel.com\` for members with no \`x\` account](${alternativeUrl})`,
     );
   },
 };
