@@ -27,7 +27,7 @@ import voiceActivity from "./features/voice-activity.js";
 import type { ChannelHandlers } from "./types/index.js";
 import { scheduleMessages } from "./features/scheduled-messages.js";
 import tsPlaygroundLinkShortener from "./features/tsplay.js";
-import xCancelGenerator from "./features/xsplay.js";
+import xCancelGenerator from "./features/x-cancel-generator.js";
 import { CHANNELS, initCachedChannels } from "./constants/channels.js";
 import { scheduleTask } from "./helpers/schedule.js";
 import { discordToken, isProd } from "./helpers/env.js";
