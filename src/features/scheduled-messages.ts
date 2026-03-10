@@ -36,9 +36,7 @@ const MESSAGE_SCHEDULE: MessageConfig[] = [
   }
   */
   {
-    postTo: [
-      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.jobBoard },
-    ],
+    postTo: [{ interval: FREQUENCY.weekly, channelId: CHANNELS.jobBoard }],
     message: async (channel) => {
       if (channel.type !== ChannelType.GuildText) {
         return;
@@ -73,57 +71,9 @@ Moderators may remove posts at any time, with or without warning. Repeat violato
     },
   },
   {
-    postTo: [
-      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.helpJs },
-    ],
-    message: {
-      content: `This channel is good for specific questions about syntax, debugging a small (< ~50 lines of code) snippet of JS, without React involved. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
-
-How to ask for programming help <http://wp.me/p2oIwo-26>
-How do I ask a good question <https://stackoverflow.com/help/how-to-ask>
-`,
-    },
-  },
-  {
-    postTo: [{ interval: FREQUENCY.often, channelId: CHANNELS.helpReact }],
-    message: {
-      content: `This channel is good for specific questions about React, how React's features work, or debugging a small (< ~50 lines of code) snippet of JS that uses React. Question not getting answered? Maybe it's hard to answer, check out these resources for how to ask a good question:
-
-How to ask for programming help <http://wp.me/p2oIwo-26>
-How do I ask a good question <https://stackoverflow.com/help/how-to-ask>
-`,
-    },
-  },
-  {
-    postTo: [
-      { interval: FREQUENCY.moreThanWeekly, channelId: CHANNELS.helpReact },
-    ],
-    message: {
-      content: `Check our the other channels too! This is our highest-traffic channel, which may mean your question gets missed as other discussions happen.
-
-<#565213527673929729> For questions about pure Javscript problems.
-<#105765765117935616> For questions about CSS or other visual problems.
-<#145170347921113088> For questions about issues with your server code.
-<#105765859191975936> Get deeper review of a snippet of code.
-<#287623405946011648> If you have a question about your job or career, ask it in here.
-<#547620660482932737> Discussion of non-JS code, or that new laptop you're deciding on.
-<#108428584783220736> for questions about building, linting, generating, or otherwise processing your code.
-
-Looking for work? Trying to hire? Check out <#103882387330457600>, or <https://reactiflux.com/jobs>
-
-Has someone been really helpful? Shoutout who and what in <#798567961468076072>! We keep an eye in there as one way to find new MVPs. Give us all the reactions in there too!
-
-Please remember our Code of Conduct: <https://reactiflux.com/conduct>
-and our guidelines for promotion: <https://reactiflux.com/promotion>
-
-If you see anything that violates our rules, help alert the mods by reacting to it with 👎 or reporting it anonymously (right click > Apps > report message).
-`,
-    },
-  },
-  {
     postTo: [{ interval: FREQUENCY.weekly, channelId: CHANNELS.random }],
     message: {
-      content: `Have you read our Code of Conduct? <https://reactiflux.com/conduct>
+      content: `Have you read our [Code of Conduct](<https://reactiflux.com/conduct>)?
 
 Let us know if anything crosses a line: give it a 👎, or if you'd prefer to remain anonymous, let mods know from the message context menu (right click > Apps > report message) or with the form at <https://reactiflux.com/contact>`,
     },
