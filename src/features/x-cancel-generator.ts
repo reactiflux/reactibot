@@ -17,11 +17,13 @@ const xCancelGenerator: ChannelHandlers = {
     if (!match || msg.author.bot) return; // Ignore bots to prevent loops
     const isThreadChannel = THREAD_CHANNELS.includes(msg.channel.id);
     if (!isThreadChannel) {
-      msg.suppressEmbeds(true);
+      // The below line will suppress the original message embed (if ever required again in future)
+      // msg.suppressEmbeds(true);
       const [url] = match;
       const alternativeUrl = url.replace(/(x|twitter)\.com/i, "xcancel.com");
+      // Including the < brackets > around alternativeLink is recognized markdown to suppress an embed
       await msg.channel.send(
-        `[Converted to \`xcancel.com\` for members with no \`x\` account](${alternativeUrl})`,
+        `[Converted to \`xcancel.com\` for members with no \`x\` account](<${alternativeUrl}>)`,
       );
     }
   },
