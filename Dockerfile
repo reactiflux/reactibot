@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:24.22.1-alpine as build
 WORKDIR /build/reactibot
 
 COPY package.json package-lock.json ./
@@ -10,7 +10,7 @@ COPY src ./src
 RUN npm run test
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:24.22.1-alpine
 
 RUN apk --no-cache add \
   ghostscript \
