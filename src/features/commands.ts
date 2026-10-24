@@ -1045,6 +1045,7 @@ If you are feeling confident or are further along in career, feel free to make u
 
 https://hnhiring.com/
 https://whoishiring.io/
+https://gethnjobs.com/remote-hacker-news-jobs
 https://weworkremotely.com/
 https://remoteok.io/
 https://remotive.io/remote-jobs/software-dev
