@@ -22,12 +22,10 @@ import { retry } from "./retry.js";
 const openai = new OpenAI({
   apiKey: openAiKey,
 });
-const ASSISTANT_ID = "asst_cC1ghvaaMFFTs3C06ycXqjeH";
-
-// one-time setup tasks for the assistant, so the functionality is all local
-const configure = async () => {
-  await openai.beta.assistants.update(ASSISTANT_ID, {
-    instructions: `
+// The Assistants API was shut down on 2026-08-26, so the model and instructions that
+// used to live on the assistant are sent with each request instead.
+const RESUME_MODEL = "gpt-5.6-terra";
+const INSTRUCTIONS = `
 You are a hiring manager reading resumes of engineers and providing feedback. 
 
 You are part of Reactiflux, the Discord for React professionals, and were created by vcarl.
@@ -58,10 +56,7 @@ you are encouraged to occasionally use obscure words or make subtle puns. don't 
 take however smart you're acting right now and write in the same style but as if you were +2sd smarter
 
 use late millenial slang not boomer slang. mix in zoomer slang in tonally-inappropriate circumstances occasionally, but occasionally nail a zoomer zinger. make obscure gen x musical references if unavoidable
-`,
-  });
-};
-configure();
+`;
 
 export const resumeResources = async (bot: Client) => {
   bot.on("interactionCreate", async (interaction) => {
@@ -132,7 +127,7 @@ export const resumeResources = async (bot: Client) => {
       const response = await fetch(resume.url);
       const file = await openai.files.create({
         file: response,
-        purpose: "assistants",
+        purpose: "user_data",
       });
       if (!response.ok || file.status === "error") {
         await deferred.edit({
@@ -143,54 +138,41 @@ export const resumeResources = async (bot: Client) => {
 
       try {
         deferred.edit("Uploaded! Reviewing…");
-        const [assistant, thread] = await Promise.all([
-          openai.beta.assistants.retrieve(ASSISTANT_ID),
-          openai.beta.threads.create({
-            messages: [
-              {
-                role: "user",
-                content:
-                  "This user has requested help with their resume. Here is their message and resume:",
-              },
-              {
-                role: "user",
-                content: firstMessage.content || "Here is my resume",
-                attachments: [
-                  {
-                    file_id: file.id,
-                    tools: [{ type: "file_search" }],
-                  },
-                ],
-              },
-            ],
-          }),
-        ]);
+        channel?.sendTyping();
+        const aiResponse = await openai.responses.create({
+          model: RESUME_MODEL,
+          instructions: INSTRUCTIONS,
+          input: [
+            {
+              role: "user",
+              content:
+                "This user has requested help with their resume. Here is their message and resume:",
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "input_text",
+                  text: firstMessage.content || "Here is my resume",
+                },
+                { type: "input_file", file_id: file.id },
+              ],
+            },
+          ],
+        });
 
-        const run = await openai.beta.threads.runs.stream(
-          thread.id,
-          { assistant_id: assistant.id },
-          { stream: true },
+        const content = aiResponse.output_text;
+        const trimmed = content.slice(0, 2000) ?? "Oops! Something went wrong.";
+        logger.log(
+          "RESUME",
+          `Feedback given: ${constructDiscordLink(firstMessage)}`,
         );
-
-        run.on("textCreated", () => {
-          channel?.sendTyping();
+        logger.log("RESUME", trimmed);
+        deferred.edit({
+          content: "Done!",
         });
 
-        run.on("textDone", (content) => {
-          interaction.channel?.type;
-          const trimmed =
-            content.value.slice(0, 2000) ?? "Oops! Something went wrong.";
-          logger.log(
-            "RESUME",
-            `Feedback given: ${constructDiscordLink(firstMessage)}`,
-          );
-          logger.log("RESUME", trimmed);
-          deferred.edit({
-            content: "Done!",
-          });
-
-          channel?.send(content.value);
-        });
+        channel?.send(content);
       } catch (e) {
         // recover
         deferred.edit("Oops, something went wrong talking to the AI.");
