@@ -74,7 +74,7 @@ jobs:
           cat k8s-context
 
       - name: Set up kubectl
-        uses: matootie/dokube@v1.4.0
+        uses: matootie/dokube@ee111b5817358e3e0439c58985a36c7d6a737a15 # v1.4.0
         with:
           personalAccessToken: ${{ secrets.DIGITALOCEAN_TOKEN }}
           clusterName: k8s-rf
@@ -82,17 +82,21 @@ jobs:
       - name: Deploy app
         # `|| echo \n` is to allow each of these steps to return non-zero exits
         # I don't remember why that was valuable but I'm afraid to remove it
+        env:
+          DISCORD_HASH: ${{ secrets.DISCORD_HASH }}
+          DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
+          DISCORD_APP_ID: ${{ secrets.DISCORD_APP_ID }}
+          GUILD_ID: ${{ secrets.GUILD_ID }}
+          GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          AMPLITUDE_KEY: ${{ secrets.AMPLITUDE_KEY }}
+          REACTIBOT_API_KEY: ${{ secrets.REACTIBOT_API_KEY }}
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
         run: |
           kubectl diff -k . || echo \n
-          kubectl delete secret reactibot-env || echo \n
-          kubectl create secret generic reactibot-env \
-            --from-literal=DISCORD_HASH=${{ secrets.DISCORD_HASH }} \
-            --from-literal=DISCORD_PUBLIC_KEY=${{ secrets.DISCORD_PUBLIC_KEY }} \
-            --from-literal=DISCORD_APP_ID=${{ secrets.DISCORD_APP_ID }} \
-            --from-literal=GUILD_ID=${{ secrets.GUILD_ID }} \
-            --from-literal=GH_READ_TOKEN=${{ secrets.GH_READ_TOKEN }} \
-            --from-literal=AMPLITUDE_KEY=${{ secrets.AMPLITUDE_KEY }} \
-            --from-literal=REACTIBOT_API_KEY=${{ secrets.REACTIBOT_API_KEY }} \
-            --from-literal=OPENAI_KEY=${{ secrets.OPENAI_KEY }} \
-            || echo \n
+          args=()
+          for k in DISCORD_HASH DISCORD_PUBLIC_KEY DISCORD_APP_ID GUILD_ID GH_READ_TOKEN AMPLITUDE_KEY REACTIBOT_API_KEY OPENAI_KEY; do
+            args+=("--from-literal=$k=${!k}")
+          done
+          kubectl create secret generic reactibot-env "${args[@]}" \
+            --dry-run=client -o yaml | kubectl apply -f - || echo \n
           kubectl apply -k .
