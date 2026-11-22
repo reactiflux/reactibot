@@ -49,15 +49,17 @@ import { getMessage } from "./helpers/discord.js";
 
 export const bot = new Client({
   intents: [
+    // ponytail: privileged intents (GuildMembers, MessageContent) were revoked
+    // by Discord; requesting them fails login with 4014. Without them,
+    // msg.content/attachments/embeds are empty except in DMs and @mentions, and
+    // guildMember* events don't fire. Re-add once access is restored.
     IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMembers,
     IntentsBitField.Flags.GuildEmojisAndStickers,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.GuildMessageReactions,
     IntentsBitField.Flags.GuildVoiceStates,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.DirectMessageReactions,
-    IntentsBitField.Flags.MessageContent,
   ],
   partials: [Partials.Channel, Partials.Reaction, Partials.GuildMember],
 });
@@ -237,7 +239,9 @@ addHandler(
 );
 bot.on("ready", () => {
   deployCommands(bot);
-  jobsMod(bot);
+  // Disabled: without MessageContent every job post parses as empty, fails
+  // validation, and gets deleted. Restore with the MessageContent intent.
+  void jobsMod;
   resumeResources(bot);
   lookingForGroup(bot);
   voiceActivity(bot);
