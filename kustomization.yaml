@@ -7,6 +7,7 @@ resources:
   - cluster/service.yaml
   - cluster/deployment.yaml
   - cluster/ingress.yaml
+  - cluster/networkpolicy.yaml
 
 configMapGenerator:
   - name: k8s-context # this is an internal name

@@ -12,10 +12,39 @@ spec:
       labels:
         app: reactibot
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: tmp
+          emptyDir: {}
       containers:
         - name: reactibot
           image: $(IMAGE)
+          ports:
+            - containerPort: 3000
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
           env:
+            - name: HOME # npm (CMD) writes ~/.npm logs; /home/node is read-only
+              value: /tmp
             - name: ENVIRONMENT
               value: production
             - name: DISCORD_HASH
