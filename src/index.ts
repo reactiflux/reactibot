@@ -213,7 +213,7 @@ addHandler(
     CHANNELS.iBuiltThis,
     CHANNELS.iWroteThis,
     CHANNELS.techReadsAndNews,
-    CHANNELS.twitterFeed,
+    CHANNELS.skillshare,
   ],
   promotionThread,
 );
